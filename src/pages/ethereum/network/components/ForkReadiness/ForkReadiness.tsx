@@ -9,7 +9,7 @@ import type {
 } from '@/pages/ethereum/clients/api/client-models';
 import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
 import { groupForkIdNext, groupNextForkDigests, upcomingFork } from '@/pages/ethereum/clients/utils/census';
-import { formatShare, total } from '../../utils/network-census';
+import { formatShare, total } from '@/pages/ethereum/network/utils/network-census';
 
 export interface ForkReadinessProps {
   /** Consensus ENRs of the latest day */

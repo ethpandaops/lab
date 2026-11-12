@@ -2,8 +2,8 @@ import type { JSX } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { hoveredIndex, renderTooltip } from '../../utils/chart-tooltip';
-import { histogram } from '../../utils/node-stats';
+import { hoveredIndex, renderTooltip } from '@/pages/xatu/nodes/utils/chart-tooltip';
+import { histogram } from '@/pages/xatu/nodes/utils/node-stats';
 
 export interface ArrivalHistogramProps {
   title: string;
@@ -44,6 +44,7 @@ export function ArrivalHistogram({
     const index = hoveredIndex(params);
     if (index === null) return '';
     const start = starts[index];
+    if (start === undefined) return '';
     const isOverflow = start + bucketMs >= maxMs && values.some(value => value >= maxMs);
     const range = isOverflow
       ? `${(start / 1000).toFixed(2)}s+`

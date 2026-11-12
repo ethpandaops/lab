@@ -12,8 +12,8 @@ import {
 } from '@/api/@tanstack/react-query.gen';
 import type { FctSyncCommitteeParticipationByValidator } from '@/api/types.gen';
 import { useTableBounds } from '@/hooks/useBounds';
-import { useCursorPagination } from '../../hooks/useCursorPagination';
-import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
+import { useCursorPagination } from '@/pages/ethereum/validators/hooks/useCursorPagination';
+import { TableCard, TableSearch, ValidatorFilter } from '@/pages/ethereum/validators/components/TableCard';
 import { formatGwei } from './format';
 
 type SyncResult = 'all' | 'missed';

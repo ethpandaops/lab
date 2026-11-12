@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { memo, useState, useEffect, useLayoutEffect, useMemo, useRef, useCallback } from 'react';
 import ReactECharts from 'echarts-for-react';
 import * as echarts from 'echarts';
 import type { Map2DChartProps, PointData, PointNodeData, RouteData } from './Map2D.types';
@@ -63,6 +63,14 @@ function Map2DChartComponent({
   // Memoize style and opts objects to prevent ReactECharts from seeing new props every render
   const chartStyle = useMemo(() => ({ height, width: '100%', minHeight: height }), [height]);
   const chartOpts = useMemo(() => ({ renderer: 'canvas' as const }), []);
+
+  // zrender paints thousands of points over several animation frames and keeps going after
+  // ReactECharts disposes the chart, so the next frame throws. Clearing the chart first ends
+  // that paint. A layout effect's cleanup runs before ReactECharts unmounts.
+  useLayoutEffect(() => {
+    const chart = chartRef.current;
+    return () => chart?.getEchartsInstance().clear();
+  }, []);
 
   // Load and register world map on mount - retry every 5s on failure
   useEffect(() => {
@@ -407,7 +415,7 @@ function Map2DChartComponent({
 
   // Always render the map container
   return (
-    <div className="relative h-full w-full">
+    <div className="relative size-full">
       {/* Fixed hover panel at top */}
       {hoveredPoint && (
         <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">
@@ -427,11 +435,9 @@ function Map2DChartComponent({
                   </tr>
                 </thead>
                 <tbody>
-                  {hoveredPoint.nodes.map((node, idx) => (
-                    <tr key={`${node.nodeId}-${idx}`} className="text-foreground">
-                      <td className="max-w-[180px] truncate py-0.5 pr-4 font-mono text-2xs opacity-80">
-                        {node.nodeId}
-                      </td>
+                  {hoveredPoint.nodes.map(node => (
+                    <tr key={node.nodeId} className="text-foreground">
+                      <td className="max-w-45 truncate py-0.5 pr-4 font-mono text-2xs opacity-80">{node.nodeId}</td>
                       <td className="py-0.5 pr-4">{node.username || <span className="text-muted">—</span>}</td>
                       <td className="py-0.5 pr-4 capitalize">
                         {node.client ? (
@@ -467,7 +473,7 @@ function Map2DChartComponent({
         opts={chartOpts}
         onEvents={onEvents}
       />
-      <div className="pointer-events-none absolute bottom-2 left-2 rounded bg-surface px-2 py-1 text-xs text-muted">
+      <div className="pointer-events-none absolute bottom-2 left-2 rounded-xs bg-surface px-2 py-1 text-xs text-muted">
         Xatu nodes
       </div>
     </div>

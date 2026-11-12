@@ -50,19 +50,19 @@ describe('forks utilities', () => {
     it('should return all configured forks sorted by epoch', () => {
       const forks = getNetworkForks(mockNetwork);
       expect(forks).toHaveLength(6);
-      expect(forks[0].name).toBe('phase0');
-      expect(forks[0].epoch).toBe(0);
-      expect(forks[5].name).toBe('electra');
-      expect(forks[5].epoch).toBe(400);
+      expect(forks[0]?.name).toBe('phase0');
+      expect(forks[0]?.epoch).toBe(0);
+      expect(forks[5]?.name).toBe('electra');
+      expect(forks[5]?.epoch).toBe(400);
     });
 
     it('should mark forks as active when currentEpoch is provided', () => {
       const forks = getNetworkForks(mockNetwork, 150);
-      expect(forks[0].isActive).toBe(true); // phase0
-      expect(forks[1].isActive).toBe(true); // altair
-      expect(forks[2].isActive).toBe(true); // bellatrix
-      expect(forks[3].isActive).toBe(false); // capella
-      expect(forks[4].isActive).toBe(false); // deneb
+      expect(forks[0]?.isActive).toBe(true); // phase0
+      expect(forks[1]?.isActive).toBe(true); // altair
+      expect(forks[2]?.isActive).toBe(true); // bellatrix
+      expect(forks[3]?.isActive).toBe(false); // capella
+      expect(forks[4]?.isActive).toBe(false); // deneb
     });
 
     it('should handle forks at the same epoch (genesis)', () => {
@@ -182,7 +182,7 @@ describe('forks utilities', () => {
     it('should return forks that activate at a specific epoch', () => {
       const forks = getForksAtEpoch(mockNetwork, 100);
       expect(forks).toHaveLength(1);
-      expect(forks[0].name).toBe('bellatrix');
+      expect(forks[0]?.name).toBe('bellatrix');
     });
 
     it('should handle multiple forks at the same epoch', () => {

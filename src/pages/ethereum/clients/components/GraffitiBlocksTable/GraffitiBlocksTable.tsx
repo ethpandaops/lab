@@ -11,8 +11,8 @@ import { Slot } from '@/components/Ethereum/Slot';
 import { Validator } from '@/components/Ethereum/Validator';
 import { Alert } from '@/components/Feedback/Alert';
 import { Card } from '@/components/Layout/Card';
-import { GRAFFITI_FORMAT_LABELS } from '../../constants';
-import { useGraffitiBlocks } from '../../hooks/useGraffitiBlocks';
+import { GRAFFITI_FORMAT_LABELS } from '@/pages/ethereum/clients/constants';
+import { useGraffitiBlocks } from '@/pages/ethereum/clients/hooks/useGraffitiBlocks';
 import {
   DEFAULT_BLOCK_PAGE_SIZE,
   hasRangeStart,
@@ -21,9 +21,9 @@ import {
   sortUpdate,
   type BlockFilterKey,
   type BlockSearch,
-} from '../../utils/block-filters';
-import { normaliseClient } from '../../utils/client-share';
-import { shortVersion } from '../../utils/client-versions';
+} from '@/pages/ethereum/clients/utils/block-filters';
+import { normaliseClient } from '@/pages/ethereum/clients/utils/client-share';
+import { shortVersion } from '@/pages/ethereum/clients/utils/client-versions';
 import { BlockFilterPanel } from './BlockFilterPanel';
 
 export interface GraffitiBlocksTableProps {
@@ -166,12 +166,7 @@ export function GraffitiBlocksTable({
   return (
     <Card rounded title="Blocks">
       {/* The table stays the body's last child so it sits flush with the card's bottom edge */}
-      <div
-        className={clsx(
-          'flex flex-col gap-4 [&>:last-child]:transition-opacity',
-          isPlaceholderData && '[&>:last-child]:opacity-60'
-        )}
-      >
+      <div className={clsx('flex flex-col gap-4 *:last:transition-opacity', isPlaceholderData && '*:last:opacity-60')}>
         <div className="flex flex-wrap items-center gap-3">
           {toolbar}
           <BlockFilterPanel filters={search} fields={fields} onChange={onSearchChange} />

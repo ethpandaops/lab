@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
 
-export type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+type AvatarSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface AvatarProps {
   /**
@@ -53,7 +53,7 @@ export const Avatar = ({ src, alt = '', size = 'md', rounded = false, className 
       src={src}
       alt={alt}
       className={clsx(
-        'inline-block outline -outline-offset-1 outline-black/5 dark:outline-white/10',
+        'inline-block outline -outline-offset-1 outline-hairline',
         sizeClasses[size],
         rounded && 'rounded-full',
         className

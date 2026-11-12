@@ -12,6 +12,7 @@ import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { getConsensusClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
+import { useNow } from '@/hooks/useNow';
 import {
   ArrivalHistogram,
   BreakdownList,
@@ -50,8 +51,10 @@ export function IndexPage(): JSX.Element {
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
   const contributor = search.contributor;
-  const { rows: allRows, block, isLoading, error } = useNodeRows(range);
-  const networkHistory = useNetworkHistory(range);
+  // Unix seconds, once a minute: a range moves on to its next bucket, and a node shows offline, at most a minute late
+  const now = useNow(60_000) / 1000;
+  const { rows: allRows, block, isLoading, error } = useNodeRows(range, now);
+  const networkHistory = useNetworkHistory(range, now);
 
   if (isLoading) {
     return (
@@ -185,6 +188,7 @@ export function IndexPage(): JSX.Element {
             <ContributorHistory
               username={contributor}
               range={range}
+              nowSeconds={now}
               rangeLabel={rangeLabel}
               networkMedians={networkHistory.data?.medians ?? new Map<number, number>()}
             />

@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef } from 'react';
+import { type JSX, useMemo } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { PieChart } from 'echarts/charts';
@@ -8,7 +8,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { DonutProps } from './Donut.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
-import { getChartTooltipChrome, legendItem } from '../chartChrome';
+import { getChartTooltipChrome, legendItem } from '@/components/Charts/chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -51,29 +51,27 @@ echarts.use([PieChart, TitleComponent, TooltipComponent, LegendComponent, Canvas
  * />
  * ```
  */
-export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
-  {
-    data = [],
-    height = 400,
-    title,
-    titleFontSize = 14,
-    titleFontFamily,
-    titleFontWeight = 600,
-    titleLeft = 'center',
-    titleTop = 8,
-    innerRadius = 40,
-    outerRadius = 70,
-    showLegend = true,
-    legendPosition = 'top',
-    legendOrientation = 'horizontal',
-    showLabel = false,
-    labelPosition = 'center',
-    showCenterValue = true,
-    centerValueFontSize = 40,
-    animationDuration = 300,
-  },
-  ref
-): JSX.Element {
+export function Donut({
+  data = [],
+  height = 400,
+  title,
+  titleFontSize = 14,
+  titleFontFamily,
+  titleFontWeight = 600,
+  titleLeft = 'center',
+  titleTop = 8,
+  innerRadius = 40,
+  outerRadius = 70,
+  showLegend = true,
+  legendPosition = 'top',
+  legendOrientation = 'horizontal',
+  showLabel = false,
+  labelPosition = 'center',
+  showCenterValue = true,
+  centerValueFontSize = 40,
+  animationDuration = 300,
+  ref,
+}: DonutProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {
@@ -224,16 +222,17 @@ export const Donut = forwardRef<ReactEChartsCore, DonutProps>(function Donut(
   ]);
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={height === '100%' ? 'size-full' : 'w-full'}>
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         ref={ref}
         echarts={echarts}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={true}
         lazyUpdate={false}
       />
     </div>
   );
-});
+}

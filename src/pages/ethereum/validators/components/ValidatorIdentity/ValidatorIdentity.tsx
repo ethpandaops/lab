@@ -9,7 +9,7 @@ import { Epoch } from '@/components/Ethereum/Epoch';
 import { useNetwork } from '@/hooks/useNetwork';
 import { epochToTimestamp } from '@/utils';
 import type { DimValidatorStatus } from '@/api/types.gen';
-import type { ValidatorIdentity as Identity } from '../../hooks/useValidatorIdentity';
+import type { ValidatorIdentity as Identity } from '@/pages/ethereum/validators/hooks/useValidatorIdentity';
 
 /** Status and balances at one point in time */
 export type ValidatorState = Pick<Identity, 'status' | 'slashed' | 'balanceEth' | 'effectiveBalanceEth'>;
@@ -40,7 +40,7 @@ export function BeaconchainLink({ index }: { index: number }): JSX.Element | nul
       rel="noopener noreferrer"
       title="Open on beaconcha.in"
       aria-label={`Open validator ${index} on beaconcha.in`}
-      className="inline-flex rounded-sm p-1 transition-colors hover:bg-muted/20"
+      className="inline-flex rounded-sm p-1 transition-colors hover:bg-muted-20"
     >
       <BeaconchainIcon className="size-4" />
     </a>
@@ -216,7 +216,7 @@ export function ValidatorSetCard({
   }
   const credentials = (['0x02', '0x01', '0x00'] as const)
     .map(ct => {
-      const members = states.filter((_, n) => identities[n].credentialType === ct);
+      const members = states.filter((_, n) => identities[n]?.credentialType === ct);
       return { ct, count: members.length, stake: members.reduce((a, s) => a + s.effectiveBalanceEth, 0) };
     })
     .filter(c => c.count > 0);

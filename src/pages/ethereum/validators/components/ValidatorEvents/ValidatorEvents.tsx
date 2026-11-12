@@ -8,8 +8,8 @@ import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { fctValidatorEventServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { FctValidatorEvent } from '@/api/types.gen';
 import { useTableBounds } from '@/hooks/useBounds';
-import { useCursorPagination } from '../../hooks/useCursorPagination';
-import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
+import { useCursorPagination } from '@/pages/ethereum/validators/hooks/useCursorPagination';
+import { TableCard, TableSearch, ValidatorFilter } from '@/pages/ethereum/validators/components/TableCard';
 
 const EVENT_LABELS: Record<string, string> = {
   deposit: 'Deposit',

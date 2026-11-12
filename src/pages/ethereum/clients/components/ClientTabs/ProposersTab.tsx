@@ -7,10 +7,10 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { useTableBounds } from '@/hooks/useBounds';
 import { completeBucketEnd } from '@/utils/time';
 import { formatClientName } from '@/utils/graffiti';
-import { CLIENT_WINDOW_OPTIONS } from '../../constants';
-import { useVersionCounts } from '../../hooks';
-import { onLatestByEntity } from '../../utils/client-versions';
-import { EntityVersionBars } from '../EntityVersionBars';
+import { CLIENT_WINDOW_OPTIONS } from '@/pages/ethereum/clients/constants';
+import { useVersionCounts } from '@/pages/ethereum/clients/hooks';
+import { onLatestByEntity } from '@/pages/ethereum/clients/utils/client-versions';
+import { EntityVersionBars } from '@/pages/ethereum/clients/components/EntityVersionBars';
 import type { ClientTabProps } from './ClientTabs.types';
 
 const DAY = 86400;

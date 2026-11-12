@@ -9,14 +9,14 @@ export function NodesSkeleton(): JSX.Element {
     <div className="flex flex-col gap-6">
       <LoadingContainer className="h-20 rounded-sm" />
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <LoadingContainer className="h-[500px] rounded-sm xl:col-span-2" />
-        <LoadingContainer className="h-[500px] rounded-sm" />
+        <LoadingContainer className="h-125 rounded-sm xl:col-span-2" />
+        <LoadingContainer className="h-125 rounded-sm" />
       </div>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <LoadingContainer className="h-96 rounded-sm" />
         <LoadingContainer className="h-96 rounded-sm" />
       </div>
-      <LoadingContainer className="h-[600px] rounded-sm" />
+      <LoadingContainer className="h-150 rounded-sm" />
     </div>
   );
 }

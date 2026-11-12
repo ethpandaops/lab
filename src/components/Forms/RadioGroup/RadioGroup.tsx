@@ -1,7 +1,7 @@
 import { RadioGroup as HeadlessRadioGroup, Description, Label } from '@headlessui/react';
 import { CheckCircleIcon } from '@heroicons/react/20/solid';
 import { clsx } from 'clsx';
-import { type JSX, createContext, useContext } from 'react';
+import { type JSX, createContext, use } from 'react';
 import { Avatar } from '@/components/Elements/Avatar';
 import { Card } from '@/components/Layout/Card';
 import { ListContainer, ListItem } from '@/components/Layout/ListContainer';
@@ -46,7 +46,7 @@ export function RadioOption({
   caption,
   children,
 }: RadioOptionProps): JSX.Element {
-  const { variant, disabled: groupDisabled, getRadioStyles } = useContext(RadioGroupContext);
+  const { variant, disabled: groupDisabled, getRadioStyles } = use(RadioGroupContext);
   const optionValue = value ?? id;
   const optionLabel = children ?? title ?? name;
   const isDisabled = disabled || groupDisabled;
@@ -142,7 +142,7 @@ export function RadioOption({
         className="relative cursor-pointer disabled:cursor-not-allowed"
       >
         {({ checked, disabled: optionDisabled }) => (
-          <ListItem className="flex items-start justify-between">
+          <ListItem as="div" className="flex items-start justify-between">
             <div className="min-w-0 flex-1 text-sm/6">
               <Label className={clsx('cursor-pointer font-medium', optionDisabled ? 'text-muted' : 'text-foreground')}>
                 {children ?? name}
@@ -167,7 +167,7 @@ export function RadioOption({
         className="relative cursor-pointer disabled:cursor-not-allowed"
       >
         {({ checked, disabled: optionDisabled }) => (
-          <ListItem className="flex items-center justify-between">
+          <ListItem as="div" className="flex items-center justify-between">
             <div className="min-w-0 flex-1 text-sm/6">
               <Label
                 className={clsx(
@@ -197,8 +197,9 @@ export function RadioOption({
       >
         {({ checked, disabled: optionDisabled }) => (
           <ListItem
+            as="div"
             className={clsx('grid w-full grid-cols-1 gap-2 py-0.5 focus:outline-none md:grid-cols-3 md:gap-4', {
-              'relative z-10 border-primary bg-primary/10': checked,
+              'relative z-10 border-primary bg-primary-10': checked,
             })}
           >
             <span className="flex items-center gap-3 text-sm">
@@ -219,7 +220,7 @@ export function RadioOption({
                   {description && (
                     <>
                       {' '}
-                      <span className={clsx('text-muted', { 'text-primary/75': checked })}>({description})</span>
+                      <span className={clsx('text-muted', { 'text-primary-75': checked })}>({description})</span>
                     </>
                   )}
                 </>
@@ -227,7 +228,7 @@ export function RadioOption({
             </span>
             <span
               className={clsx('ml-6 pl-1 text-sm text-muted md:ml-0 md:pl-0 md:text-right', {
-                'text-primary/75': checked,
+                'text-primary-75': checked,
               })}
             >
               {caption}
@@ -248,8 +249,9 @@ export function RadioOption({
       >
         {({ checked, disabled: optionDisabled }) => (
           <ListItem
+            as="div"
             className={clsx('flex items-start py-0.5 focus:outline-none', {
-              'relative z-10 border-primary bg-primary/10': checked,
+              'relative z-10 border-primary bg-primary-10': checked,
             })}
           >
             <div
@@ -266,7 +268,7 @@ export function RadioOption({
                 {children ?? name}
               </Label>
               {description && (
-                <Description className={clsx('block text-sm text-muted', { 'text-primary/75': checked })}>
+                <Description className={clsx('block text-sm text-muted', { 'text-primary-75': checked })}>
                   {description}
                 </Description>
               )}
@@ -292,7 +294,7 @@ export function RadioOption({
             size="sm"
             rounded
             className={clsx(
-              'outline-primary/20!',
+              'outline-primary-20!',
               {
                 'outline-2! outline-offset-2! outline-primary!': checked,
               },
@@ -316,7 +318,7 @@ export function RadioOption({
         {({ checked, focus, disabled: optionDisabled }) => (
           <Card
             className={clsx('w-full', {
-              'border-primary bg-primary! dark:bg-primary!': checked,
+              'border-primary bg-primary!': checked,
               'outline-3 -outline-offset-1 outline-primary': focus,
             })}
           >
@@ -325,18 +327,13 @@ export function RadioOption({
                 <Label
                   className={clsx(
                     'block text-sm font-medium',
-                    optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
+                    optionDisabled ? 'text-muted' : checked ? 'text-on-solid' : 'text-foreground'
                   )}
                 >
                   {children ?? name}
                 </Label>
                 {description && (
-                  <Description
-                    className={clsx(
-                      'mt-1 block text-sm',
-                      checked ? 'text-white/80 dark:text-zinc-900/80' : 'text-muted'
-                    )}
-                  >
+                  <Description className={clsx('mt-1 block text-sm', checked ? 'text-on-solid-80' : 'text-muted')}>
                     {description}
                   </Description>
                 )}
@@ -344,7 +341,7 @@ export function RadioOption({
                   <span
                     className={clsx(
                       'mt-6 block text-sm font-medium',
-                      optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
+                      optionDisabled ? 'text-muted' : checked ? 'text-on-solid' : 'text-foreground'
                     )}
                   >
                     {detail}
@@ -353,7 +350,7 @@ export function RadioOption({
               </div>
               <CheckCircleIcon
                 aria-hidden="true"
-                className={clsx('size-5', checked ? 'text-white dark:text-zinc-900' : 'text-primary', {
+                className={clsx('size-5', checked ? 'text-on-solid' : 'text-primary', {
                   visible: checked,
                   invisible: !checked,
                 })}
@@ -376,14 +373,14 @@ export function RadioOption({
         {({ checked, focus, disabled: optionDisabled }) => (
           <Card
             className={clsx('flex w-full items-center justify-center px-3', {
-              'border-primary bg-primary! dark:bg-primary!': checked,
+              'border-primary bg-primary!': checked,
               'outline-2 outline-offset-2 outline-primary': focus,
             })}
           >
             <Label
               className={clsx(
                 'text-sm font-medium uppercase',
-                optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
+                optionDisabled ? 'text-muted' : checked ? 'text-on-solid' : 'text-foreground'
               )}
             >
               {children ?? name}
@@ -404,8 +401,8 @@ export function RadioOption({
       >
         {({ checked, focus, disabled: optionDisabled }) => (
           <Card
-            className={clsx('grid grid-cols-[1fr_auto] items-center gap-4 px-4', {
-              'border-primary bg-primary dark:bg-primary!': checked,
+            className={clsx('grid grid-cols-1fr-auto items-center gap-4 px-4', {
+              'border-primary bg-primary!': checked,
               'outline-3 -outline-offset-1 outline-primary': focus,
             })}
           >
@@ -413,15 +410,13 @@ export function RadioOption({
               <Label
                 className={clsx(
                   'font-medium',
-                  optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
+                  optionDisabled ? 'text-muted' : checked ? 'text-on-solid' : 'text-foreground'
                 )}
               >
                 {children ?? name}
               </Label>
               {description && (
-                <Description className={clsx(checked ? 'text-white/80 dark:text-zinc-900/80' : 'text-muted')}>
-                  {description}
-                </Description>
+                <Description className={clsx(checked ? 'text-on-solid-80' : 'text-muted')}>{description}</Description>
               )}
             </div>
             {detail && (
@@ -429,16 +424,12 @@ export function RadioOption({
                 <span
                   className={clsx(
                     'font-medium',
-                    optionDisabled ? 'text-muted' : checked ? 'text-white dark:text-zinc-900' : 'text-foreground'
+                    optionDisabled ? 'text-muted' : checked ? 'text-on-solid' : 'text-foreground'
                   )}
                 >
                   {detail}
                 </span>
-                {caption && (
-                  <span className={clsx(checked ? 'text-white/80 dark:text-zinc-900/80' : 'text-muted')}>
-                    {caption}
-                  </span>
-                )}
+                {caption && <span className={clsx(checked ? 'text-on-solid-80' : 'text-muted')}>{caption}</span>}
               </div>
             )}
           </Card>
@@ -487,7 +478,7 @@ export function RadioGroup({
       'before:absolute before:inset-1 before:rounded-full',
       {
         'border-primary bg-primary before:block': checked,
-        'border-border before:hidden dark:border-border': !checked,
+        'border-border before:hidden': !checked,
         'opacity-50 cursor-not-allowed': optionDisabled || disabled,
       }
     );
@@ -518,7 +509,7 @@ export function RadioGroup({
     // List with radio on right variant
     if (variant === 'right-radio-list') {
       return (
-        <ListContainer variant="simple" withDividers compact className="mt-2.5">
+        <ListContainer as="div" variant="simple" withDividers compact className="mt-2.5">
           {children}
         </ListContainer>
       );
@@ -527,7 +518,7 @@ export function RadioGroup({
     // Simple list with radio on right variant
     if (variant === 'simple-right-radio-list') {
       return (
-        <ListContainer variant="flat" withDividers compact className="mt-4">
+        <ListContainer as="div" variant="flat" withDividers compact className="mt-4">
           {children}
         </ListContainer>
       );
@@ -536,7 +527,7 @@ export function RadioGroup({
     // Table variant
     if (variant === 'table' || variant === 'panel') {
       return (
-        <ListContainer variant="card" withDividers compact>
+        <ListContainer as="div" variant="card" withDividers compact>
           {children}
         </ListContainer>
       );
@@ -566,7 +557,7 @@ export function RadioGroup({
   };
 
   return (
-    <RadioGroupContext.Provider value={contextValue}>
+    <RadioGroupContext value={contextValue}>
       <HeadlessRadioGroup
         value={currentValue}
         onChange={handleChange}
@@ -590,11 +581,11 @@ export function RadioGroup({
         )}
         {variant === 'small-cards' && description && (
           <div className="flex items-center justify-between">
-            <div className="text-sm/6 font-medium text-primary hover:text-primary/75">{description}</div>
+            <div className="text-sm/6 font-medium text-primary hover:text-primary-75">{description}</div>
           </div>
         )}
         {renderContent()}
       </HeadlessRadioGroup>
-    </RadioGroupContext.Provider>
+    </RadioGroupContext>
   );
 }

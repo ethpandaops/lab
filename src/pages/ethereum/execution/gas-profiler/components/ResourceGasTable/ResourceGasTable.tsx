@@ -1,10 +1,10 @@
-import { type JSX, useState, useMemo } from 'react';
+import { type JSX, type ReactNode, useState, useMemo } from 'react';
 import clsx from 'clsx';
 import { Button } from '@/components/Elements/Button';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
-import { RESOURCE_COLORS } from '../../utils/resourceGas';
-import type { OpcodeResourceRow } from '../../utils/resourceGas';
+import { RESOURCE_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
+import type { OpcodeResourceRow } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
 
 export interface ResourceGasTableProps {
   /** Per-opcode resource attribution rows */
@@ -43,6 +43,37 @@ const ALL_RESOURCE_COLUMNS: { field: SortField; label: string; color: string }[]
 function formatGas(value: number): string {
   if (value === 0) return '\u2013';
   return value.toLocaleString();
+}
+
+interface SortHeaderProps {
+  field: SortField;
+  sortField: SortField;
+  sortDir: 'asc' | 'desc';
+  onSort: (field: SortField) => void;
+  children: ReactNode;
+  align?: 'left' | 'right';
+}
+
+/**
+ * Column header that sorts the table by its field, with an arrow on the sorted column
+ */
+function SortHeader({ field, sortField, sortDir, onSort, children, align = 'right' }: SortHeaderProps): JSX.Element {
+  return (
+    <th
+      scope="col"
+      onClick={() => onSort(field)}
+      className={clsx(
+        'cursor-pointer px-3 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors hover:text-primary',
+        align === 'right' ? 'text-right' : 'text-left',
+        sortField === field ? 'text-primary' : 'text-foreground'
+      )}
+    >
+      <span className={clsx('inline-flex items-center gap-1', align === 'right' && 'justify-end')}>
+        {children}
+        {sortField === field && <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+      </span>
+    </th>
+  );
 }
 
 /**
@@ -103,31 +134,6 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
     );
   }
 
-  const SortHeader = ({
-    field,
-    children,
-    align = 'right',
-  }: {
-    field: SortField;
-    children: React.ReactNode;
-    align?: 'left' | 'right';
-  }): JSX.Element => (
-    <th
-      scope="col"
-      onClick={() => handleSort(field)}
-      className={clsx(
-        'cursor-pointer px-3 py-3.5 text-sm font-semibold whitespace-nowrap transition-colors hover:text-primary',
-        align === 'right' ? 'text-right' : 'text-left',
-        sortField === field ? 'text-primary' : 'text-foreground'
-      )}
-    >
-      <span className={clsx('inline-flex items-center gap-1', align === 'right' && 'justify-end')}>
-        {children}
-        {sortField === field && <span className="text-primary">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-      </span>
-    </th>
-  );
-
   return (
     <Card
       title="Gas by opcode"
@@ -146,13 +152,23 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
           <table className="min-w-full divide-y divide-border">
             <thead className="sticky top-0 bg-surface">
               <tr>
-                <SortHeader field="opcode" align="left">
+                <SortHeader field="opcode" sortField={sortField} sortDir={sortDir} onSort={handleSort} align="left">
                   Opcode
                 </SortHeader>
-                <SortHeader field="count">Count</SortHeader>
-                <SortHeader field="totalGas">Total Gas</SortHeader>
+                <SortHeader field="count" sortField={sortField} sortDir={sortDir} onSort={handleSort}>
+                  Count
+                </SortHeader>
+                <SortHeader field="totalGas" sortField={sortField} sortDir={sortDir} onSort={handleSort}>
+                  Total Gas
+                </SortHeader>
                 {visibleColumns.map(col => (
-                  <SortHeader key={col.field} field={col.field}>
+                  <SortHeader
+                    key={col.field}
+                    field={col.field}
+                    sortField={sortField}
+                    sortDir={sortDir}
+                    onSort={handleSort}
+                  >
                     <span className="size-2 rounded-full" style={{ backgroundColor: col.color }} />
                     {col.label}
                   </SortHeader>
@@ -162,13 +178,11 @@ export function ResourceGasTable({ rows, maxRows = 20, loading = false }: Resour
             <tbody className="divide-y divide-border bg-surface">
               {displayed.map(row => (
                 <tr key={row.opcode} className="transition-colors hover:bg-background">
-                  <td className="px-3 py-3 font-mono text-sm text-foreground">{row.opcode}</td>
-                  <td className="px-3 py-3 text-right font-mono text-sm text-muted">{row.count.toLocaleString()}</td>
-                  <td className="px-3 py-3 text-right font-mono text-sm text-foreground">
-                    {row.totalGas.toLocaleString()}
-                  </td>
+                  <td className="p-3 font-mono text-sm text-foreground">{row.opcode}</td>
+                  <td className="p-3 text-right font-mono text-sm text-muted">{row.count.toLocaleString()}</td>
+                  <td className="p-3 text-right font-mono text-sm text-foreground">{row.totalGas.toLocaleString()}</td>
                   {visibleColumns.map(col => (
-                    <td key={col.field} className="px-3 py-3 text-right font-mono text-sm text-muted">
+                    <td key={col.field} className="p-3 text-right font-mono text-sm text-muted">
                       {formatGas(row[col.field as keyof OpcodeResourceRow] as number)}
                     </td>
                   ))}

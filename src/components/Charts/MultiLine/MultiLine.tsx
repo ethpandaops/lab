@@ -1,5 +1,6 @@
 import type React from 'react';
-import { useState, useEffect, useRef, useMemo, useCallback, useContext } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, use } from 'react';
+import clsx from 'clsx';
 import type { EChartsInstance } from 'echarts-for-react/lib';
 import type ReactEChartsCore from 'echarts-for-react/lib/core';
 import ReactEChartsComponent from 'echarts-for-react/lib/core';
@@ -22,7 +23,7 @@ import { SharedCrosshairsContext } from '@/contexts/SharedCrosshairsContext';
 import { Disclosure } from '@/components/Layout/Disclosure';
 import type { MultiLineChartProps } from './MultiLine.types';
 import { dateCategoryTicks, formatUtcTime, timeAxisTicks } from './MultiLine.utils';
-import { clientLogoHtml, formatAxisNumber } from '../chartChrome';
+import { clientLogoHtml, formatAxisNumber } from '@/components/Charts/chartChrome';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { isKnownClient } from '@/utils/ethereum';
@@ -62,16 +63,15 @@ function LegendSwatch({
   return block ? (
     <span
       aria-hidden
-      className="size-2.5 rounded-xs transition-opacity"
-      style={{ backgroundColor: color, opacity: active ? 0.9 : 0.25 }}
+      className={clsx('size-2.5 rounded-xs transition-opacity', active ? 'opacity-90' : 'opacity-25')}
+      style={{ backgroundColor: color }}
     />
   ) : (
     <span
       aria-hidden
-      className="w-3 transition-opacity"
+      className={clsx('w-3 transition-opacity', active ? 'opacity-100' : 'opacity-30')}
       style={{
         borderTop: `2px ${series.lineStyle === 'dotted' ? 'dotted' : series.lineStyle === 'dashed' ? 'dashed' : 'solid'} ${color}`,
-        opacity: active ? 1 : 0.3,
       }}
     />
   );
@@ -96,7 +96,7 @@ function blendHex(color: string, base: string, alpha: number): string {
   if (a.some(Number.isNaN) || b.some(Number.isNaN)) return hexToRgba(color, alpha);
   return `#${a
     .map((v, i) =>
-      Math.round(v * alpha + b[i] * (1 - alpha))
+      Math.round(v * alpha + (b[i] ?? 0) * (1 - alpha))
         .toString(16)
         .padStart(2, '0')
     )
@@ -107,12 +107,14 @@ function blendHex(color: string, base: string, alpha: number): string {
 function endLabelsClear(values: (number | null)[], plotHeight: number, axisMin?: number, axisMax?: number): boolean {
   const ends = values.filter((v): v is number => v !== null).sort((a, b) => a - b);
   if (ends.length < 2) return ends.length > 0;
-  const low = axisMin ?? Math.min(0, ends[0]);
-  const high = axisMax ?? ends[ends.length - 1];
+  const low = axisMin ?? Math.min(0, ends[0] ?? 0);
+  const high = axisMax ?? ends[ends.length - 1] ?? 0;
   const range = high - low || 1;
   const minGap = (END_LABEL_GAP_PX / Math.max(plotHeight, 1)) * range;
-  for (let i = 1; i < ends.length; i++) {
-    if (ends[i] - ends[i - 1] < minGap) return false;
+  let previous: number | undefined;
+  for (const end of ends) {
+    if (previous !== undefined && end - previous < minGap) return false;
+    previous = end;
   }
   return true;
 }
@@ -250,7 +252,7 @@ export function MultiLineChart({
   const [zoomRange, setZoomRange] = useState({ start: 0, end: 100 });
 
   // Get shared crosshairs context for sync registration
-  const crosshairsContext = useContext(SharedCrosshairsContext);
+  const crosshairsContext = use(SharedCrosshairsContext);
 
   // Handle chart ready - register for sync when chart is fully initialized
   const handleChartReady = useCallback(
@@ -318,6 +320,8 @@ export function MultiLineChart({
       // Convert pixel coordinates to data coordinates
       const pointInGrid = instance.convertFromPixel('grid', [offsetX, offsetY]);
       if (!pointInGrid) return;
+      const [gridX, gridY] = pointInGrid;
+      if (gridX === undefined || gridY === undefined) return;
 
       // Get all series data and find which one is closest to click position
       const opt = instance.getOption() as { series?: Array<{ name?: string; data?: unknown[] }> };
@@ -328,7 +332,7 @@ export function MultiLineChart({
       for (const s of chartSeries) {
         if (!s.name || !s.data) continue;
         // Find the y value at the clicked x position
-        const xIndex = Math.round(pointInGrid[0]);
+        const xIndex = Math.round(gridX);
         if (xIndex < 0 || xIndex >= s.data.length) continue;
         const dataPoint = s.data[xIndex];
         if (dataPoint === null || dataPoint === undefined) continue;
@@ -336,7 +340,7 @@ export function MultiLineChart({
         const yValue = typeof dataPoint === 'number' ? dataPoint : (dataPoint as [number, number])[1];
         if (yValue === null || yValue === undefined) continue;
 
-        const distance = Math.abs(yValue - pointInGrid[1]);
+        const distance = Math.abs(yValue - gridY);
         if (distance < minDistance) {
           minDistance = distance;
           closestSeries = s.name;
@@ -711,7 +715,7 @@ export function MultiLineChart({
     const seriesConfig = displayedSeries.map(s => {
       // Use explicit color or auto-assign from palette
       const originalIndex = series.indexOf(s);
-      const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length];
+      const seriesColor = s.color || extendedPalette[originalIndex % extendedPalette.length] || themeColors.primary;
 
       const chartType = s.seriesType ?? 'line';
 
@@ -882,7 +886,7 @@ export function MultiLineChart({
           lastIndex = mark.index;
         } else {
           const names = mergedMarkLabels.get(lastIndex) ?? [];
-          names.unshift(markLines![mark.index].label ?? '');
+          names.unshift(markLines![mark.index]?.label ?? '');
           mergedMarkLabels.set(lastIndex, names);
         }
       }
@@ -1206,6 +1210,7 @@ export function MultiLineChart({
     themeColors.border,
     themeColors.muted,
     themeColors.surface,
+    themeColors.primary,
     xAxis,
     yAxis,
     secondaryYAxis,
@@ -1243,8 +1248,10 @@ export function MultiLineChart({
     group.items.push(s);
   }
   // A single series still gets a legend when it is a client, so its logo and name label the chart
+  const firstSeries = series[0];
   const hasLegend =
-    showLegend && (series.length > 1 || (series.length === 1 && isKnownClient(series[0].client ?? series[0].name)));
+    showLegend &&
+    (series.length > 1 || (firstSeries !== undefined && isKnownClient(firstSeries.client ?? firstSeries.name)));
 
   const legendControls = (
     <>
@@ -1253,7 +1260,7 @@ export function MultiLineChart({
           <button
             onClick={() => setShowAggregate(!showAggregate)}
             className={`rounded-sm px-2 py-1 text-xs/5 transition-colors ${
-              showAggregate ? 'bg-muted/20 text-foreground' : 'text-muted hover:bg-muted/10'
+              showAggregate ? 'bg-muted-20 text-foreground' : 'text-muted hover:bg-muted-10'
             }`}
           >
             {showAggregate ? '✓' : '○'} {aggregateSeriesName}
@@ -1261,26 +1268,28 @@ export function MultiLineChart({
         </div>
       )}
       {/* One wrapping row: each group is a muted name followed by its series */}
-      <div className="flex max-h-[200px] flex-wrap items-center gap-x-5 gap-y-1 overflow-y-auto">
+      <div className="flex max-h-50 flex-wrap items-center gap-x-5 gap-y-1 overflow-y-auto">
         {legendGroups.map(group => (
-          <div key={group.name ?? '__ungrouped__'} className="flex flex-wrap items-center gap-x-0.5 gap-y-0.5">
+          <div key={group.name ?? '__ungrouped__'} className="flex flex-wrap items-center gap-0.5">
             {group.name && <span className="mr-1 text-xs/5 whitespace-nowrap text-muted">{group.name}</span>}
             {group.items.map(s => {
               const isVisible = visibleSeries.has(s.name);
-              const seriesColor = s.color || extendedPalette[series.indexOf(s) % extendedPalette.length];
+              const seriesColor =
+                s.color || extendedPalette[series.indexOf(s) % extendedPalette.length] || themeColors.primary;
               return (
                 <button
                   key={s.name}
                   onClick={() => toggleSeries(s.name)}
                   aria-pressed={isVisible}
-                  className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted/10 ${
-                    isVisible ? 'text-foreground' : 'text-muted/60'
+                  className={`flex cursor-pointer items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-colors hover:bg-muted-10 ${
+                    isVisible ? 'text-foreground' : 'text-muted-60'
                   }`}
                 >
                   <LegendSwatch series={s} color={seriesColor} active={isVisible} />
                   {isKnownClient(s.client ?? s.name) && (
                     <ClientLogo
                       noLink
+                      decorative
                       client={s.client ?? s.name}
                       size={14}
                       className={isVisible ? undefined : 'opacity-50'}
@@ -1327,7 +1336,7 @@ export function MultiLineChart({
                       setVisibleSeries(new Set(filterableSeries.map(s => s.name)));
                     }
                   }}
-                  className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground"
+                  className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted-10 hover:text-foreground"
                 >
                   Show All
                 </span>
@@ -1349,20 +1358,20 @@ export function MultiLineChart({
             <div className="mb-3 flex gap-2">
               <button
                 onClick={selectAllFiltered}
-                className="bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                className="bg-primary-10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary-20"
               >
                 Select All {searchQuery && `(${filteredSeriesBySearch.length})`}
               </button>
               <button
                 onClick={clearAllFiltered}
-                className="bg-muted/10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted/20"
+                className="bg-muted-10 px-3 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-muted-20"
               >
                 Clear All {searchQuery && `(${filteredSeriesBySearch.length})`}
               </button>
             </div>
 
             {/* Series checkboxes */}
-            <div className="max-h-[300px] space-y-1 overflow-y-auto">
+            <div className="max-h-75 space-y-1 overflow-y-auto">
               {filteredSeriesBySearch.length === 0 ? (
                 <div className="py-4 text-center text-sm text-muted">No series match your search</div>
               ) : (
@@ -1372,15 +1381,15 @@ export function MultiLineChart({
                   return (
                     <label
                       key={s.name}
-                      className="hover:bg-surface-hover flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors"
+                      className="flex cursor-pointer items-center gap-2 px-2 py-1.5 text-sm transition-colors hover:bg-surface-hover"
                     >
                       <input
                         type="checkbox"
                         checked={isVisible}
                         onChange={() => toggleSeries(s.name)}
-                        className="h-4 w-4 cursor-pointer border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                        className="size-4 cursor-pointer border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
                       />
-                      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
+                      <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: seriesColor }} />
                       <span className={isVisible ? 'text-foreground' : 'text-muted'}>{s.name}</span>
                     </label>
                   );
@@ -1395,12 +1404,7 @@ export function MultiLineChart({
       {!useNativeLegend && hasLegend && legendPosition === 'top' && <div className="mb-3">{legendControls}</div>}
 
       <div
-        style={{
-          height: _height === '100%' ? '100%' : 'auto',
-          flex: _height === '100%' ? '1 1 0%' : undefined,
-          minHeight: _height === '100%' ? 0 : undefined,
-          cursor: onSeriesClick ? 'pointer' : undefined,
-        }}
+        className={clsx(_height === '100%' ? 'h-full min-h-0 flex-1' : 'h-auto', onSeriesClick && 'cursor-pointer')}
         onClickCapture={onSeriesClick ? handleChartClick : undefined}
       >
         <ReactEChartsComponent
@@ -1408,9 +1412,9 @@ export function MultiLineChart({
           ref={chartRef}
           echarts={echarts}
           option={option}
+          className="w-full"
           style={{
             height: typeof _height === 'number' && !hasLegend ? _height + 52 : _height,
-            width: '100%',
             minHeight: typeof _height === 'number' && !hasLegend ? _height + 52 : _height,
           }}
           notMerge={notMerge}
@@ -1443,7 +1447,7 @@ export function MultiLineChart({
   // At height 100% the legend and the chart share the container: a flex column lets the chart take
   // what the legend leaves, instead of the full height plus the legend (which clipped the x axis)
   return (
-    <div ref={measureRef} className={_height === '100%' ? 'flex h-full w-full flex-col' : 'w-full'}>
+    <div ref={measureRef} className={_height === '100%' ? 'flex size-full flex-col' : 'w-full'}>
       {chartContent}
     </div>
   );

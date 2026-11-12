@@ -17,9 +17,9 @@ const base = {
   description: 'text-muted',
   descriptionBorder: 'text-muted',
   actionText: 'text-foreground',
-  actionHover: 'hover:bg-muted/10',
+  actionHover: 'hover:bg-muted-10',
   dismissText: 'text-muted hover:text-foreground',
-  dismissHover: 'hover:bg-muted/10',
+  dismissHover: 'hover:bg-muted-10',
 };
 
 const variantConfig = {
@@ -91,7 +91,7 @@ export function Alert({
 
         <div className={`${displayIcon ? 'ml-3' : ''} ${link ? 'flex-1 md:flex md:justify-between' : ''}`}>
           {/* Title and description section */}
-          {title && !link && <h3 className={`text-sm/5 font-medium ${config.title}`}>{title}</h3>}
+          {title && !link && <h2 className={`text-sm/5 font-medium ${config.title}`}>{title}</h2>}
 
           {description && (
             <div className={`${title && !link ? 'mt-2' : ''} text-sm/5 ${descriptionClasses}`}>
@@ -103,8 +103,8 @@ export function Alert({
           {items && items.length > 0 && (
             <div className={`mt-2 text-sm/5 ${descriptionClasses}`}>
               <ul role="list" className="list-disc space-y-1 pl-5">
-                {items.map((item, index) => (
-                  <li key={index}>{item}</li>
+                {items.map(item => (
+                  <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
@@ -124,9 +124,9 @@ export function Alert({
           {actions && actions.length > 0 && (
             <div className="mt-4">
               <div className="-mx-2 -my-1.5 flex gap-3">
-                {actions.map((action, index) => (
+                {actions.map(action => (
                   <button
-                    key={index}
+                    key={action.label}
                     type="button"
                     onClick={action.onClick}
                     className={`rounded-sm px-2 py-1.5 text-sm/5 font-medium ${config.actionText} ${config.actionHover} ${FOCUS}`}
@@ -142,7 +142,7 @@ export function Alert({
         {/* Dismiss button */}
         {onDismiss && (
           <div className="ml-auto pl-3">
-            <div className="-mx-1.5 -my-1.5">
+            <div className="-m-1.5">
               <button
                 type="button"
                 onClick={onDismiss}

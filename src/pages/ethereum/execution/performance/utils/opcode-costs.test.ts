@@ -75,17 +75,18 @@ describe('buildOpcodeCostModel', () => {
     const model = buildOpcodeCostModel(rows)!;
     expect(model.clients.map(c => c.client)).toEqual(['geth']);
     const geth = model.clients[0];
+    if (!geth) throw new Error('Expected a geth client');
     expect(geth.daily.map(d => d.day)).toEqual([
       Date.parse('2026-10-20T00:00:00Z') / 1000,
       Date.parse('2026-10-21T00:00:00Z') / 1000,
       Date.parse('2026-10-22T00:00:00Z') / 1000,
     ]);
     const stack = OPCODE_GROUPS.indexOf('STACK');
-    expect(geth.ratios[stack].ratio).toBe(4);
-    expect(geth.ratios[stack].nsPerOp).toBe(40);
+    expect(geth.ratios[stack]?.ratio).toBe(4);
+    expect(geth.ratios[stack]?.nsPerOp).toBe(40);
     expect(model.days).toBe(3);
-    expect(model.opcodes[stack].pricedFor).toBe('execution');
-    expect(model.opcodes[OPCODE_GROUPS.indexOf('SSTORE')].pricedFor).toBe('state');
+    expect(model.opcodes[stack]?.pricedFor).toBe('execution');
+    expect(model.opcodes[OPCODE_GROUPS.indexOf('SSTORE')]?.pricedFor).toBe('state');
   });
 
   it('reads weekly fits as week-long points', () => {
@@ -96,7 +97,7 @@ describe('buildOpcodeCostModel', () => {
       }));
     const model = buildOpcodeCostModel([...week('2026-10-19', 2), ...week('2026-10-26', 3)])!;
     expect(model.grain).toBe('week');
-    expect(model.clients[0].daily.map(d => d.day)).toEqual([
+    expect(model.clients[0]?.daily.map(d => d.day)).toEqual([
       Date.parse('2026-10-19T00:00:00Z') / 1000,
       Date.parse('2026-10-26T00:00:00Z') / 1000,
     ]);

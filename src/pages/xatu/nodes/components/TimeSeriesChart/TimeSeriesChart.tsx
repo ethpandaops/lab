@@ -3,9 +3,9 @@ import { MultiLineChart, type SeriesData } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTimezone } from '@/hooks/useTimezone';
-import type { Granularity } from '../../constants';
-import { hoveredIndex, renderTooltip, type TooltipRow } from '../../utils/chart-tooltip';
-import { bucketAxisLabel, bucketHeading } from '../../utils/time-buckets';
+import type { Granularity } from '@/pages/xatu/nodes/constants';
+import { hoveredIndex, renderTooltip, type TooltipRow } from '@/pages/xatu/nodes/utils/chart-tooltip';
+import { bucketAxisLabel, bucketHeading } from '@/pages/xatu/nodes/utils/time-buckets';
 
 export interface TimeSeriesChartProps {
   title: string;
@@ -73,15 +73,15 @@ export function TimeSeriesChart({
 
   const tooltipFormatter = (params: unknown): string => {
     const index = hoveredIndex(params);
-    if (index === null || index >= buckets.length) return '';
+    if (index === null) return '';
+    const start = buckets[index];
+    if (start === undefined) return '';
     const rows = [
-      ...(behind?.has(buckets[index])
-        ? [{ color: colors.muted, label: 'Behind the network, catching up', value: '' }]
-        : []),
+      ...(behind?.has(start) ? [{ color: colors.muted, label: 'Behind the network, catching up', value: '' }] : []),
       ...tooltipRows(index),
     ];
     return renderTooltip(
-      bucketHeading(buckets[index], granularity, timezone),
+      bucketHeading(start, granularity, timezone),
       rows.length > 0 ? rows : [{ label: 'No data', value: '' }]
     );
   };

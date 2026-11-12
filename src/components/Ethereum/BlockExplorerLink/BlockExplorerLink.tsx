@@ -64,7 +64,7 @@ export function BlockExplorerLink({
   if (!url) return null;
 
   const getIcon = (): React.JSX.Element => {
-    const iconClassName = 'h-5 w-5';
+    const iconClassName = 'size-5';
     switch (type) {
       case 'beaconchain':
         return <BeaconchainIcon className={iconClassName} />;

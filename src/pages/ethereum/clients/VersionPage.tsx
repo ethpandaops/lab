@@ -218,7 +218,7 @@ export function VersionPage(): JSX.Element {
                   to="/ethereum/clients/$client/$version"
                   params={{ client, version: previous.version }}
                   search={{ w: search.w, fork: search.fork }}
-                  className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-sm text-foreground hover:bg-muted/20"
+                  className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-sm text-foreground hover:bg-muted-20"
                   aria-label="Previous release"
                 >
                   <ChevronLeftIcon className="size-4" />
@@ -230,7 +230,7 @@ export function VersionPage(): JSX.Element {
                   to="/ethereum/clients/$client/$version"
                   params={{ client, version: next.version }}
                   search={{ w: search.w, fork: search.fork }}
-                  className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-sm text-foreground hover:bg-muted/20"
+                  className="inline-flex items-center gap-1 rounded-sm border border-border px-2 py-1 text-sm text-foreground hover:bg-muted-20"
                   aria-label="Next release"
                 >
                   {next.version}
@@ -273,7 +273,7 @@ export function VersionPage(): JSX.Element {
 
         <InspectSection title="Adoption">
           {releasesLoading ? (
-            <LoadingContainer className="h-[40rem] rounded-sm" />
+            <LoadingContainer className="h-160 rounded-sm" />
           ) : (
             <VersionAdoption
               client={client}

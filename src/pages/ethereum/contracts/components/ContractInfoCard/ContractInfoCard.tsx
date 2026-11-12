@@ -5,7 +5,7 @@ import { Badge } from '@/components/Elements/Badge';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { useNetwork } from '@/hooks/useNetwork';
-import { getLabelColor } from '../../utils';
+import { getLabelColor } from '@/pages/ethereum/contracts/utils';
 import type { ContractInfoCardProps } from './ContractInfoCard.types';
 
 /** Known source info for external links */
@@ -112,7 +112,7 @@ export function ContractInfoCard({ address, contractOwner }: ContractInfoCardPro
                                 href={info.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-0.5 text-sm text-foreground underline decoration-muted/50 underline-offset-2 transition-colors hover:decoration-foreground"
+                                className="inline-flex items-center gap-0.5 text-sm text-foreground underline decoration-muted-50 underline-offset-2 transition-colors hover:decoration-foreground"
                               >
                                 {source}
                                 <ArrowTopRightOnSquareIcon className="size-3" />

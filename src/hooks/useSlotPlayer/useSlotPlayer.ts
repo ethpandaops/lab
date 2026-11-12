@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { use } from 'react';
 import {
   SlotPlayerProgressContext,
   SlotPlayerStateContext,
@@ -182,7 +182,7 @@ import type {
  * ```
  */
 export function useSlotPlayerProgress(): SlotPlayerProgressContextValue {
-  const context = useContext(SlotPlayerProgressContext);
+  const context = use(SlotPlayerProgressContext);
   if (context === undefined) {
     throw new Error('useSlotPlayerProgress must be used within a SlotPlayerProvider');
   }
@@ -227,7 +227,7 @@ export function useSlotPlayerProgress(): SlotPlayerProgressContextValue {
  * ```
  */
 export function useSlotPlayerState(): SlotPlayerStateContextValue {
-  const context = useContext(SlotPlayerStateContext);
+  const context = use(SlotPlayerStateContext);
 
   if (context === undefined) {
     throw new Error('useSlotPlayerState must be used within a SlotPlayerProvider');
@@ -280,7 +280,7 @@ export function useSlotPlayerState(): SlotPlayerStateContextValue {
  * ```
  */
 export function useSlotPlayerConfig(): SlotPlayerConfigContextValue {
-  const context = useContext(SlotPlayerConfigContext);
+  const context = use(SlotPlayerConfigContext);
 
   if (context === undefined) {
     throw new Error('useSlotPlayerConfig must be used within a SlotPlayerProvider');
@@ -350,7 +350,7 @@ export function useSlotPlayerConfig(): SlotPlayerConfigContextValue {
  * ```
  */
 export function useSlotPlayerActions(): SlotPlayerActions {
-  const context = useContext(SlotPlayerActionsContext);
+  const context = use(SlotPlayerActionsContext);
 
   if (context === undefined) {
     throw new Error('useSlotPlayerActions must be used within a SlotPlayerProvider');
@@ -405,7 +405,7 @@ export function useSlotPlayerActions(): SlotPlayerActions {
  * ```
  */
 export function useSlotPlayerMeta(): SlotPlayerMetaContextValue {
-  const context = useContext(SlotPlayerMetaContext);
+  const context = use(SlotPlayerMetaContext);
   if (context === undefined) {
     throw new Error('useSlotPlayerMeta must be used within a SlotPlayerProvider');
   }

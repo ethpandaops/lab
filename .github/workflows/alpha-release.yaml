@@ -8,13 +8,19 @@ on:
 permissions:
   contents: write
 
+# Serialized per branch so concurrent runs cannot compute the same next tag.
+concurrency:
+  group: alpha-release-${{ github.ref_name }}
+
 jobs:
   alpha-release:
     name: Build and Create Alpha Release
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
+      # Keeps the token in git config: the job pushes the new tag.
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
@@ -53,14 +59,15 @@ jobs:
           git push origin ${{ steps.version.outputs.new_tag }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
 
+      # No dependency cache: the release archives are built from a clean
+      # install, so a poisoned cache cannot reach them.
       - name: Set up Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
-          cache: 'pnpm'
-          cache-dependency-path: pnpm-lock.yaml
+          node-version-file: package.json
+          package-manager-cache: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -74,7 +81,7 @@ jobs:
           cd dist && zip -r ../lab-${{ steps.version.outputs.new_tag }}.zip . && cd ..
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           tag_name: ${{ steps.version.outputs.new_tag }}
           name: ${{ steps.extract.outputs.release_name }} ${{ steps.version.outputs.new_version }} (Alpha)

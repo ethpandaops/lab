@@ -1,13 +1,13 @@
-import type { BlockDetailsData } from '../useBlockDetailsData/useBlockDetailsData.types';
-import type { MapPointWithTiming } from '../useMapData/useMapData';
+import type { BlockDetailsData } from '@/pages/ethereum/live/hooks/useBlockDetailsData/useBlockDetailsData.types';
+import type { MapPointWithTiming } from '@/pages/ethereum/live/hooks/useMapData/useMapData';
 import type { SlotPhase } from '@/utils/beacon';
 import type { TimelineItem } from '@/components/Lists/ScrollingTimeline/ScrollingTimeline.types';
 import type {
   BlobDataPoint,
   DataAvailabilityRatePoint,
   ContinentalPropagationSeries,
-} from '../../components/BlobDataAvailability/BlobDataAvailability.types';
-import type { AttestationDataPoint } from '../../components/AttestationArrivals/AttestationArrivals.types';
+} from '@/pages/ethereum/live/components/BlobDataAvailability/BlobDataAvailability.types';
+import type { AttestationDataPoint } from '@/pages/ethereum/live/components/AttestationArrivals/AttestationArrivals.types';
 import type { PayloadStatus } from '@/utils/epbs';
 import type {
   FctBlockHead,

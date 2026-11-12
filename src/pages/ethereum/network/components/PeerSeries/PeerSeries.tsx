@@ -2,8 +2,13 @@ import type { JSX } from 'react';
 import type { FctPeerCountBySourceDaily } from '@/api/types.gen';
 import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
 import { CUSTODY_BUCKETS } from '@/pages/ethereum/clients/utils/census';
-import { SeriesCard } from '../SeriesCard';
-import { dayShares, seriesDays, stackLayer, type ConcentrationRow } from '../../utils/network-series';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import {
+  dayShares,
+  seriesDays,
+  stackLayer,
+  type ConcentrationRow,
+} from '@/pages/ethereum/network/utils/network-series';
 
 type Row = FctPeerCountBySourceDaily;
 

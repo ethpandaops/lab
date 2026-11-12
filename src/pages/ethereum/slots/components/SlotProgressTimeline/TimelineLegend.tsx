@@ -35,7 +35,7 @@ export function TimelineLegend(): JSX.Element {
         <span className="text-muted">Attestations</span>
       </div>
       <div className="ml-auto flex items-center gap-2">
-        <div className="h-4 w-px bg-success/50" />
+        <div className="h-4 w-px bg-success-50" />
         <span className="text-muted">Attestation Deadline (4s)</span>
       </div>
     </div>

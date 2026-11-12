@@ -19,7 +19,7 @@ export function parseVersion(version: string): VersionComponents {
   let prerelease: string | undefined;
 
   if (prereleaseMatch) {
-    cleanVersion = prereleaseMatch[1];
+    cleanVersion = prereleaseMatch[1] ?? cleanVersion;
     prerelease = prereleaseMatch[2];
   }
 

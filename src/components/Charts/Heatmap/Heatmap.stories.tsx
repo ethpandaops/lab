@@ -2,13 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useEffect } from 'react';
 import colors from 'tailwindcss/colors';
 import { HeatmapChart } from './Heatmap';
+import { seededRandom } from '@/test-utils/random';
 
 const meta: Meta<typeof HeatmapChart> = {
   title: 'Components/Charts/Heatmap',
   component: HeatmapChart,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-xs bg-surface p-6">
+      <div className="min-w-150 rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),
@@ -197,6 +198,7 @@ export const MonthlyActivity: Story = {
     // Generate data for each hour of each day of a week
     const hours = 24;
     const days = 7;
+    const random = seededRandom(3);
     const data: [number, number, number][] = [];
 
     for (let day = 0; day < days; day++) {
@@ -205,7 +207,7 @@ export const MonthlyActivity: Story = {
         const isWorkHour = hour >= 9 && hour <= 17;
         const isWeekend = day === 5 || day === 6;
         const baseValue = isWorkHour && !isWeekend ? 50 : 10;
-        const value = Math.round(baseValue + Math.random() * 30);
+        const value = Math.round(baseValue + random() * 30);
         data.push([hour, day, value]);
       }
     }
@@ -234,12 +236,13 @@ export const GitHubContributions: Story = {
     // Generate 52 weeks of contribution data
     const weeks = 52;
     const daysPerWeek = 7;
+    const random = seededRandom(4);
     const data: [number, number, number][] = [];
 
     for (let week = 0; week < weeks; week++) {
       for (let day = 0; day < daysPerWeek; day++) {
         // Random contributions with some days having no contributions
-        const value = Math.random() > 0.3 ? Math.floor(Math.random() * 20) : 0;
+        const value = random() > 0.3 ? Math.floor(random() * 20) : 0;
         data.push([week, day, value]);
       }
     }
@@ -247,7 +250,7 @@ export const GitHubContributions: Story = {
     const weekLabels = Array.from({ length: weeks }, (_, i) => {
       const month = Math.floor((i * 7) / 30);
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return i % 4 === 0 ? months[month % 12] : '';
+      return i % 4 === 0 ? (months[month % 12] ?? '') : '';
     });
     const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -315,24 +318,28 @@ export const Compact: Story = {
 export const AnimatedRealtime: Story = {
   render: () => {
     const [data, setData] = useState<[number, number, number][]>(() => {
+      const random = seededRandom(5);
       const initial: [number, number, number][] = [];
       for (let x = 0; x < 10; x++) {
         for (let y = 0; y < 5; y++) {
-          initial.push([x, y, Math.floor(Math.random() * 100)]);
+          initial.push([x, y, Math.floor(random() * 100)]);
         }
       }
       return initial;
     });
 
     useEffect(() => {
+      const random = seededRandom(6);
       const interval = setInterval(() => {
         setData(prev => {
           // Update 5 random cells
           const newData = [...prev];
           for (let i = 0; i < 5; i++) {
-            const randomIndex = Math.floor(Math.random() * newData.length);
-            const [x, y] = newData[randomIndex];
-            newData[randomIndex] = [x, y, Math.floor(Math.random() * 100)];
+            const randomIndex = Math.floor(random() * newData.length);
+            const cell = newData[randomIndex];
+            if (!cell) continue;
+            const [x, y] = cell;
+            newData[randomIndex] = [x, y, Math.floor(random() * 100)];
           }
           return newData;
         });
@@ -424,10 +431,11 @@ export const HighlightedRow: Story = {
     const yLabels = ['Server 1', 'Server 2', 'Server 3', 'Server 4'];
     const xLabels = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'];
 
+    const random = seededRandom(7);
     const data: [number, number, number][] = [];
     for (let x = 0; x < xLabels.length; x++) {
       for (let y = 0; y < yLabels.length; y++) {
-        data.push([x, y, Math.floor(Math.random() * 100)]);
+        data.push([x, y, Math.floor(random() * 100)]);
       }
     }
 
@@ -438,7 +446,7 @@ export const HighlightedRow: Story = {
             <button
               key={label}
               className={`rounded-xs px-3 py-1 text-sm ${
-                highlighted === i ? 'bg-primary text-white' : 'bg-surface text-foreground'
+                highlighted === i ? 'bg-primary text-on-fill' : 'bg-surface text-foreground'
               }`}
               onClick={() => setHighlighted(i)}
             >
@@ -584,10 +592,11 @@ export const AxisTitlesAndMinMax: Story = {
     const xLabels = Array.from({ length: 20 }, (_, i) => `${i}`);
     const yLabels = Array.from({ length: 10 }, (_, i) => `V${i}`);
 
+    const random = seededRandom(8);
     const data: [number, number, number][] = [];
     for (let x = 0; x < xLabels.length; x++) {
       for (let y = 0; y < yLabels.length; y++) {
-        data.push([x, y, Math.floor(Math.random() * 12)]);
+        data.push([x, y, Math.floor(random() * 12)]);
       }
     }
 

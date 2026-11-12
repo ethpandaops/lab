@@ -1,8 +1,11 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import type { FctPreparedBlock } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { parseExecutionClient } from '../utils';
-import { type PreparedBlockQuery, fetchNewestPreparedBlocks } from '../utils/block-query';
+import { parseExecutionClient } from '@/pages/ethereum/execution/locally-built-blocks/utils';
+import {
+  type PreparedBlockQuery,
+  fetchNewestPreparedBlocks,
+} from '@/pages/ethereum/execution/locally-built-blocks/utils/block-query';
 
 /**
  * Extended block data with client names: execution from the node name, consensus from meta_consensus_implementation

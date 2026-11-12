@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useDailyByClient } from '@/pages/ethereum/clients/hooks/useDailyByClient';
 import { windowStart } from '@/pages/ethereum/clients/utils/client-versions';
 import type { fetchAllPages } from '@/utils/api-pagination';
-import { dayStart } from '../utils/network-census';
+import { dayStart } from '@/pages/ethereum/network/utils/network-census';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 

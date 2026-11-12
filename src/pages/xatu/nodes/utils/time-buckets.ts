@@ -1,6 +1,6 @@
 import type { TimezoneMode } from '@/contexts/TimezoneContext';
 import { completeBucketEnd, type RollupGrain } from '@/utils/time';
-import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '../constants';
+import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '@/pages/xatu/nodes/constants';
 
 const HOUR = 3600;
 const DAY = 86400;
@@ -9,7 +9,7 @@ const WEEK = 7 * DAY;
 const GRAIN: Record<Granularity, RollupGrain> = { hourly: 'hour', daily: 'day', weekly: 'week' };
 
 /** Length of one bucket in seconds */
-export function bucketSeconds(granularity: Granularity): number {
+function bucketSeconds(granularity: Granularity): number {
   return granularity === 'hourly' ? HOUR : granularity === 'daily' ? DAY : WEEK;
 }
 
@@ -46,7 +46,7 @@ export function weekStart(seconds: number): number {
 }
 
 /** UTC date of a daily bucket, e.g. "2026-10-30" */
-export function toDateString(seconds: number): string {
+function toDateString(seconds: number): string {
   return new Date(seconds * 1000).toISOString().slice(0, 10);
 }
 
@@ -59,8 +59,10 @@ export function bucketFilter(
   buckets: number[],
   allHistory: boolean
 ): Record<string, string | number> {
-  const last = buckets[buckets.length - 1];
-  if (granularity === 'hourly') return { hour_start_date_time_gte: buckets[0], hour_start_date_time_lt: last + HOUR };
+  const first = buckets[0];
+  const last = buckets.at(-1);
+  if (first === undefined || last === undefined) throw new Error('bucketFilter needs at least one bucket');
+  if (granularity === 'hourly') return { hour_start_date_time_gte: first, hour_start_date_time_lt: last + HOUR };
   if (granularity === 'weekly') return { week_start_date_ne: toDateString(last + WEEK) };
   return allHistory
     ? { day_start_date_ne: toDateString(last + DAY) }
@@ -144,5 +146,5 @@ export function weightedMedian(values: Array<{ value: number; weight: number }>)
     running += entry.weight;
     if (running >= total / 2) return entry.value;
   }
-  return sorted[sorted.length - 1].value;
+  return sorted.at(-1)?.value ?? null;
 }

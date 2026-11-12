@@ -7,7 +7,7 @@ import { useGasProfilerBounds } from './useGasProfilerBounds';
 /**
  * Lightweight block summary for Recent Blocks visualization
  */
-export interface BlockSummary {
+interface BlockSummary {
   blockNumber: number;
   /** Receipt gas used by the block, or null when the block header isn't available */
   gasUsed: number | null;

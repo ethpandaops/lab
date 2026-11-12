@@ -2,8 +2,8 @@ import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'rea
 import { createPortal } from 'react-dom';
 import { Link } from '@tanstack/react-router';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
-import { useBlockTransactionOpcodes } from '../../hooks/useBlockTransactionOpcodes';
+import { CATEGORY_COLORS, getOpcodeCategory } from '@/pages/ethereum/execution/gas-profiler/utils';
+import { useBlockTransactionOpcodes } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactionOpcodes';
 
 /**
  * Format gas value with suffixes (K, M, B)
@@ -42,13 +42,13 @@ interface BlockOpcodeHeatmapProps {
  */
 function getColorIntensity(gas: number, maxGas: number): string {
   const ratio = maxGas > 0 ? gas / maxGas : 0;
-  if (ratio === 0) return 'bg-data-indigo/5';
-  if (ratio < 0.1) return 'bg-data-indigo/15';
-  if (ratio < 0.25) return 'bg-data-indigo/25';
-  if (ratio < 0.4) return 'bg-data-indigo/40';
-  if (ratio < 0.55) return 'bg-data-indigo/55';
-  if (ratio < 0.7) return 'bg-data-indigo/70';
-  if (ratio < 0.85) return 'bg-data-indigo/85';
+  if (ratio === 0) return 'bg-data-indigo-5';
+  if (ratio < 0.1) return 'bg-data-indigo-15';
+  if (ratio < 0.25) return 'bg-data-indigo-25';
+  if (ratio < 0.4) return 'bg-data-indigo-40';
+  if (ratio < 0.55) return 'bg-data-indigo-55';
+  if (ratio < 0.7) return 'bg-data-indigo-70';
+  if (ratio < 0.85) return 'bg-data-indigo-85';
   return 'bg-data-indigo';
 }
 
@@ -61,12 +61,12 @@ function Legend({ opcodeCount }: { opcodeCount: number }): JSX.Element {
       <div className="flex items-center gap-2 text-xs text-muted">
         <span>Low</span>
         <div className="flex gap-px">
-          <div className="size-3 bg-data-indigo/15" />
-          <div className="size-3 bg-data-indigo/25" />
-          <div className="size-3 bg-data-indigo/40" />
-          <div className="size-3 bg-data-indigo/55" />
-          <div className="size-3 bg-data-indigo/70" />
-          <div className="size-3 bg-data-indigo/85" />
+          <div className="size-3 bg-data-indigo-15" />
+          <div className="size-3 bg-data-indigo-25" />
+          <div className="size-3 bg-data-indigo-40" />
+          <div className="size-3 bg-data-indigo-55" />
+          <div className="size-3 bg-data-indigo-70" />
+          <div className="size-3 bg-data-indigo-85" />
           <div className="size-3 bg-data-indigo" />
         </div>
         <span>High</span>
@@ -82,12 +82,12 @@ function Legend({ opcodeCount }: { opcodeCount: number }): JSX.Element {
 function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.Element {
   const [hoveredOpcode, setHoveredOpcode] = useState<string | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cellsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Update tooltip position when hovered opcode changes
   useEffect(() => {
-    if (hoveredOpcode && cellRefs.current.has(hoveredOpcode)) {
-      const cell = cellRefs.current.get(hoveredOpcode)!;
+    if (hoveredOpcode && cellsRef.current.has(hoveredOpcode)) {
+      const cell = cellsRef.current.get(hoveredOpcode)!;
       const rect = cell.getBoundingClientRect();
       setTooltipPosition({
         top: rect.top - 8,
@@ -98,9 +98,9 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
 
   const setCellRef = useCallback((opcode: string, el: HTMLDivElement | null) => {
     if (el) {
-      cellRefs.current.set(opcode, el);
+      cellsRef.current.set(opcode, el);
     } else {
-      cellRefs.current.delete(opcode);
+      cellsRef.current.delete(opcode);
     }
   }, []);
 
@@ -164,16 +164,13 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
                     {/* Cell */}
                     <div
                       ref={el => setCellRef(opcode, el)}
-                      className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo/60' : ''}`}
+                      className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo-60' : ''}`}
                       onMouseEnter={() => setHoveredOpcode(opcode)}
                       onMouseLeave={() => setHoveredOpcode(null)}
                     />
 
                     {/* Opcode label (vertical using writing-mode) */}
-                    <div
-                      className="mt-1 font-mono text-2xs whitespace-nowrap text-muted"
-                      style={{ writingMode: 'vertical-rl' }}
-                    >
+                    <div className="mt-1 font-mono text-2xs whitespace-nowrap text-muted writing-vertical-rl">
                       {opcode}
                     </div>
                   </div>
@@ -194,7 +191,7 @@ function BlockViewHeatmap({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
+              className="pointer-events-none fixed z-9999 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredOpcode}</div>
@@ -243,14 +240,14 @@ function TransactionsViewHeatmap({
   const [hoveredCell, setHoveredCell] = useState<{ txHash: string; opcode: string } | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [headerHeight, setHeaderHeight] = useState<number>(0);
-  const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
-  const headerRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cellsRef = useRef<Map<string, HTMLDivElement>>(new Map());
+  const headersRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const setHeaderRef = useCallback((category: string, el: HTMLDivElement | null) => {
     if (el) {
-      headerRefs.current.set(category, el);
+      headersRef.current.set(category, el);
     } else {
-      headerRefs.current.delete(category);
+      headersRef.current.delete(category);
     }
   }, []);
 
@@ -258,8 +255,8 @@ function TransactionsViewHeatmap({
   useEffect(() => {
     if (hoveredCell) {
       const key = `${hoveredCell.txHash}-${hoveredCell.opcode}`;
-      if (cellRefs.current.has(key)) {
-        const cell = cellRefs.current.get(key)!;
+      if (cellsRef.current.has(key)) {
+        const cell = cellsRef.current.get(key)!;
         const rect = cell.getBoundingClientRect();
         setTooltipPosition({
           top: rect.top - 8,
@@ -271,9 +268,9 @@ function TransactionsViewHeatmap({
 
   const setCellRef = useCallback((key: string, el: HTMLDivElement | null) => {
     if (el) {
-      cellRefs.current.set(key, el);
+      cellsRef.current.set(key, el);
     } else {
-      cellRefs.current.delete(key);
+      cellsRef.current.delete(key);
     }
   }, []);
 
@@ -344,7 +341,7 @@ function TransactionsViewHeatmap({
 
   // Sync header height for y-axis spacer alignment - use max height across all categories
   useEffect(() => {
-    const elements = Array.from(headerRefs.current.values());
+    const elements = Array.from(headersRef.current.values());
     if (elements.length === 0) return;
 
     const updateMaxHeight = (): void => {
@@ -378,7 +375,7 @@ function TransactionsViewHeatmap({
       <Legend opcodeCount={allOpcodesOrdered.length} />
 
       {/* Heatmap grid with sticky row headers and max height */}
-      <div className={`overflow-x-auto overflow-y-auto ${inModal ? 'flex-1' : 'max-h-96'}`}>
+      <div className={`overflow-auto ${inModal ? 'flex-1' : 'max-h-96'}`}>
         <div className="inline-flex min-w-full">
           {/* Row headers (transaction labels) - sticky */}
           <div className="sticky left-0 z-10 shrink-0 pr-2">
@@ -392,8 +389,7 @@ function TransactionsViewHeatmap({
                     to="/ethereum/execution/gas-profiler/tx/$txHash"
                     params={{ txHash }}
                     search={{ block: blockNumber }}
-                    className="truncate text-2xs text-muted hover:text-foreground"
-                    style={{ maxWidth: '80px' }}
+                    className="max-w-20 truncate text-2xs text-muted hover:text-foreground"
                     title={targetName || txHash}
                   >
                     {txIndex >= 0 ? `#${txIndex}` : txHash.slice(0, 8)}
@@ -415,10 +411,7 @@ function TransactionsViewHeatmap({
                 >
                   {opcodes.map(opcode => (
                     <div key={opcode} className="flex w-6 justify-center">
-                      <span
-                        className="font-mono text-2xs whitespace-nowrap text-muted"
-                        style={{ writingMode: 'vertical-rl' }}
-                      >
+                      <span className="font-mono text-2xs whitespace-nowrap text-muted writing-vertical-rl">
                         {opcode}
                       </span>
                     </div>
@@ -441,7 +434,7 @@ function TransactionsViewHeatmap({
                             <div
                               key={opcode}
                               ref={el => setCellRef(cellKey, el)}
-                              className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo/60' : ''}`}
+                              className={`size-6 cursor-pointer transition-all ${getColorIntensity(gas, maxGas)} ${isHovered ? 'z-10 ring-1 ring-data-indigo-60' : ''}`}
                               onMouseEnter={() => gas > 0 && setHoveredCell({ txHash, opcode })}
                               onMouseLeave={() => setHoveredCell(null)}
                             />
@@ -469,7 +462,7 @@ function TransactionsViewHeatmap({
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
+              className="pointer-events-none fixed z-9999 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredCell.opcode}</div>
@@ -532,8 +525,8 @@ export function BlockOpcodeHeatmap({
         onClick={() => setViewMode('block')}
         className={`px-3 py-1 text-xs font-medium transition-colors ${
           viewMode === 'block'
-            ? 'bg-primary text-white'
-            : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
+            ? 'bg-primary text-on-fill'
+            : 'bg-surface text-muted hover:bg-surface-80 hover:text-foreground'
         }`}
       >
         Block
@@ -542,8 +535,8 @@ export function BlockOpcodeHeatmap({
         onClick={() => setViewMode('transactions')}
         className={`border-l border-border px-3 py-1 text-xs font-medium transition-colors ${
           viewMode === 'transactions'
-            ? 'bg-primary text-white'
-            : 'bg-surface text-muted hover:bg-surface/80 hover:text-foreground'
+            ? 'bg-primary text-on-fill'
+            : 'bg-surface text-muted hover:bg-surface-80 hover:text-foreground'
         }`}
       >
         By Transaction
@@ -560,7 +553,7 @@ export function BlockOpcodeHeatmap({
       headerActions={viewModeToggle}
     >
       {({ inModal }) => (
-        <div className={inModal ? 'flex h-full w-full flex-col' : 'w-full'}>
+        <div className={inModal ? 'flex size-full flex-col' : 'w-full'}>
           {viewMode === 'block' ? (
             <BlockViewHeatmap opcodeStats={opcodeStats} />
           ) : (

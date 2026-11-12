@@ -1,2 +1,2 @@
 export { Dialog } from './Dialog';
-export type { DialogProps, DialogSize } from './Dialog.types';
+export type { DialogSize } from './Dialog.types';

@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
-export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
+type AlertVariant = 'info' | 'success' | 'warning' | 'error';
 
-export interface AlertAction {
+interface AlertAction {
   /**
    * The label for the action button
    */

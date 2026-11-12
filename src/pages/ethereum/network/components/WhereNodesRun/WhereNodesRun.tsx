@@ -1,8 +1,8 @@
 import type { JSX } from 'react';
 import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
 import { getDataVizColors } from '@/utils/dataVizColors';
-import { SeriesCard } from '../SeriesCard';
-import { countryName } from '../../utils/network-census';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import { countryName } from '@/pages/ethereum/network/utils/network-census';
 import {
   CONTINENTS,
   countryShares,
@@ -13,7 +13,7 @@ import {
   stackLayer,
   type ConcentrationRow,
   type CountryDayRow,
-} from '../../utils/network-series';
+} from '@/pages/ethereum/network/utils/network-series';
 
 export interface WhereNodesRunProps {
   /** The layer's concentration rows, one a day */
@@ -34,7 +34,7 @@ const located = (row: ConcentrationRow): number | undefined => row.located_peer_
  */
 export function WhereNodesRun({ rows, countryCodes, countries, noun }: WhereNodesRunProps): JSX.Element {
   const { CHART_CATEGORICAL_COLORS: palette } = getDataVizColors();
-  const color = (index: number): string => palette[index % palette.length];
+  const color = (index: number): string | undefined => palette[index % palette.length];
   const geoDays = seriesDays(rows, geolocated);
   const days = seriesDays(rows, located);
   const share = (part: (row: ConcentrationRow) => number | undefined): Array<number | null> =>

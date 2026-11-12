@@ -12,7 +12,11 @@ import {
   type BlockSearch,
 } from '@/pages/ethereum/clients/utils/block-filters';
 
-import { ENTITY_TABLES, fctBlockProposerByEntityList, type FctBlockProposerByEntity } from '../api/entity-models';
+import {
+  ENTITY_TABLES,
+  fctBlockProposerByEntityList,
+  type FctBlockProposerByEntity,
+} from '@/pages/ethereum/entities/api/entity-models';
 
 /** Proposal outcomes that leave no block on chain, so have no graffiti to filter by */
 export type ProposalStatus = 'missed' | 'orphaned';

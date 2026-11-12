@@ -5,22 +5,29 @@
 ```bash
 pnpm dev                    # Dev server proxying to local backend (localhost:8080)
 BACKEND=production pnpm dev # Dev server proxying to production (lab.ethpandaops.io)
-pnpm lint
-pnpm test
+pnpm lint                   # ESLint; warnings fail too
+pnpm typecheck              # tsc -b over the app, the tests and stories, and the config files
+pnpm format:check           # Prettier over the whole repo; pnpm format rewrites
+pnpm knip                   # Unused files, exports and dependencies
+pnpm test                   # Unit tests (jsdom), then every story in Chromium under each theme
+pnpm test:unit              # jsdom only; pnpm test:storybook for stories only
+pnpm test:coverage          # Unit tests with a v8 coverage report in coverage/
 pnpm build
 pnpm storybook
 ```
+
+Story tests need Chromium once: `pnpm exec playwright install chromium`.
 
 The `BACKEND` env var controls the API proxy target. Values: `local` (default), `production`, or any custom URL.
 
 ## Libraries
 
-- pnpm v10, node v24, vite v7, react v19, typescript v5
+- pnpm v12, node v26, vite v7, react v19, typescript v5
 - tailwindcss v4, headlessui v2, heroicons v2
 - @tanstack/react-query v5, @tanstack/router-plugin v1
 - zod v4, react-hook-form v7, clsx
 - echarts v6, echarts-for-react v3, echarts-gl v2
-- storybook v10, vitest v4
+- storybook v10, vitest v5, msw v3
 
 ## Project Structure
 
@@ -62,10 +69,13 @@ src/
   providers/                          # React Context Providers
   contexts/                           # React Context definitions (with .types.ts)
   hooks/                              # Custom React hooks (with tests)
-  api/                                # Generated API client (do not edit)
-    @tanstack/react-query.gen.ts      # TanStack Query hooks - USE THIS for all API calls
+  api/                                # Generated CBT API client (do not edit)
+    @tanstack/react-query.gen.ts      # TanStack Query options - USE THIS for all API calls
+  lab-api/                            # Generated lab-backend client from openapi/lab-backend.yaml (do not edit)
   utils/                              # Utility functions and helpers
-  index.css                           # Global styles and Tailwind theme config
+  index.css                           # Entry stylesheet: fonts, tokens, utilities, base styles; Tailwind scans src
+  styles/                             # tokens.css (every design token), base.css, utilities.css, token tests
+  design-docs/                        # Foundations MDX pages generated from the tokens
 ```
 
 ## Architecture
@@ -73,11 +83,13 @@ src/
 ### Component & State Philosophy
 
 **Core/Shared** (`src/components/`, `src/hooks/`, `src/contexts/`):
+
 - App-wide reusable building blocks — generic and configurable
 - Work in any context without page logic
 - Core components include Storybook stories
 
 **Page-Scoped** (`src/pages/[section]/[page-name]/components|hooks|contexts|providers|utils/`):
+
 - Used within specific page/section only
 - Compose/extend core items for page needs
 - Contain page-specific business logic
@@ -128,12 +140,12 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - Storybook stories for all core components
 - Write Vitest tests for all components, hooks, and utilities
 - Use JSDoc style comments for functions, components, hooks, and complex types
-- Use Tailwind v4 classes with semantic color tokens from `src/index.css` theme
-- Use `@/api/@tanstack/react-query.gen.ts` hooks for API calls
-- Use path aliases (`@/`) over relative imports
+- Use Tailwind v4 classes with semantic color tokens from `src/styles/tokens.css`
+- Read API data through the generated query options (see [Data](#data))
+- Import through `@/`, never `../`; lint rejects parent-relative imports
 - Use `clsx` for conditional classes
-- Run `pnpm lint` and `pnpm build` before committing
-- React `useMemo`/`memo` should only be used for genuinely expensive calculations
+- Run `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, `pnpm knip` and `pnpm build` before committing
+- Test-only code (tests, stories, `src/test-utils`, `src/design-docs`, `src/styles/**/*.ts`) is excluded from `tsconfig.app.json` and type-checked by `tsconfig.test.json`; a new test-only path goes in both
 
 ### Naming Conventions
 
@@ -151,13 +163,18 @@ Route directories also include `beacon/` and `xatu-data/` alongside the sections
 - **Required for**: All hooks, utilities, and core components
 - **Vitest** for hooks and utilities, **Storybook interactions** for components
 - **Location**: Co-located with source files (`.test.ts(x)` for Vitest, `.stories.tsx` for Storybook)
+- `vitest.config.ts` holds both projects: `unit` (jsdom) and `storybook` (Chromium, once per theme: `storybook:light`, `storybook:dark`, `storybook:star`, each in UTC, `en-US` and reduced motion). Mocks and stubbed globals are restored before every test.
+- Unit tests render through `@/test-utils` and mock the API with MSW; fixtures and time come from `@/test-utils` too. See [Tests](.claude/rules/tests.md).
+- Vitest caps jsdom at four workers, then runs Storybook with two Chromium pages per theme. The test scripts raise `VITEST_CHROMIUM_GC_DISK_THRESHOLD_GB` so Vitest's Linux workaround collects Chromium garbage after each file.
 
-### Loading States
+## Data
 
-- Use `LoadingContainer` from `src/components/Layout/LoadingContainer/` as base
-- Create page-specific skeletons: `[PageName]Skeleton` or `[ComponentName]Skeleton`
-- Place in `pages/[section]/[page-name]/components/` alongside other page components
-- Show skeleton UI that matches actual content structure
+- Read server data with `useQuery(<operation>Options(...))` from the generated clients: `@/api/@tanstack/react-query.gen` for the CBT tables, `@/lab-api/@tanstack/react-query.gen` for lab-backend's own routes (config, bounds, downloads, gas profiler). Types come from `@/api` and `@/lab-api`, schemas from their `zod.gen`. Never `fetch` in a component or an effect.
+- Actions, such as a download or a simulation, run the generated SDK function or `<operation>Mutation()` through `useMutation`.
+- A lab-backend route the UI needs goes into `openapi/lab-backend.yaml`, matching the backend's handler in `internal/api`; `pnpm generate:api` regenerates both clients. The CBT client validates requests and responses against its spec. The lab-backend client doesn't: its spec is written by hand, and a field it gets wrong must not stop the app from loading.
+- The generated clients throw the response body, not an `Error`. Read lab-backend's message with `apiErrorMessage` from `@/utils/api-error`.
+- `createQueryClient` (`@/utils/query-client`) makes the app's query client; tests and stories use it too, with `{ retry: false }`.
+- Read configuration with `useConfig()` and bounds with `useBounds()`, never `window.__CONFIG__` or `window.__BOUNDS__`. lab-backend injects both into the page, and `createQueryClient` seeds the cache with them before the first render.
 
 ## Slot & Epoch Display
 
@@ -183,13 +200,16 @@ import { formatSlot, formatEpoch } from '@/utils';
 
 ## Additional Rules
 
-Detailed standards for specific topics are in `.claude/rules/`:
+Detailed standards for specific topics are in `.claude/rules/`. Claude Code loads each for the paths in its front matter; other agents read the matching file before editing those files.
 
 - [Charts](.claude/rules/charts.md) — Visual standards, axis formatting, grid padding, component architecture
 - [Forms](.claude/rules/forms.md) — Zod search param validation, react-hook-form patterns
+- [Loading states](.claude/rules/loading-states.md) — Loading, error, empty and stale states for async data
+- [React](.claude/rules/react.md) — Components, hooks and the React Compiler rules lint enforces
 - [SEO](.claude/rules/seo.md) — Head meta hierarchy, feature images, route implementation
-- [Theming](.claude/rules/theming.md) — Two-tier color architecture, semantic tokens
-- [Storybook](.claude/rules/storybook.md) — Decorator pattern, story title convention
+- [Styling](.claude/rules/styling.md) — Tokens, themes, Tailwind classes, adding a token
+- [Storybook](.claude/rules/storybook.md) — Stories as tests, API mocks, decorator pattern, story title convention
+- [Tests](.claude/rules/tests.md) — `@/test-utils`, MSW handlers, fixtures and time in unit tests
 
 ## Layout
 

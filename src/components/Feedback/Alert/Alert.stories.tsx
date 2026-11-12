@@ -113,7 +113,7 @@ export const WithAccentBorder: Story = {
     description: (
       <>
         You have no credits left.{' '}
-        <a href="#" className="font-medium underline hover:text-yellow-600 dark:hover:text-yellow-200">
+        <a href="#" className="font-medium underline hover:text-tag-yellow">
           Upgrade your account to add more credits.
         </a>
       </>

@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BaseFeeChart } from './BaseFeeChart';
+import { seededRandom } from '@/test-utils/random';
+import { NOW_MS } from '@/test-utils/time';
+
+const random = seededRandom(17);
 
 const meta = {
   title: 'Components/Ethereum/BaseFeeChart',
@@ -10,7 +14,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -27,7 +31,7 @@ export const SlotGranularity: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: Number((Math.random() * 10 + 15).toFixed(2)), // 15-25 Gwei
+      value: Number((random() * 10 + 15).toFixed(2)), // 15-25 Gwei
     })),
     xAxis: {
       name: 'Slot',
@@ -44,7 +48,7 @@ export const EpochGranularity: Story = {
   args: {
     data: Array.from({ length: 100 }, (_, i) => ({
       x: 300000 + i,
-      value: Number((Math.random() * 20 + 10).toFixed(2)), // 10-30 Gwei
+      value: Number((random() * 20 + 10).toFixed(2)), // 10-30 Gwei
     })),
     xAxis: {
       name: 'Epoch',
@@ -60,7 +64,7 @@ export const BlockGranularity: Story = {
   args: {
     data: Array.from({ length: 100 }, (_, i) => ({
       x: 20000000 + i,
-      value: Number((Math.random() * 15 + 12).toFixed(2)), // 12-27 Gwei
+      value: Number((random() * 15 + 12).toFixed(2)), // 12-27 Gwei
     })),
     xAxis: {
       name: 'Block Number',
@@ -75,8 +79,8 @@ export const BlockGranularity: Story = {
 export const TimestampGranularity: Story = {
   args: {
     data: Array.from({ length: 30 }, (_, i) => ({
-      x: Date.now() / 1000 - (30 - i) * 86400, // Last 30 days
-      value: Number((Math.random() * 30 + 10).toFixed(2)), // 10-40 Gwei
+      x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
+      value: Number((random() * 30 + 10).toFixed(2)), // 10-40 Gwei
     })),
     xAxis: {
       name: 'Date',
@@ -97,7 +101,7 @@ export const HighFees: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: Number((Math.random() * 50 + 100).toFixed(2)), // 100-150 Gwei (high!)
+      value: Number((random() * 50 + 100).toFixed(2)), // 100-150 Gwei (high!)
     })),
     xAxis: {
       name: 'Slot',
@@ -115,7 +119,7 @@ export const LowFees: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: Number((Math.random() * 2 + 1).toFixed(2)), // 1-3 Gwei (low)
+      value: Number((random() * 2 + 1).toFixed(2)), // 1-3 Gwei (low)
     })),
     xAxis: {
       name: 'Slot',
@@ -136,7 +140,7 @@ export const VolatileFees: Story = {
       const isSpike = i % 8 === 0;
       return {
         x: 10000000 + i,
-        value: Number((isSpike ? Math.random() * 50 + 50 : Math.random() * 10 + 10).toFixed(2)),
+        value: Number((isSpike ? random() * 50 + 50 : random() * 10 + 10).toFixed(2)),
       };
     }),
     xAxis: {

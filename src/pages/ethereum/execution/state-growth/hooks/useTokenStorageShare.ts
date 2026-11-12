@@ -5,13 +5,13 @@ import { fctTokenContractStorageStateByBlockDailyServiceListOptions } from '@/ap
 import type { FctTokenContractStorageStateByBlockDaily } from '@/api/types.gen';
 
 /** Live storage slots owned by token contracts for a single day, split by standard. */
-export interface TokenStorageDay {
+interface TokenStorageDay {
   erc20: number;
   erc721: number;
 }
 
 /** Map of day_start_date ("YYYY-MM-DD") -> per-standard slot counts. */
-export type TokenStorageByDay = Map<string, TokenStorageDay>;
+type TokenStorageByDay = Map<string, TokenStorageDay>;
 
 interface UseTokenStorageShareResult {
   byDay: TokenStorageByDay;

@@ -2,12 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { fctBlockDataColumnSidecarFirstSeenByNodeServiceList } from '@/api/sdk.gen';
 import type { FctBlockDataColumnSidecarFirstSeenByNode } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { NETWORK_WINDOW_SLOTS } from '../constants';
-import { median, summarize, type Summary } from '../utils/node-stats';
+import { NETWORK_WINDOW_SLOTS } from '@/pages/xatu/nodes/constants';
+import { median, summarize, type Summary } from '@/pages/xatu/nodes/utils/node-stats';
 import { useSlotWindow, type SlotWindow } from './useSlotWindow';
 
 /** Arrival of the columns a node saw in one slot */
-export interface SlotColumns {
+interface SlotColumns {
   first: number;
   p50: number;
   /** When the node held every column it saw */
@@ -33,10 +33,7 @@ export interface UseNodeDataColumnsResult {
 /**
  * Group one node's data column sidecar rows by column index and by slot.
  */
-export function buildNodeDataColumns(
-  window: SlotWindow,
-  rows: FctBlockDataColumnSidecarFirstSeenByNode[]
-): NodeDataColumns {
+function buildNodeDataColumns(window: SlotWindow, rows: FctBlockDataColumnSidecarFirstSeenByNode[]): NodeDataColumns {
   const byColumn = new Map<number, number[]>();
   const bySlot = new Map<number, Map<number, number>>();
 
@@ -54,10 +51,13 @@ export function buildNodeDataColumns(
   const slots = new Map<number, SlotColumns>();
   bySlot.forEach((columns, slot) => {
     const values = [...columns.values()].sort((a, b) => a - b);
+    const first = values[0];
+    const last = values.at(-1);
+    if (first === undefined || last === undefined) return;
     slots.set(slot, {
-      first: values[0],
+      first,
       p50: median(values)!,
-      last: values[values.length - 1],
+      last,
       count: values.length,
     });
     columns.forEach((value, column) => {

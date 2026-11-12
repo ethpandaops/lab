@@ -33,7 +33,7 @@ module.exports = {
   },
 
   create(context) {
-    const filename = context.getFilename();
+    const filename = context.filename;
 
     // Only check files in src/routes directory
     if (!filename.includes('/src/routes/')) {

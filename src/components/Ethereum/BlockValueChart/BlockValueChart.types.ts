@@ -1,7 +1,7 @@
 /**
  * Data point for block value timeseries
  */
-export interface BlockValueDataPoint {
+interface BlockValueDataPoint {
   /** X-axis value (slot, epoch, block, timestamp, etc.) */
   x: number;
   /** Block value in ETH */
@@ -16,7 +16,7 @@ export interface BlockValueDataPoint {
 /**
  * X-axis configuration for BlockValueChart
  */
-export interface BlockValueXAxisConfig {
+interface BlockValueXAxisConfig {
   /** Axis label (e.g., "Slot", "Epoch", "Block Number") */
   name: string;
   /** Optional minimum value */

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { DimClientRelease } from '@/api/types.gen';
-import { last24hStart, latestAdoption, type LatestAdoption } from '../utils/client-versions';
+import { last24hStart, latestAdoption, type LatestAdoption } from '@/pages/ethereum/clients/utils/client-versions';
 import { useVersionCounts } from './useVersionCounts';
 
 /**

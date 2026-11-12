@@ -2,8 +2,8 @@ import type { JSX } from 'react';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { normalizeClientName } from '@/utils/ethereum';
 import { compareVersions } from '@/utils/version';
-import { useLatestReleases } from '../../hooks/useClientReleases';
-import { matchReleaseVersion, shortVersion } from '../../utils/client-versions';
+import { useLatestReleases } from '@/pages/ethereum/clients/hooks/useClientReleases';
+import { matchReleaseVersion, shortVersion } from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface NodeClientVersionProps {
   /** Client as a node reports it, e.g. lighthouse */

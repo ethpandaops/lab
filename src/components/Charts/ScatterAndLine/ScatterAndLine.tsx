@@ -20,7 +20,7 @@ import {
   getChartValueSplitLine,
   legendItem,
   legendItemSize,
-} from '../chartChrome';
+} from '@/components/Charts/chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -93,7 +93,7 @@ export function ScatterAndLineChart({
 
   const option = useMemo(() => {
     // Auto-assign colors from categorical palette for multi-series data
-    const getSeriesColor = (index: number): string => {
+    const getSeriesColor = (index: number): string | undefined => {
       return CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length];
     };
 
@@ -291,13 +291,14 @@ export function ScatterAndLineChart({
   ]);
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={height === '100%' ? 'size-full' : 'w-full'}>
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         ref={chartRef}
         echarts={echarts}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
       />

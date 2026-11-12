@@ -51,8 +51,8 @@ function SidebarComponent({
           </div>
           {activeFork && (
             <div className="flex flex-col items-center gap-0.5" style={{ color: activeFork.color }}>
-              <span className="text-2xl leading-none">{activeFork.emoji}</span>
-              <span className="text-2xs leading-none font-medium">{activeFork.displayName}</span>
+              <span className="text-2xl/none">{activeFork.emoji}</span>
+              <span className="text-2xs/none font-medium">{activeFork.displayName}</span>
             </div>
           )}
         </div>

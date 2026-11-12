@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BlobCountChart } from './BlobCountChart';
+import { seededRandom } from '@/test-utils/random';
+import { NOW_MS } from '@/test-utils/time';
+
+const random = seededRandom(18);
 
 const meta = {
   title: 'Components/Ethereum/BlobCountChart',
@@ -10,7 +14,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -27,7 +31,7 @@ export const SlotGranularity: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: Math.floor(Math.random() * 7), // 0-6 blobs per slot
+      value: Math.floor(random() * 7), // 0-6 blobs per slot
     })),
     xAxis: {
       name: 'Slot',
@@ -44,7 +48,7 @@ export const EpochGranularity: Story = {
   args: {
     data: Array.from({ length: 100 }, (_, i) => ({
       x: 300000 + i,
-      value: Math.floor(Math.random() * 100 + 50), // 50-150 blobs per epoch
+      value: Math.floor(random() * 100 + 50), // 50-150 blobs per epoch
     })),
     xAxis: {
       name: 'Epoch',
@@ -59,8 +63,8 @@ export const EpochGranularity: Story = {
 export const TimestampGranularity: Story = {
   args: {
     data: Array.from({ length: 30 }, (_, i) => ({
-      x: Date.now() / 1000 - (30 - i) * 86400, // Last 30 days
-      value: Math.floor(Math.random() * 50 + 100), // 100-150 avg blobs
+      x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
+      value: Math.floor(random() * 50 + 100), // 100-150 avg blobs
     })),
     xAxis: {
       name: 'Date',
@@ -81,7 +85,7 @@ export const CustomLabels: Story = {
   args: {
     data: Array.from({ length: 50 }, (_, i) => ({
       x: 20000000 + i,
-      value: Math.floor(Math.random() * 6),
+      value: Math.floor(random() * 6),
     })),
     xAxis: {
       name: 'Block Number',
@@ -98,7 +102,7 @@ export const SparseData: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: i % 5 === 0 ? Math.floor(Math.random() * 6) : 0, // Blobs only every 5th slot
+      value: i % 5 === 0 ? Math.floor(random() * 6) : 0, // Blobs only every 5th slot
     })),
     xAxis: {
       name: 'Slot',
@@ -115,7 +119,7 @@ export const MaxBlobs: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => ({
       x: 10000000 + i,
-      value: Math.random() > 0.2 ? 6 : Math.floor(Math.random() * 6), // Mostly 6 blobs
+      value: random() > 0.2 ? 6 : Math.floor(random() * 6), // Mostly 6 blobs
     })),
     xAxis: {
       name: 'Slot',

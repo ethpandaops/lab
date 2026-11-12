@@ -86,7 +86,7 @@ export function MiniStat({
             fill="none"
             stroke="currentColor"
             strokeWidth={strokeWidth}
-            className="text-muted/20"
+            className="text-muted-20"
           />
           {/* Progress circle */}
           <circle
@@ -104,7 +104,7 @@ export function MiniStat({
         </svg>
         {/* Center percentage text */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xs leading-none font-semibold text-foreground">{percentage.toFixed(0)}%</span>
+          <span className="text-2xs/none font-semibold text-foreground">{percentage.toFixed(0)}%</span>
         </div>
       </div>
     );
@@ -118,17 +118,17 @@ export function MiniStat({
         {renderIcon()}
 
         {/* Stats content - 2 rows */}
-        <div className="flex-1">
-          <dt className="text-xs leading-tight font-medium text-muted">{label}</dt>
-          <dd className="text-base leading-tight font-semibold text-foreground">{value}</dd>
-        </div>
+        <dl className="flex-1">
+          <dt className="text-xs/tight font-medium text-muted">{label}</dt>
+          <dd className="text-base/tight font-semibold text-foreground">{value}</dd>
+        </dl>
       </div>
     );
   }
 
   // Default layout with secondary text
   return (
-    <div>
+    <dl>
       {/* Label */}
       <dt className="text-xs font-medium text-muted">{label}</dt>
 
@@ -140,11 +140,11 @@ export function MiniStat({
         {/* Stats content */}
         <div className="flex-1">
           {/* Value */}
-          <div className="text-base leading-tight font-semibold text-foreground">{value}</div>
+          <div className="text-base/tight font-semibold text-foreground">{value}</div>
           {/* Secondary text */}
-          <div className="text-xs leading-tight text-muted">{secondaryText}</div>
+          <div className="text-xs/tight text-muted">{secondaryText}</div>
         </div>
       </dd>
-    </div>
+    </dl>
   );
 }

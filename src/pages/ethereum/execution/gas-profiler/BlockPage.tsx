@@ -185,7 +185,7 @@ export function BlockPage(): JSX.Element {
   const maxBlockDepth = useMemo(() => {
     if (!data?.transactions?.length) return 0;
     return Math.max(...data.transactions.map(tx => tx.maxDepth));
-  }, [data?.transactions]);
+  }, [data]);
 
   // Block opcode data (from API) - transformed for OpcodeAnalysis component
   const opcodeStats = useMemo(() => {
@@ -227,13 +227,13 @@ export function BlockPage(): JSX.Element {
   const callTypeChartData = useMemo(() => {
     if (!data?.callTypeDistribution) return [];
     return data.callTypeDistribution.map(d => ({ name: d.callType, value: d.count }));
-  }, [data?.callTypeDistribution]);
+  }, [data]);
 
   // Call type distribution for pie chart - by gas
   const callTypeGasChartData = useMemo(() => {
     if (!data?.callTypeDistribution) return [];
     return data.callTypeDistribution.map(d => ({ name: d.callType, value: d.gasUsed }));
-  }, [data?.callTypeDistribution]);
+  }, [data]);
 
   // ============================================================================
   // CHART OPTIONS
@@ -454,7 +454,7 @@ export function BlockPage(): JSX.Element {
         },
       },
     };
-  }, [data?.transactions, totalBlockGas, colors]);
+  }, [data, totalBlockGas, colors]);
 
   // Block Gas Breakdown - aggregate intrinsic, EVM execution, and refunds
   const blockGasBreakdown = useMemo(() => {
@@ -476,7 +476,7 @@ export function BlockPage(): JSX.Element {
     const totalEvm = totalReceipt + totalRefund - totalIntrinsic;
 
     return { totalIntrinsic, totalEvm, totalRefund, totalReceipt };
-  }, [data?.transactions, blockNumber, currentNetwork]);
+  }, [data, blockNumber, currentNetwork]);
 
   // Determine refund cap percentage based on fork (London changed from 50% to 20%)
   const refundCapPercent = useMemo(() => {
@@ -497,13 +497,13 @@ export function BlockPage(): JSX.Element {
         index: tx.transactionIndex,
         hasError: tx.hasErrors,
       }));
-  }, [data?.transactions]);
+  }, [data]);
 
   // Transaction gas values for histogram
   const transactionGasValues = useMemo(() => {
     if (!data?.transactions?.length) return [];
     return data.transactions.map(tx => tx.totalGasUsed);
-  }, [data?.transactions]);
+  }, [data]);
 
   // Contract treemap data
   const contractTreemapOption = useMemo(() => {
@@ -584,13 +584,13 @@ export function BlockPage(): JSX.Element {
         show: false,
       },
     };
-  }, [data?.allContractsByGas, data?.totalContractGas, colors]);
+  }, [data, colors]);
 
   // Count of flows shown in Sankey
   const sankeyFlowCount = useMemo(() => {
     if (!data?.txContractFlows?.length) return 0;
     return Math.min(data.txContractFlows.length, 15);
-  }, [data?.txContractFlows]);
+  }, [data]);
 
   // Sankey diagram showing tx → contract flow
   const contractFlowSankeyOption = useMemo(() => {
@@ -661,8 +661,8 @@ export function BlockPage(): JSX.Element {
         source: sourceIdx,
         target: targetIdx,
         value: flow.gas,
-        sourceName: nodes[sourceIdx].name,
-        targetName: nodes[targetIdx].name,
+        sourceName: nodes[sourceIdx]?.name,
+        targetName: nodes[targetIdx]?.name,
         callCount: flow.callCount,
         txHash: flow.txHash,
       };
@@ -778,7 +778,7 @@ export function BlockPage(): JSX.Element {
         },
       },
     };
-  }, [data?.txContractFlows, colors]);
+  }, [data, colors]);
 
   // Click handler for contracts treemap - show popover with options
   const handleContractTreemapClick = (params: {
@@ -925,7 +925,7 @@ export function BlockPage(): JSX.Element {
               disabled={!canGoPrev}
               className={clsx(
                 'flex items-center gap-1 rounded-xs px-2 py-1 text-sm transition-colors',
-                canGoPrev ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted/50'
+                canGoPrev ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted-50'
               )}
             >
               <ChevronLeftIcon className="size-4" />
@@ -940,7 +940,7 @@ export function BlockPage(): JSX.Element {
               disabled={!canGoNext}
               className={clsx(
                 'flex items-center gap-1 rounded-xs px-2 py-1 text-sm transition-colors',
-                canGoNext ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted/50'
+                canGoNext ? 'text-muted hover:bg-surface hover:text-foreground' : 'cursor-not-allowed text-muted-50'
               )}
             >
               Next
@@ -1010,7 +1010,7 @@ export function BlockPage(): JSX.Element {
             <Link
               to="/ethereum/execution/gas-profiler/simulate"
               search={{ block: blockNumber }}
-              className="flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+              className="flex items-center gap-1.5 rounded-xs px-3 py-1.5 text-sm text-muted transition-colors hover:bg-primary-10 hover:text-primary"
             >
               <BeakerIcon className="size-4" />
               Simulate
@@ -1064,13 +1064,13 @@ export function BlockPage(): JSX.Element {
                   <ReactECharts
                     theme={ECHARTS_THEME}
                     option={gasDistributionOption}
-                    style={{ height: inModal ? 500 : 280 }}
+                    // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                    className={inModal ? 'h-125!' : 'h-70!'}
                     onEvents={{ click: handleTreemapClick }}
                   />
                 ) : (
                   <div
-                    className="flex items-center justify-center text-sm text-muted"
-                    style={{ height: inModal ? 500 : 280 }}
+                    className={clsx('flex items-center justify-center text-sm text-muted', inModal ? 'h-125' : 'h-70')}
                   >
                     No transaction data
                   </div>
@@ -1194,7 +1194,8 @@ export function BlockPage(): JSX.Element {
                     <ReactECharts
                       theme={ECHARTS_THEME}
                       option={contractTreemapOption}
-                      style={{ height: inModal ? 500 : 280, cursor: 'pointer' }}
+                      // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                      className={clsx(inModal ? 'h-125!' : 'h-70!', 'cursor-pointer')}
                       opts={{ renderer: 'canvas' }}
                       onEvents={{ click: handleContractTreemapClick }}
                     />
@@ -1243,7 +1244,8 @@ export function BlockPage(): JSX.Element {
                     <ReactECharts
                       theme={ECHARTS_THEME}
                       option={contractFlowSankeyOption}
-                      style={{ height: inModal ? 550 : 320, width: '100%', cursor: 'pointer' }}
+                      // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                      className={clsx(inModal ? 'h-137.5!' : 'h-80!', 'w-full cursor-pointer')}
                       opts={{ renderer: 'canvas' }}
                       onEvents={{ click: handleSankeyClick }}
                     />

@@ -3,7 +3,7 @@ import { EtherscanIcon } from '@/components/Ethereum/EtherscanIcon';
 import { PhalconIcon } from '@/components/Ethereum/PhalconIcon';
 import { TenderlyIcon } from '@/components/Ethereum/TenderlyIcon';
 
-export interface ExplorerLink {
+interface ExplorerLink {
   /** Destination URL */
   href: string;
   /** Tooltip text, e.g. "View on Etherscan" */

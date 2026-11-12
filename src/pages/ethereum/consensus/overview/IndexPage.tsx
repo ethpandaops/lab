@@ -752,7 +752,7 @@ export function IndexPage(): JSX.Element {
         {
           title: `REORGS (${total} total)`,
           items: sortedDepths.map(([depth, count], i) => ({
-            color: DEPTH_COLORS[i % DEPTH_COLORS.length],
+            color: DEPTH_COLORS[i % DEPTH_COLORS.length] ?? '',
             label: `Depth ${depth}`,
             value: String(count),
             style: 'area' as const,

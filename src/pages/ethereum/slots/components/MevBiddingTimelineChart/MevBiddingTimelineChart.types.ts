@@ -5,7 +5,7 @@
 /**
  * Raw MEV bid data from API
  */
-export interface MevBidData {
+interface MevBidData {
   chunk_slot_start_diff: number; // Time offset in ms from slot start (0-12000ms)
   value: string; // Bid value in wei (as string to avoid precision loss)
   builder_pubkey: string; // Builder's public key

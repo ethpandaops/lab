@@ -20,7 +20,7 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
 import { slotToTimestamp } from '@/utils/beacon';
 import { formatSlot } from '@/utils';
-import { ProbeFlow } from '../ProbeFlow';
+import { ProbeFlow } from '@/pages/ethereum/data-availability/probes/components/ProbeFlow';
 
 export interface ProbeDetailDialogProps {
   /** The probe to display */
@@ -70,10 +70,10 @@ function CopyableBadge({
         className={clsx(
           'inline-flex cursor-pointer items-center justify-center rounded-xs border px-1.5 py-0.5 font-mono text-2xs transition-all',
           copied
-            ? 'border-success/30 bg-success/10 text-success'
+            ? 'border-success-30 bg-success-10 text-success'
             : onDrillDown
-              ? 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
-              : 'border-border bg-background text-foreground hover:border-primary/30 hover:bg-primary/10'
+              ? 'border-border bg-background text-foreground hover:border-primary-30 hover:bg-primary-10 hover:text-primary'
+              : 'border-border bg-background text-foreground hover:border-primary-30 hover:bg-primary-10'
         )}
         title={onDrillDown ? `Filter by ${label || value}` : `Copy ${label || value}`}
       >
@@ -185,8 +185,8 @@ export function ProbeDetailDialog({
               className={clsx(
                 'ml-auto flex items-center gap-1.5 rounded-xs border px-2 py-1 text-xs transition-colors',
                 linkCopied
-                  ? 'border-success/30 bg-success/10 text-success'
-                  : 'border-border bg-background text-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary'
+                  ? 'border-success-30 bg-success-10 text-success'
+                  : 'border-border bg-background text-muted hover:border-primary-30 hover:bg-primary-10 hover:text-primary'
               )}
               title="Copy link to this probe"
             >
@@ -198,7 +198,7 @@ export function ProbeDetailDialog({
             timestamp={probe.probe_date_time ?? 0}
             format="long"
             disableModal
-            className="!p-0 text-xs !text-muted"
+            className="p-0! text-xs text-muted!"
           />
         </div>
       }
@@ -219,8 +219,8 @@ export function ProbeDetailDialog({
                   probe.result === 'success'
                     ? 'text-success'
                     : probe.result === 'failure'
-                      ? 'text-warning dark:text-warning'
-                      : 'text-danger dark:text-danger'
+                      ? 'text-warning'
+                      : 'text-danger'
                 )}
               >
                 {probe.result === 'success'
@@ -233,7 +233,7 @@ export function ProbeDetailDialog({
                 <Link
                   to="/ethereum/data-availability/probes"
                   search={{ slot: probe.slot }}
-                  className="inline-flex w-fit items-center gap-1 text-xs text-primary transition-colors hover:text-primary/80 hover:underline"
+                  className="inline-flex w-fit items-center gap-1 text-xs text-primary transition-colors hover:text-primary-80 hover:underline"
                 >
                   <MagnifyingGlassIcon className="size-3" />
                   <span>View all probes for this slot</span>
@@ -255,10 +255,10 @@ export function ProbeDetailDialog({
                     className={clsx(
                       'relative flex items-center gap-2 rounded-sm border px-3 py-2',
                       probe.result === 'success'
-                        ? 'border-success/30 bg-success/5'
+                        ? 'border-success-30 bg-success-5'
                         : probe.result === 'failure'
-                          ? 'border-warning/30 bg-warning/5'
-                          : 'border-danger/30 bg-danger/5'
+                          ? 'border-warning-30 bg-warning-5'
+                          : 'border-danger-30 bg-danger-5'
                     )}
                   >
                     {/* Logo with shield overlay */}
@@ -290,7 +290,7 @@ export function ProbeDetailDialog({
 
         {/* Error Section - show early for failure probes */}
         {probe.error && (
-          <div className="rounded-sm border border-danger/20 bg-danger/5 p-3">
+          <div className="rounded-sm border border-danger-20 bg-danger-5 p-3">
             <h4 className="mb-2 text-xs font-semibold text-danger">Error</h4>
             <div className="font-mono text-2xs text-danger">{probe.error}</div>
           </div>
@@ -361,7 +361,7 @@ export function ProbeDetailDialog({
 
           <div className="overflow-x-auto rounded-sm border border-border">
             <table className="min-w-full text-xs">
-              <thead className="bg-muted/50 font-medium text-muted">
+              <thead className="bg-muted-50 font-medium text-muted">
                 <tr>
                   <th className="px-2 py-1 text-left">Attribute</th>
                   <th className="px-2 py-1 text-left">Prober</th>
@@ -518,7 +518,7 @@ export function ProbeDetailDialog({
               <ListBulletIcon className="size-4 text-primary" />
               Probed Columns
             </h4>
-            <div className="max-h-32 overflow-y-auto rounded-sm border border-border/50 bg-muted/30 p-2">
+            <div className="max-h-32 overflow-y-auto rounded-sm border border-border-50 bg-muted-30 p-2">
               <div className="flex flex-wrap gap-1">
                 {[...probe.column_indices]
                   .sort((a, b) => a - b)

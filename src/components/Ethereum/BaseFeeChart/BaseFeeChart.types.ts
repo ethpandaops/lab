@@ -1,7 +1,7 @@
 /**
  * Data point for base fee timeseries
  */
-export interface BaseFeeDataPoint {
+interface BaseFeeDataPoint {
   /** X-axis value (slot, epoch, block, timestamp, etc.) */
   x: number;
   /** Base fee in Gwei */
@@ -16,7 +16,7 @@ export interface BaseFeeDataPoint {
 /**
  * X-axis configuration for BaseFeeChart
  */
-export interface BaseFeeXAxisConfig {
+interface BaseFeeXAxisConfig {
   /** Axis label (e.g., "Slot", "Epoch", "Block Number") */
   name: string;
   /** Optional minimum value */

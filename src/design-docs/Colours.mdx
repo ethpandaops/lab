@@ -1,0 +1,74 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import * as Stories from './Colours.stories';
+
+<Meta of={Stories} />
+
+# Colours
+
+Every colour is a token, used as a Tailwind class: `bg-surface`, `text-muted`, `border-border`, `text-danger`.
+Tailwind's own palette does not compile, so `bg-red-500` and `text-white` do not exist, and lint rejects colour
+literals, opacity modifiers such as `bg-primary/10` and `dark:` variants. Each base colour is a `light-dark(light, dark)`
+pair with its own star value; the tables show all three.
+
+## Surfaces
+
+`background` is the page, `surface` a card, panel or header.
+
+<Story of={Stories.Surfaces} />
+
+## Lines
+
+<Story of={Stories.Lines} />
+
+## Text
+
+`foreground` for content, `muted` for secondary text, labels and hints.
+
+<Story of={Stories.Text} />
+
+## Brand
+
+<Story of={Stories.Brand} />
+
+## Status
+
+The outcome of anything: `success`, `warning`, `danger`. A word or a mark goes with the colour.
+
+<Story of={Stories.Status} />
+
+## Tints
+
+A tint is a colour at part of its strength, a token like any other: `bg-primary-10` is `primary` at 10%. A tint that is
+missing is added to `src/styles/tokens.css`, not written inline. The chips follow the toolbar's theme.
+
+<Story of={Stories.Tints} />
+
+## Derived
+
+Colours whose strength differs between light and dark, or that name a role: text on a solid fill, panels, hover
+states. Each is defined from other colours, so star follows without its own value. The swatches follow the toolbar's
+theme.
+
+<Story of={Stories.Derived} />
+
+## Categories
+
+Badge and chip tags, phase text and contributor classes, in Tailwind's palette. Each part (text, background, ring) is a
+pair.
+
+<Story of={Stories.Categories} />
+
+## Data
+
+Charts, blobs, continents and timings map to the data hues, which stay the same in every theme.
+
+<Story of={Stories.Data} />
+
+## Contrast
+
+`src/styles/tokens.test.ts` checks every rule below in all three themes. A base colour must be in a rule or exempt
+with a reason; the rules and exemptions live in `src/styles/tokens.ts`.
+
+<Story of={Stories.Contrast} />
+
+<Story of={Stories.Exempt} />

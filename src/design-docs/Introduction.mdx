@@ -1,0 +1,30 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Introduction" />
+
+# Foundations
+
+These pages document the design tokens every component is built from. Every colour, size, radius, shadow and easing is
+a token in `src/styles/tokens.css`, and the values shown here are read from that file.
+
+## Principles
+
+**Tokens, not values.** A component never names a colour or a size. Tailwind's defaults are removed, so only the tokens
+compile, and lint rejects arbitrary values. If no token fits, add one; an arbitrary value is a design decision nobody
+can find again.
+
+**Name the role, not the look.** `danger`, not `red`; `muted`, not `gray`. A role survives a rebrand, and a reader knows
+what it is for.
+
+**Every theme, always.** Every base colour is a `light-dark(light, dark)` pair with its own star value, and each theme
+passes the same contrast checks, so no class carries a `dark:` variant.
+
+**Never colour alone.** A state is a word or a mark as well as a colour.
+
+## Themes
+
+Lab has three: light, dark and star. Light and dark are the two sides of each `light-dark()` pair, picked by the colour
+scheme `<html>` sets. Star is a dark scheme with its own palette, which `html.star` in `tokens.css` writes over the base
+colours; every colour derived from them follows. The toolbar's theme switch changes the class on `<html>`.
+
+To add or change a token, follow `.claude/rules/styling.md`.

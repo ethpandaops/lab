@@ -19,7 +19,7 @@ export function ForkStatusBadge({ isActive, isCurrent, label }: ForkStatusBadgeP
     <span
       className={clsx(
         'inline-flex items-center rounded-xs px-2 py-1 text-xs font-medium',
-        isLive ? 'bg-success/10 text-success' : 'bg-muted/10 text-muted'
+        isLive ? 'bg-success-10 text-success' : 'bg-muted-10 text-muted'
       )}
     >
       {text}

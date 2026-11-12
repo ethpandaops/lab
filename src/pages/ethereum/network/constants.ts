@@ -27,7 +27,6 @@ export const DEFAULT_RANGE: NetworkRange = 'all';
 export const networkSearchSchema = z.object({
   t: z.enum(['7d', '30d', '90d', '1y', 'all']).optional().catch(undefined),
 });
-export type NetworkSearch = z.infer<typeof networkSearchSchema>;
 
 /** Countries the overview charts */
 export const TOP_PLACES = 10;

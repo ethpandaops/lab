@@ -2,13 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useEffect } from 'react';
 import colors from 'tailwindcss/colors';
 import { LineChart } from './Line';
+import { seededRandom } from '@/test-utils/random';
 
 const meta: Meta<typeof LineChart> = {
   title: 'Components/Charts/Line',
   component: LineChart,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -135,8 +136,9 @@ export const CustomColor: Story = {
 export const LargeDataset: Story = {
   render: () => {
     // Generate sinusoidal data for 24 hours
+    const random = seededRandom(9);
     const hourlyData = Array.from({ length: 24 }, (_, i) => {
-      return Math.round(500 + 300 * Math.sin((i / 24) * Math.PI * 2) + Math.random() * 100);
+      return Math.round(500 + 300 * Math.sin((i / 24) * Math.PI * 2) + random() * 100);
     });
     const hourLabels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
@@ -167,13 +169,14 @@ export const AnimatedGrowingData: Story = {
     });
 
     useEffect(() => {
+      const random = seededRandom(10);
       const interval = setInterval(() => {
         setChartData(prev => {
           if (prev.data.length >= 50) {
             clearInterval(interval);
             return prev;
           }
-          const newValue = Math.round(100 + Math.random() * 400 + Math.sin(prev.data.length / 5) * 100);
+          const newValue = Math.round(100 + random() * 400 + Math.sin(prev.data.length / 5) * 100);
           return {
             data: [...prev.data, newValue],
             labels: [...prev.labels, `${prev.data.length}`],
@@ -206,12 +209,13 @@ export const AnimatedProgressiveFill: Story = {
   render: () => {
     const totalPoints = 100;
     const labels = Array.from({ length: totalPoints }, (_, i) => `${i}`);
-    const [chartData, setChartData] = useState<{ filledCount: number; data: number[] }>({
+    const [chartData, setChartData] = useState<{ filledCount: number; data: number[] }>(() => ({
       filledCount: 0,
       data: Array(totalPoints).fill(0),
-    });
+    }));
 
     useEffect(() => {
+      const random = seededRandom(11);
       const interval = setInterval(() => {
         setChartData(prev => {
           if (prev.filledCount >= totalPoints) {
@@ -221,7 +225,7 @@ export const AnimatedProgressiveFill: Story = {
 
           const newData = [...prev.data];
           // Fill the next point with data
-          newData[prev.filledCount] = Math.round(200 + Math.random() * 300 + Math.sin(prev.filledCount / 10) * 150);
+          newData[prev.filledCount] = Math.round(200 + random() * 300 + Math.sin(prev.filledCount / 10) * 150);
 
           return {
             filledCount: prev.filledCount + 1,
@@ -253,18 +257,20 @@ export const AnimatedProgressiveFill: Story = {
  */
 export const AnimatedRandomUpdates: Story = {
   render: () => {
-    const [data, setData] = useState<number[]>(() =>
-      Array.from({ length: 30 }, () => Math.round(100 + Math.random() * 400))
-    );
+    const [data, setData] = useState<number[]>(() => {
+      const random = seededRandom(12);
+      return Array.from({ length: 30 }, () => Math.round(100 + random() * 400));
+    });
 
     useEffect(() => {
+      const random = seededRandom(13);
       const interval = setInterval(() => {
         setData(prev => {
           const newData = [...prev];
           // Update 3 random points
           for (let i = 0; i < 3; i++) {
-            const randomIndex = Math.floor(Math.random() * newData.length);
-            newData[randomIndex] = Math.round(100 + Math.random() * 400);
+            const randomIndex = Math.floor(random() * newData.length);
+            newData[randomIndex] = Math.round(100 + random() * 400);
           }
           return newData;
         });

@@ -26,16 +26,13 @@ const getPositionClasses = (position: NotificationPosition): string => {
 };
 
 /**
- * Get icon component for notification variant
+ * Icon component for each notification variant
  */
-const getVariantIcon = (variant: NotificationVariant): typeof InformationCircleIcon => {
-  const icons: Record<NotificationVariant, typeof InformationCircleIcon> = {
-    info: InformationCircleIcon,
-    success: CheckCircleIcon,
-    warning: ExclamationTriangleIcon,
-    danger: XCircleIcon,
-  };
-  return icons[variant];
+const VARIANT_ICONS: Record<NotificationVariant, typeof InformationCircleIcon> = {
+  info: InformationCircleIcon,
+  success: CheckCircleIcon,
+  warning: ExclamationTriangleIcon,
+  danger: XCircleIcon,
 };
 
 /**
@@ -44,9 +41,9 @@ const getVariantIcon = (variant: NotificationVariant): typeof InformationCircleI
 const getVariantClasses = (variant: NotificationVariant): string => {
   const variants: Record<NotificationVariant, string> = {
     info: 'bg-surface text-foreground border-border',
-    success: 'bg-success text-white border-success dark:text-background',
-    warning: 'bg-warning text-white border-warning dark:text-background',
-    danger: 'bg-danger text-white border-danger dark:text-background',
+    success: 'bg-success text-on-solid border-success',
+    warning: 'bg-warning text-on-solid border-warning',
+    danger: 'bg-danger text-on-solid border-danger',
   };
   return variants[variant];
 };
@@ -95,7 +92,7 @@ export function Notification({
   showCloseButton = false,
   className = '',
 }: NotificationProps): JSX.Element {
-  const Icon = getVariantIcon(variant);
+  const Icon = VARIANT_ICONS[variant];
 
   // Auto-dismiss after duration
   useEffect(() => {
@@ -134,7 +131,7 @@ export function Notification({
           <Icon className="size-5 shrink-0" aria-hidden="true" />
 
           {/* Content */}
-          <div className="text-sm leading-5 font-medium">{children}</div>
+          <div className="text-sm/5 font-medium">{children}</div>
 
           {/* Close button */}
           {showCloseButton && (

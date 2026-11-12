@@ -1,6 +1,7 @@
 import { Badge } from '@/components/Elements/Badge';
 import { type JSX, useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { useSearch, Link } from '@tanstack/react-router';
+import { useMutation } from '@tanstack/react-query';
 import {
   ArrowLeftIcon,
   BeakerIcon,
@@ -36,11 +37,14 @@ import { Dialog } from '@/components/Overlays/Dialog';
 import { Button } from '@/components/Elements/Button';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { simulateBlockMutation } from '@/lab-api/@tanstack/react-query.gen';
+import type { BlockSimulation } from '@/lab-api';
+import { apiErrorMessage } from '@/utils/api-error';
 import { GasScheduleDrawer } from './components/GasScheduleDrawer';
 import { BlockSimulationResultsV2 } from './components/BlockSimulationResultsV2';
 import { GlamsterdamPresetModal } from './components/GlamsterdamPresetModal';
 import { useGasSchedule } from './hooks/useGasSchedule';
-import type { GasSchedule, BlockSimulationResult, CallError } from './SimulatePage.types';
+import type { GasSchedule, GasScheduleDefaults, BlockSimulationResult } from './SimulatePage.types';
 import { GLAMSTERDAM_PRESET } from './SimulatePage.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -109,17 +113,20 @@ function getDeltaColor(percent: number): string {
   return 'text-muted';
 }
 
-/** Detect backend syncing errors (503 from the proxy). */
+/** Count of schedule parameters that differ from the defaults (every parameter while the defaults are unknown) */
+function countModifiedParams(schedule: GasSchedule, defaults: GasScheduleDefaults | undefined): number {
+  if (!defaults) return Object.keys(schedule).length;
+  return Object.keys(schedule).filter(key => {
+    const defaultParam = defaults.parameters[key];
+    return schedule[key] !== undefined && defaultParam && schedule[key] !== defaultParam.value;
+  }).length;
+}
+
+/** Detect backend syncing errors (503 from the proxy), as thrown or as a simulation's error message. */
 function isSyncingError(error: unknown): boolean {
-  if (error instanceof Error) {
-    return error.message.includes('currently syncing');
-  }
+  const message = typeof error === 'string' ? error : apiErrorMessage(error);
 
-  if (typeof error === 'string') {
-    return error.includes('currently syncing');
-  }
-
-  return false;
+  return message?.includes('currently syncing') ?? false;
 }
 
 function calculateAggregateStats(results: BlockSimulationResult[]): AggregateStats {
@@ -159,50 +166,10 @@ function calculateAggregateStats(results: BlockSimulationResult[]): AggregateSta
 // API
 // ============================================================================
 
-/**
- * API response from the backend (matches Erigon response structure)
- */
-interface ApiBlockSimulationResponse {
-  blockNumber: number;
-  baseFork: string;
-  customSchedule: GasSchedule;
-  original: {
-    gasUsed: number;
-    gasLimit: number;
-    wouldExceedLimit: boolean;
-  };
-  simulated: {
-    gasUsed: number;
-    gasLimit: number;
-    wouldExceedLimit: boolean;
-  };
-  transactions: Array<{
-    hash: string;
-    index: number;
-    originalStatus: string;
-    simulatedStatus: string;
-    originalGas: number;
-    simulatedGas: number;
-    deltaPercent: number;
-    diverged: boolean;
-    originalReverts: number;
-    simulatedReverts: number;
-    originalErrors: CallError[] | null;
-    simulatedErrors: CallError[] | null;
-    error?: string;
-  }>;
-  opcodeBreakdown: Record<
-    string,
-    { originalCount: number; originalGas: number; simulatedCount: number; simulatedGas: number }
-  >;
-}
-
 /** Transform API response to match frontend types */
-function transformApiResponse(response: ApiBlockSimulationResponse): BlockSimulationResult {
+function transformApiResponse(response: BlockSimulation): BlockSimulationResult {
   return {
     blockNumber: response.blockNumber,
-    baseFork: response.baseFork,
-    customSchedule: response.customSchedule,
     original: response.original,
     simulated: response.simulated,
     transactions: response.transactions.map(tx => ({
@@ -267,7 +234,7 @@ export function SimulatePage(): JSX.Element {
   const cancelledRef = useRef(false);
 
   // Block card refs for scroll-into-view
-  const blockCardRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+  const blockCardsRef = useRef<Map<number, HTMLButtonElement>>(new Map());
   const blockStripRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -299,7 +266,7 @@ export function SimulatePage(): JSX.Element {
   // Scroll selected block card into view when selection changes
   useEffect(() => {
     if (selectedBlockIndex === null) return;
-    const el = blockCardRefs.current.get(selectedBlockIndex);
+    const el = blockCardsRef.current.get(selectedBlockIndex);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     }
@@ -318,15 +285,13 @@ export function SimulatePage(): JSX.Element {
     isLoading: defaultsLoading,
     error: defaultsError,
   } = useGasSchedule({ blockNumber: startBlockNumber });
+  const defaultsErrorMessage = apiErrorMessage(defaultsError);
 
   // Count of modified gas parameters
-  const modifiedCount = useMemo(() => {
-    if (!gasScheduleDefaults) return Object.keys(gasSchedule).length;
-    return Object.keys(gasSchedule).filter(key => {
-      const defaultParam = gasScheduleDefaults.parameters[key];
-      return gasSchedule[key] !== undefined && defaultParam && gasSchedule[key] !== defaultParam.value;
-    }).length;
-  }, [gasSchedule, gasScheduleDefaults]);
+  const modifiedCount = useMemo(
+    () => countModifiedParams(gasSchedule, gasScheduleDefaults),
+    [gasSchedule, gasScheduleDefaults]
+  );
 
   // Check if Glamsterdam preset is currently applied
   const isGlamsterdamApplied = useMemo(
@@ -506,108 +471,105 @@ export function SimulatePage(): JSX.Element {
   );
 
   // Simulate a single block (API call)
+  const { mutateAsync: simulateBlock } = useMutation(simulateBlockMutation());
   const simulateSingleBlock = useCallback(
-    async (blockNumber: number): Promise<BlockSimulationResult> => {
+    async (blockNumber: number, schedule: GasSchedule): Promise<BlockSimulationResult> => {
       if (!currentNetwork) {
         throw new Error('No network selected');
       }
 
-      const response = await fetch(`/api/v1/gas-profiler/${currentNetwork.name}/simulate-block`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          blockNumber,
-          gasSchedule: { overrides: gasSchedule },
-          ...(useMaxGasLimit && { maxGasLimit: true }),
-        }),
+      const overrides = Object.fromEntries(
+        Object.entries(schedule).filter((entry): entry is [string, number] => entry[1] !== undefined)
+      );
+      const apiResult = await simulateBlock({
+        path: { network: currentNetwork.name },
+        body: { blockNumber, gasSchedule: { overrides }, ...(useMaxGasLimit && { maxGasLimit: true }) },
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error || `Failed to simulate block ${blockNumber}`;
-        throw new Error(errorMessage);
-      }
-
-      const apiResult: ApiBlockSimulationResponse = await response.json();
       return transformApiResponse(apiResult);
     },
-    [gasSchedule, currentNetwork, useMaxGasLimit]
+    [currentNetwork, useMaxGasLimit, simulateBlock]
   );
 
   // Run the range simulation
   const [gasWarning, setGasWarning] = useState(false);
 
-  const handleSimulate = useCallback(async () => {
-    if (startBlockNumber === null) {
-      setInputError('Enter a valid start block');
-      return;
-    }
-
-    if (modifiedCount === 0) {
-      setGasWarning(true);
-      setDrawerOpen(true);
-      return;
-    }
-
-    setGasWarning(false);
-    cancelledRef.current = false;
-    setSelectedBlockIndex(null);
-
-    setSimState({
-      status: 'running',
-      currentBlock: startBlockNumber,
-      completedBlocks: 0,
-      totalBlocks: blockCount,
-      results: [],
-      error: null,
-      startTime: Date.now(),
-    });
-
-    const results: BlockSimulationResult[] = [];
-
-    for (let i = 0; i < blockCount; i++) {
-      if (cancelledRef.current) {
-        setSimState(prev => ({ ...prev, status: 'cancelled' }));
+  const runSimulation = useCallback(
+    async (schedule: GasSchedule) => {
+      if (startBlockNumber === null) {
+        setInputError('Enter a valid start block');
         return;
       }
 
-      const currentBlockNum = startBlockNumber + i;
+      if (countModifiedParams(schedule, gasScheduleDefaults) === 0) {
+        setGasWarning(true);
+        setDrawerOpen(true);
+        return;
+      }
+
+      setGasWarning(false);
+      cancelledRef.current = false;
+      setSelectedBlockIndex(null);
+
+      setSimState({
+        status: 'running',
+        currentBlock: startBlockNumber,
+        completedBlocks: 0,
+        totalBlocks: blockCount,
+        results: [],
+        error: null,
+        startTime: Date.now(),
+      });
+
+      const results: BlockSimulationResult[] = [];
+
+      for (let i = 0; i < blockCount; i++) {
+        if (cancelledRef.current) {
+          setSimState(prev => ({ ...prev, status: 'cancelled' }));
+          return;
+        }
+
+        const currentBlockNum = startBlockNumber + i;
+
+        setSimState(prev => ({
+          ...prev,
+          currentBlock: currentBlockNum,
+        }));
+
+        try {
+          const result = await simulateSingleBlock(currentBlockNum, schedule);
+          results.push(result);
+
+          setSimState(prev => ({
+            ...prev,
+            completedBlocks: prev.completedBlocks + 1,
+            results: [...results],
+          }));
+
+          // Auto-select first block when it completes
+          if (results.length === 1) {
+            setSelectedBlockIndex(0);
+          }
+        } catch (err) {
+          setSimState(prev => ({
+            ...prev,
+            status: 'error',
+            error: apiErrorMessage(err) ?? `Failed to simulate block ${currentBlockNum}`,
+          }));
+          return;
+        }
+      }
 
       setSimState(prev => ({
         ...prev,
-        currentBlock: currentBlockNum,
+        status: 'completed',
+        currentBlock: null,
       }));
+    },
+    [startBlockNumber, blockCount, simulateSingleBlock, gasScheduleDefaults]
+  );
 
-      try {
-        const result = await simulateSingleBlock(currentBlockNum);
-        results.push(result);
-
-        setSimState(prev => ({
-          ...prev,
-          completedBlocks: prev.completedBlocks + 1,
-          results: [...results],
-        }));
-
-        // Auto-select first block when it completes
-        if (results.length === 1) {
-          setSelectedBlockIndex(0);
-        }
-      } catch (err) {
-        setSimState(prev => ({
-          ...prev,
-          status: 'error',
-          error: err instanceof Error ? err.message : 'Unknown error',
-        }));
-        return;
-      }
-    }
-
-    setSimState(prev => ({
-      ...prev,
-      status: 'completed',
-      currentBlock: null,
-    }));
-  }, [startBlockNumber, blockCount, simulateSingleBlock, modifiedCount]);
+  const handleSimulate = useCallback(() => runSimulation(gasSchedule), [runSimulation, gasSchedule]);
 
   // Cancel simulation
   const handleCancel = useCallback(() => {
@@ -639,23 +601,15 @@ export function SimulatePage(): JSX.Element {
 
   const modifiedParamNames = useMemo(() => modifiedEntries.map(([key]) => key), [modifiedEntries]);
 
-  // Pending simulate flag - triggers simulation on next render after preset is applied
-  const [pendingSimulate, setPendingSimulate] = useState(false);
-
-  // Auto-simulate after preset application
-  useEffect(() => {
-    if (pendingSimulate) {
-      setPendingSimulate(false);
-      handleSimulate();
-    }
-  }, [pendingSimulate, handleSimulate]);
-
   // Handle preset modal "Apply & Simulate"
-  const handlePresetApplyAndSimulate = useCallback((presetValues: Record<string, number>) => {
-    setGasSchedule(presetValues as GasSchedule);
-    setGasWarning(false);
-    setPendingSimulate(true);
-  }, []);
+  const handlePresetApplyAndSimulate = useCallback(
+    (presetValues: Record<string, number>) => {
+      setGasSchedule(presetValues);
+      setGasWarning(false);
+      void runSimulation(presetValues);
+    },
+    [runSimulation]
+  );
 
   // Handle preset modal "Cancel" - resets gas schedule to empty
   const handlePresetCancel = useCallback(() => {
@@ -665,6 +619,12 @@ export function SimulatePage(): JSX.Element {
 
   const isRunning = simState.status === 'running';
   const hasResults = simState.results.length > 0;
+
+  // Block numbers of the running simulation, in order (the start block input is locked while it runs)
+  const runBlocks =
+    isRunning && startBlockNumber !== null
+      ? Array.from({ length: simState.totalBlocks }, (_, i) => startBlockNumber + i)
+      : [];
 
   // Block navigation
   const selectedResult = selectedBlockIndex !== null ? simState.results[selectedBlockIndex] : null;
@@ -694,7 +654,7 @@ export function SimulatePage(): JSX.Element {
 
       {/* Config Bar */}
       <Card className="mb-4 p-5">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-[1fr_auto_auto_auto]">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-1fr-auto-3">
           {/* Start Block */}
           <div>
             <label className="mb-1.5 block text-xs text-muted">Start Block</label>
@@ -729,7 +689,7 @@ export function SimulatePage(): JSX.Element {
                   disabled={isRunning}
                   className={clsx(
                     'rounded-xs px-3 py-2 text-sm font-medium transition-colors',
-                    blockCount === count ? 'bg-primary text-white' : 'bg-surface text-muted hover:bg-primary/10',
+                    blockCount === count ? 'bg-primary text-on-fill' : 'bg-surface text-muted hover:bg-primary-10',
                     isRunning && 'cursor-not-allowed opacity-50'
                   )}
                 >
@@ -750,8 +710,8 @@ export function SimulatePage(): JSX.Element {
                 className={clsx(
                   'flex items-center gap-1.5 rounded-xs border px-3 py-2 text-sm font-medium transition-colors',
                   isGlamsterdamApplied
-                    ? 'border-primary/30 bg-primary/10 text-primary'
-                    : 'border-border bg-surface text-muted hover:border-primary/30 hover:bg-primary/10 hover:text-primary',
+                    ? 'border-primary-30 bg-primary-10 text-primary'
+                    : 'border-border bg-surface text-muted hover:border-primary-30 hover:bg-primary-10 hover:text-primary',
                   (!gasScheduleDefaults || isRunning) && 'cursor-not-allowed opacity-50'
                 )}
                 title="Apply Glamsterdam (EIP-8007) gas schedule preset"
@@ -766,7 +726,7 @@ export function SimulatePage(): JSX.Element {
                 className={clsx(
                   'flex items-center gap-2 rounded-xs border px-3 py-2 text-sm font-medium transition-colors',
                   modifiedCount > 0
-                    ? 'border-primary/30 bg-primary/10 text-primary'
+                    ? 'border-primary-30 bg-primary-10 text-primary'
                     : 'border-border bg-surface text-muted hover:text-foreground',
                   (!gasScheduleDefaults || isRunning) && 'cursor-not-allowed opacity-50'
                 )}
@@ -774,7 +734,7 @@ export function SimulatePage(): JSX.Element {
                 <AdjustmentsHorizontalIcon className="size-4" />
                 Configure
                 {modifiedCount > 0 && (
-                  <span className="rounded-xs bg-primary px-1.5 py-0.5 text-xs text-white">{modifiedCount}</span>
+                  <span className="rounded-xs bg-primary px-1.5 py-0.5 text-xs text-on-fill">{modifiedCount}</span>
                 )}
               </button>
             </div>
@@ -843,10 +803,10 @@ export function SimulatePage(): JSX.Element {
         )}
         {defaultsError &&
           (isSyncingError(defaultsError) ? (
-            <div className="mt-3 overflow-hidden rounded-sm border border-warning/30" role="status" aria-live="polite">
-              <div className="flex items-start gap-3 bg-warning/5 p-3.5">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-warning/15">
-                  <ArrowPathIcon className="size-4 animate-spin text-warning" style={{ animationDuration: '2s' }} />
+            <div className="mt-3 overflow-hidden rounded-sm border border-warning-30" role="status" aria-live="polite">
+              <div className="flex items-start gap-3 bg-warning-5 p-3.5">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-xs bg-warning-15">
+                  <ArrowPathIcon className="size-4 animate-spin text-warning animate-duration-2000" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm/5 font-medium text-foreground">Backend execution clients are syncing</p>
@@ -857,7 +817,11 @@ export function SimulatePage(): JSX.Element {
           ) : (
             <Alert
               variant="error"
-              description={`Error loading gas schedule: ${defaultsError.message}`}
+              description={
+                defaultsErrorMessage
+                  ? `Error loading gas schedule: ${defaultsErrorMessage}`
+                  : 'Error loading gas schedule'
+              }
               accentBorder
               className="mt-3"
             />
@@ -904,7 +868,7 @@ export function SimulatePage(): JSX.Element {
           <div className="flex items-center gap-4 p-4">
             {/* Spinner */}
             <div className="relative flex size-10 shrink-0 items-center justify-center">
-              <svg className="size-10 -rotate-90 animate-spin" viewBox="0 0 40 40" style={{ animationDuration: '3s' }}>
+              <svg className="size-10 -rotate-90 animate-spin animate-duration-3000" viewBox="0 0 40 40">
                 <circle cx="20" cy="20" r="16" fill="none" className="stroke-border" strokeWidth="3" />
                 <circle
                   cx="20"
@@ -938,7 +902,7 @@ export function SimulatePage(): JSX.Element {
                 </span>
                 {estimatedTimeRemaining !== null && (
                   <>
-                    <span className="size-0.5 rounded-full bg-muted/50" />
+                    <span className="size-0.5 rounded-full bg-muted-50" />
                     <span>~{estimatedTimeRemaining}s remaining</span>
                   </>
                 )}
@@ -947,17 +911,17 @@ export function SimulatePage(): JSX.Element {
           </div>
 
           {/* Segmented progress */}
-          <div className="flex h-1.5 gap-px bg-border/50">
-            {Array.from({ length: simState.totalBlocks }).map((_, i) => (
+          <div className="flex h-1.5 gap-px bg-border-50">
+            {runBlocks.map((blockNumber, i) => (
               <div
-                key={i}
+                key={blockNumber}
                 className={clsx(
                   'flex-1 transition-colors duration-500',
                   i < simState.completedBlocks
                     ? 'bg-primary'
                     : i === simState.completedBlocks
-                      ? 'animate-pulse bg-primary/40'
-                      : 'bg-border/30'
+                      ? 'animate-pulse bg-primary-40'
+                      : 'bg-border-30'
                 )}
               />
             ))}
@@ -972,7 +936,7 @@ export function SimulatePage(): JSX.Element {
             <Card className="overflow-hidden">
               <div className="flex items-start gap-4 p-5" role="status" aria-live="polite">
                 <div className="relative flex size-10 shrink-0 items-center justify-center">
-                  <ArrowPathIcon className="size-5 animate-spin text-warning" style={{ animationDuration: '2s' }} />
+                  <ArrowPathIcon className="size-5 animate-spin text-warning animate-duration-2000" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-semibold text-foreground">Backend Syncing</h3>
@@ -1071,7 +1035,8 @@ export function SimulatePage(): JSX.Element {
                 theme={ECHARTS_THEME}
                 echarts={echarts}
                 option={chartOptions}
-                style={{ height: 180 }}
+                // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+                className="h-45!"
                 onEvents={{ click: handleChartClick }}
                 notMerge={true}
               />
@@ -1105,12 +1070,9 @@ export function SimulatePage(): JSX.Element {
             </button>
           )}
 
-          <div
-            ref={blockStripRef}
-            className="mx-5 flex gap-2 overflow-x-auto pb-5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
+          <div ref={blockStripRef} className="mx-5 flex gap-2 overflow-x-auto pb-5">
             {simState.results.map((result, index) => {
-              const delta = blockDeltas[index];
+              const delta = blockDeltas[index] ?? 0;
               const isSelected = selectedBlockIndex === index;
               const divergedCount = result.transactions.filter(tx => tx.diverged).length;
 
@@ -1118,21 +1080,20 @@ export function SimulatePage(): JSX.Element {
                 <button
                   key={result.blockNumber}
                   ref={el => {
-                    if (el) blockCardRefs.current.set(index, el);
-                    else blockCardRefs.current.delete(index);
+                    if (el) blockCardsRef.current.set(index, el);
+                    else blockCardsRef.current.delete(index);
                   }}
                   type="button"
                   onClick={() => setSelectedBlockIndex(index)}
                   className={clsx(
-                    'group relative flex shrink-0 flex-col rounded-sm border transition-all',
-                    isSelected ? 'border-primary bg-primary/10' : 'border-border bg-background hover:border-muted'
+                    'group relative flex min-w-30 shrink-0 flex-col rounded-sm border transition-all',
+                    isSelected ? 'border-primary bg-primary-10' : 'border-border bg-background hover:border-muted'
                   )}
-                  style={{ minWidth: '7.5rem' }}
                 >
                   {/* Connector arrow to detail panel */}
                   {isSelected && (
                     <div className="absolute -bottom-4 left-1/2 z-10 -translate-x-1/2">
-                      <div className="size-0 border-x-[8px] border-t-[8px] border-x-transparent border-t-primary" />
+                      <div className="size-0 border-x-8 border-t-8 border-x-transparent border-t-primary" />
                     </div>
                   )}
                   {/* Top section: label + block number */}
@@ -1141,7 +1102,7 @@ export function SimulatePage(): JSX.Element {
                     <div
                       className={clsx(
                         'font-mono text-sm tabular-nums',
-                        isSelected ? 'font-bold text-foreground' : 'font-semibold text-foreground/80'
+                        isSelected ? 'font-bold text-foreground' : 'font-semibold text-foreground-80'
                       )}
                     >
                       {result.blockNumber}
@@ -1152,7 +1113,7 @@ export function SimulatePage(): JSX.Element {
                   <div
                     className={clsx(
                       'flex items-center gap-3 border-t px-3 pt-1.5 pb-2',
-                      isSelected ? 'border-primary/20' : 'border-border/60'
+                      isSelected ? 'border-primary-20' : 'border-border-60'
                     )}
                   >
                     <div>
@@ -1178,32 +1139,26 @@ export function SimulatePage(): JSX.Element {
             })}
 
             {/* Pending blocks */}
-            {isRunning &&
-              Array.from({
-                length: simState.totalBlocks - simState.completedBlocks,
-              }).map((_, i) => (
-                <div
-                  key={`pending-${i}`}
-                  className={clsx(
-                    'flex shrink-0 flex-col rounded-sm border border-dashed border-border/60',
-                    i === 0 && 'animate-pulse'
-                  )}
-                  style={{ minWidth: '7.5rem' }}
-                >
-                  <div className="px-3 pt-2 pb-1.5">
-                    <div className="text-2xs font-semibold text-muted">Block</div>
-                    <div className="font-mono text-sm text-muted/30 tabular-nums">
-                      {startBlockNumber !== null ? formatGas(startBlockNumber + simState.completedBlocks + i) : '...'}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 border-t border-dashed border-border/40 px-3 pt-1.5 pb-2">
-                    <div>
-                      <div className="text-2xs text-muted/30">Delta</div>
-                      <div className="font-mono text-xs text-muted/20">—</div>
-                    </div>
+            {runBlocks.slice(simState.completedBlocks).map((blockNumber, i) => (
+              <div
+                key={blockNumber}
+                className={clsx(
+                  'flex min-w-30 shrink-0 flex-col rounded-sm border border-dashed border-border-60',
+                  i === 0 && 'animate-pulse'
+                )}
+              >
+                <div className="px-3 pt-2 pb-1.5">
+                  <div className="text-2xs font-semibold text-muted">Block</div>
+                  <div className="font-mono text-sm text-muted-30 tabular-nums">{formatGas(blockNumber)}</div>
+                </div>
+                <div className="flex items-center gap-3 border-t border-dashed border-border-40 px-3 pt-1.5 pb-2">
+                  <div>
+                    <div className="text-2xs text-muted-30">Delta</div>
+                    <div className="font-mono text-xs text-muted-20">—</div>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -1214,13 +1169,13 @@ export function SimulatePage(): JSX.Element {
           {/* Header with navigation */}
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="flex size-8 items-center justify-center rounded-sm bg-primary/10">
+              <div className="flex size-8 items-center justify-center rounded-sm bg-primary-10">
                 <CubeIcon className="size-4 text-primary" />
               </div>
               <div>
                 <h3 className="font-mono text-sm font-semibold text-foreground">{selectedResult.blockNumber}</h3>
                 {(() => {
-                  const delta = blockDeltas[selectedBlockIndex!];
+                  const delta = blockDeltas[selectedBlockIndex!] ?? 0;
                   return (
                     <span className={clsx('font-mono text-xs font-medium', getDeltaColor(delta))}>
                       {formatDelta(delta)} gas delta
@@ -1237,7 +1192,7 @@ export function SimulatePage(): JSX.Element {
                 className={clsx(
                   'rounded-xs p-1.5 transition-colors',
                   selectedBlockIndex === 0
-                    ? 'cursor-not-allowed text-muted/30'
+                    ? 'cursor-not-allowed text-muted-30'
                     : 'text-muted hover:bg-surface hover:text-foreground'
                 )}
               >
@@ -1253,7 +1208,7 @@ export function SimulatePage(): JSX.Element {
                 className={clsx(
                   'rounded-xs p-1.5 transition-colors',
                   selectedBlockIndex === simState.results.length - 1
-                    ? 'cursor-not-allowed text-muted/30'
+                    ? 'cursor-not-allowed text-muted-30'
                     : 'text-muted hover:bg-surface hover:text-foreground'
                 )}
               >

@@ -261,7 +261,7 @@ const PROGRESS_EMIT_STEP_MS = 50;
  * Wrap components in test provider:
  *
  * ```tsx
- * import { render } from '@testing-library/react';
+ * import { render } from '@/test-utils';
  * import { SlotPlayerProvider } from '@/providers/SlotPlayerProvider';
  *
  * const wrapper = ({ children }) => (
@@ -349,7 +349,10 @@ export function SlotPlayerProvider({
   const { currentNetwork } = useNetwork();
 
   // Get slot bounds from the API (TanStack Query handles retries internally)
-  const { data: boundsData, isLoading, error } = useTablesBounds(tables);
+  const { data: boundsData, isLoading, error: boundsError } = useTablesBounds(tables);
+
+  // The client throws the response body, but the meta context reports an Error; memoized to keep its identity
+  const error = useMemo(() => (boundsError ? new Error('Failed to load bounds') : null), [boundsError]);
 
   // Get current wall clock slot for staleness checking
   const { slot: wallClockSlot } = useBeaconClock();
@@ -370,14 +373,7 @@ export function SlotPlayerProvider({
     if (!boundsData?.aggregate?.minOfMaxes || !boundsData?.aggregate?.maxOfMaxes || !currentNetwork) return 0;
     const maxLagSeconds = 3 * SECONDS_PER_SLOT;
     const effectiveMax = Math.max(boundsData.aggregate.minOfMaxes, boundsData.aggregate.maxOfMaxes - maxLagSeconds);
-    const calculated = Math.floor((effectiveMax - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
-    console.log('[SlotPlayerProvider] maxSlot calculation:', {
-      minOfMaxes: boundsData.aggregate.minOfMaxes,
-      maxOfMaxes: boundsData.aggregate.maxOfMaxes,
-      genesisTime: currentNetwork.genesis_time,
-      calculatedMaxSlot: calculated,
-    });
-    return calculated;
+    return Math.floor((effectiveMax - currentNetwork.genesis_time) / SECONDS_PER_SLOT);
   }, [boundsData, currentNetwork]);
 
   // Calculate initial slot (returns actual slot number)
@@ -445,39 +441,36 @@ export function SlotPlayerProvider({
   }, [playbackSpeed]);
   const currentSlotRef = useRef(currentSlot);
   useEffect(() => {
-    currentSlotRef.current = currentSlot;
+    // Actions and the playback loop write this ref themselves. A slot set during render (the bounds checks below)
+    // can't, so hand it to the loop here, restarting its progress like every other slot change.
+    if (currentSlotRef.current !== currentSlot) {
+      currentSlotRef.current = currentSlot;
+      slotProgressRef.current = 0;
+      lastProgressBucketRef.current = 0;
+    }
   }, [currentSlot]);
   const pauseReasonRef = useRef(pauseReason);
   useEffect(() => {
     pauseReasonRef.current = pauseReason;
   }, [pauseReason]);
 
-  // Initialize currentSlot when bounds data is loaded
-  // Only run if currentSlot is still 0 (not yet initialized) and no explicit initialSlot was provided
-  useEffect(() => {
-    if (boundsData && currentSlot === 0 && initialSlot === undefined) {
-      const newInitialSlot = getInitialSlot();
-      setCurrentSlot(newInitialSlot);
-      currentSlotRef.current = newInitialSlot;
-      setSlotProgressSafe(0);
-    }
-  }, [boundsData, currentSlot, initialSlot, getInitialSlot, setSlotProgressSafe]);
-
-  // Handle bounds update race conditions - clamp currentSlot to valid range
-  // Skip clamping if currentSlot is 0 (waiting for initialization)
-  useEffect(() => {
-    if (boundsData && currentSlot !== 0) {
-      if (currentSlot < minSlot) {
-        setCurrentSlot(minSlot);
-        currentSlotRef.current = minSlot;
-        setSlotProgressSafe(0);
-      } else if (currentSlot > maxSlot) {
-        setCurrentSlot(maxSlot);
-        currentSlotRef.current = maxSlot;
-        setSlotProgressSafe(0);
+  if (boundsData) {
+    let boundedSlot = currentSlot;
+    if (currentSlot === 0) {
+      // Initialize currentSlot when bounds data is loaded
+      // Only if currentSlot is still 0 (not yet initialized) and no explicit initialSlot was provided
+      if (initialSlot === undefined) {
+        boundedSlot = getInitialSlot();
       }
+    } else {
+      // Handle bounds update race conditions - clamp currentSlot to valid range
+      boundedSlot = Math.min(Math.max(currentSlot, minSlot), maxSlot);
     }
-  }, [boundsData, currentSlot, minSlot, maxSlot, setSlotProgressSafe]);
+    if (boundedSlot !== currentSlot) {
+      setCurrentSlot(boundedSlot);
+      setSlotProgress(0);
+    }
+  }
 
   // Jump to live when network changes
   // Use a ref to track the previous network to detect changes
@@ -511,14 +504,9 @@ export function SlotPlayerProvider({
     }
   }, [maxSlot]);
 
-  useEffect(() => {
-    if (!isPlaying && pauseReason === 'boundary' && mode === 'continuous' && currentSlot < maxSlot) {
-      setIsPlaying(true);
-      setPauseReason(null);
-      isPlayingRef.current = true;
-      pauseReasonRef.current = null;
-    }
-  }, [maxSlot, currentSlot, isPlaying, pauseReason, mode]);
+  // Paused at the live edge boundary in continuous mode, with newer slots in: the playback loop restarts to resume
+  const canResumeAtBoundary =
+    !isPlaying && pauseReason === 'boundary' && mode === 'continuous' && currentSlot < maxSlot;
 
   // Calculate derived state
   // Both wallClockSlot and currentSlot are now actual slot numbers - direct comparison
@@ -535,7 +523,7 @@ export function SlotPlayerProvider({
   // Using useLayoutEffect to ensure cleanup happens synchronously before re-paint,
   // preventing the animation frame from escaping cleanup logic
   useLayoutEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying && !canResumeAtBoundary) {
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
@@ -547,8 +535,21 @@ export function SlotPlayerProvider({
 
     const animate = (currentTime: number): void => {
       if (!isPlayingRef.current) {
-        animationFrameRef.current = null;
-        return;
+        if (pauseReasonRef.current !== 'boundary' || modeRef.current !== 'continuous') {
+          animationFrameRef.current = null;
+          return;
+        }
+
+        // Resume past the live edge boundary once the refs catch up with the render that restarted the loop
+        if (currentSlotRef.current >= maxSlotRef.current) {
+          lastProcessedTime = currentTime;
+          animationFrameRef.current = requestAnimationFrame(animate);
+          return;
+        }
+        isPlayingRef.current = true;
+        setIsPlaying(true);
+        pauseReasonRef.current = null;
+        setPauseReason(null);
       }
 
       const deltaTime = currentTime - lastProcessedTime;
@@ -605,7 +606,7 @@ export function SlotPlayerProvider({
         animationFrameRef.current = null;
       }
     };
-  }, [isPlaying, slotDuration, callbacks, setSlotProgressSafe]);
+  }, [isPlaying, canResumeAtBoundary, slotDuration, callbacks, setSlotProgressSafe]);
 
   // Define actions using useCallback for optimal performance
   const play = useCallback(() => {
@@ -801,14 +802,14 @@ export function SlotPlayerProvider({
    * - Progress - High-frequency updates (60fps animation)
    */
   return (
-    <SlotPlayerMetaContext.Provider value={metaValue}>
-      <SlotPlayerActionsContext.Provider value={actions}>
-        <SlotPlayerConfigContext.Provider value={configValue}>
-          <SlotPlayerStateContext.Provider value={stateValue}>
-            <SlotPlayerProgressContext.Provider value={progressValue}>{children}</SlotPlayerProgressContext.Provider>
-          </SlotPlayerStateContext.Provider>
-        </SlotPlayerConfigContext.Provider>
-      </SlotPlayerActionsContext.Provider>
-    </SlotPlayerMetaContext.Provider>
+    <SlotPlayerMetaContext value={metaValue}>
+      <SlotPlayerActionsContext value={actions}>
+        <SlotPlayerConfigContext value={configValue}>
+          <SlotPlayerStateContext value={stateValue}>
+            <SlotPlayerProgressContext value={progressValue}>{children}</SlotPlayerProgressContext>
+          </SlotPlayerStateContext>
+        </SlotPlayerConfigContext>
+      </SlotPlayerActionsContext>
+    </SlotPlayerMetaContext>
   );
 }

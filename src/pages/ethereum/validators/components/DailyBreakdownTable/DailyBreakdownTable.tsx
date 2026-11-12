@@ -7,12 +7,12 @@ import type {
   BalanceDailyDataPoint,
   SyncCommitteeDailyDataPoint,
   BlockProposalDataPoint,
-} from '../../hooks/useValidatorsData.types';
-import { useHourlyData, useSlotData } from '../../hooks';
-import { getStatusIconConfig } from '../../hooks/useValidatorStatus';
-import { weekStartOf } from '../../utils/week';
-import { weekSpan } from '../../utils/range';
-import { MISSED_OR_ORPHANED, type ProposalStatus } from '../../utils/proposal-status';
+} from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
+import { useHourlyData, useSlotData } from '@/pages/ethereum/validators/hooks';
+import { getStatusIconConfig } from '@/pages/ethereum/validators/hooks/useValidatorStatus';
+import { weekStartOf } from '@/pages/ethereum/validators/utils/week';
+import { weekSpan } from '@/pages/ethereum/validators/utils/range';
+import { MISSED_OR_ORPHANED, type ProposalStatus } from '@/pages/ethereum/validators/utils/proposal-status';
 
 interface DailyBreakdownTableProps {
   /** Daily attestation data for the validator */
@@ -238,7 +238,7 @@ function SlotBreakdownRows({
         <td colSpan={9} className="px-3 py-2">
           <div className="flex gap-2">
             {Array.from({ length: 9 }, (_, i) => (
-              <div key={i} className="h-4 grow animate-pulse rounded-xs bg-muted/15" />
+              <div key={i} className="h-4 grow animate-pulse rounded-xs bg-muted-15" />
             ))}
           </div>
         </td>
@@ -259,7 +259,7 @@ function SlotBreakdownRows({
   return (
     <>
       {rows.map(row => (
-        <tr key={row.slot} className="border-b border-border/10 bg-background/15">
+        <tr key={row.slot} className="border-b border-border-10 bg-background-15">
           <td className="py-1 pr-3 pl-12 font-mono text-xs text-muted">{formatSlot(row.slot)}</td>
           <td className="px-3 py-1 text-right text-xs">{formatBoolean(row.attested)}</td>
           <td className="px-3 py-1 text-right text-xs">{formatBoolean(row.headCorrect)}</td>
@@ -432,7 +432,7 @@ function HourlyBreakdownRows({
         <td colSpan={9} className="px-3 py-2">
           <div className="flex gap-2">
             {Array.from({ length: 9 }, (_, i) => (
-              <div key={i} className="h-4 grow animate-pulse rounded-xs bg-muted/15" />
+              <div key={i} className="h-4 grow animate-pulse rounded-xs bg-muted-15" />
             ))}
           </div>
         </td>
@@ -503,8 +503,8 @@ function HourlyRow({
     <>
       <tr
         className={clsx(
-          'cursor-pointer border-b border-border/20 bg-background/30 transition-colors hover:bg-surface/40',
-          isExpanded && 'bg-surface/20'
+          'cursor-pointer border-b border-border-20 bg-background-30 transition-colors hover:bg-surface-40',
+          isExpanded && 'bg-surface-20'
         )}
         onClick={onToggle}
       >
@@ -734,7 +734,7 @@ export function DailyBreakdownTable({
   return (
     <table className="w-full text-xs">
       <thead>
-        <tr className="border-b border-border/50 text-muted">
+        <tr className="border-b border-border-50 text-muted">
           <th className="px-3 py-1.5 text-left font-medium">{weekly ? 'Week' : 'Date'}</th>
           <th className="px-3 py-1.5 text-right font-medium">Inclusion %</th>
           <th className="px-3 py-1.5 text-right font-medium">Head %</th>
@@ -808,8 +808,8 @@ function DailyDateRow({
     <>
       <tr
         className={clsx(
-          'cursor-pointer border-b border-border/30 transition-colors hover:bg-surface/50',
-          isExpanded && 'bg-surface/30'
+          'cursor-pointer border-b border-border-30 transition-colors hover:bg-surface-50',
+          isExpanded && 'bg-surface-30'
         )}
         onClick={onToggle}
       >

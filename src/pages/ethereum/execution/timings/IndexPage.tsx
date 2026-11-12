@@ -46,7 +46,7 @@ export function IndexPage(): JSX.Element {
   const activeTab = selectedIndex === 0 ? 'newPayload' : 'getBlobs';
 
   // Fetch engine timing data (getBlobs queries only run when that tab is visited)
-  const { data, isLoading, isLoadingBlobs, error } = useEngineTimingsData({
+  const { data, isLoading, isLoadingBlobs, error, startDay } = useEngineTimingsData({
     timeRange,
     referenceNodesOnly,
     activeTab,
@@ -63,11 +63,8 @@ export function IndexPage(): JSX.Element {
         (min, r) => (r.day_start_date && (!min || r.day_start_date < min) ? r.day_start_date : min),
         undefined
       );
-  const rangeSeconds = TIME_RANGE_CONFIG[timeRange].seconds;
-  const rangeStartDay =
-    rangeSeconds === null ? undefined : new Date(Date.now() - rangeSeconds * 1000).toISOString().slice(0, 10);
   const dataSince =
-    firstDay && (rangeStartDay === undefined || firstDay > rangeStartDay)
+    firstDay && (startDay === undefined || firstDay > startDay)
       ? new Date(`${firstDay}T00:00:00Z`).toLocaleDateString([], {
           month: 'short',
           day: 'numeric',

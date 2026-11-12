@@ -1,12 +1,13 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fctPreparedBlockByNodeDailyServiceList } from '@/api/sdk.gen';
 import type { FctPreparedBlockByNodeDaily } from '@/api/types.gen';
+import { useInterval } from '@/hooks/useInterval';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { toUtcDate } from '@/utils/time';
-import { parseExecutionClient } from '../utils';
-import { nodeIdOf } from '../utils/block-query';
+import { completeBucketEnd, toUtcDate } from '@/utils/time';
+import { parseExecutionClient } from '@/pages/ethereum/execution/locally-built-blocks/utils';
+import { nodeIdOf } from '@/pages/ethereum/execution/locally-built-blocks/utils/block-query';
 
 /** Past this many days the roster reads every day and keeps the window's in memory, instead of listing them */
 const MAX_LISTED_DAYS = 31;
@@ -30,7 +31,10 @@ export interface NodeRoster {
 export function useNodeRoster(start: number, end?: number): NodeRoster {
   const { currentNetwork } = useNetwork();
   const genesisTime = currentNetwork?.genesis_time ?? 0;
-  const endSeconds = end ?? Date.now() / 1000;
+  // An open window ends now, and only its day counts: the start of the day in progress, rechecked each minute
+  const [todayStart, setTodayStart] = useState(() => completeBucketEnd('day'));
+  useInterval(() => setTodayStart(completeBucketEnd('day')), 60_000);
+  const endSeconds = end ?? todayStart;
   const firstDay = toUtcDate(start);
   const lastDay = toUtcDate(endSeconds);
   const dayCount = Math.floor(endSeconds / DAY) - Math.floor(start / DAY) + 1;

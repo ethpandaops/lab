@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { MevRelayDistributionChart } from './MevRelayDistributionChart';
+import { seededRandom } from '@/test-utils/random';
+
+const random = seededRandom(24);
 
 const meta = {
   title: 'Components/Ethereum/MevRelayDistributionChart',
@@ -10,7 +13,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -58,7 +61,7 @@ export const Default: Story = {
  */
 export const ManyRelays: Story = {
   args: {
-    data: RELAY_NAMES.flatMap(relay => Array.from({ length: Math.floor(Math.random() * 20) + 1 }, () => ({ relay }))),
+    data: RELAY_NAMES.flatMap(relay => Array.from({ length: Math.floor(random() * 20) + 1 }, () => ({ relay }))),
     countAxisName: 'Blocks',
     subtitle: 'Diverse relay ecosystem',
   },
@@ -69,7 +72,7 @@ export const ManyRelays: Story = {
  */
 export const TopFive: Story = {
   args: {
-    data: RELAY_NAMES.flatMap(relay => Array.from({ length: Math.floor(Math.random() * 15) + 1 }, () => ({ relay }))),
+    data: RELAY_NAMES.flatMap(relay => Array.from({ length: Math.floor(random() * 15) + 1 }, () => ({ relay }))),
     topN: 5,
     countAxisName: 'Blocks',
     title: 'Top 5 Relays',
@@ -190,7 +193,7 @@ export const TwoRelays: Story = {
  */
 export const LargeDataset: Story = {
   args: {
-    data: RELAY_NAMES.flatMap(relay => Array.from({ length: Math.floor(Math.random() * 100) + 50 }, () => ({ relay }))),
+    data: RELAY_NAMES.flatMap(relay => Array.from({ length: Math.floor(random() * 100) + 50 }, () => ({ relay }))),
     topN: 10,
     countAxisName: 'Blocks',
     title: 'Multi-Epoch Analysis',

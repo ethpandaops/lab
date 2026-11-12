@@ -1,3 +1,6 @@
+import type { Ref } from 'react';
+import type ReactEChartsCore from 'echarts-for-react/lib/core';
+
 import type { ReactNode } from 'react';
 
 /**
@@ -33,6 +36,10 @@ export interface StackedBarSegment {
  * budget distribution, or any proportional visualization.
  */
 export interface StackedBarProps {
+  /**
+   * Ref to the underlying echarts-for-react instance
+   */
+  ref?: Ref<ReactEChartsCore>;
   /**
    * Array of segments to display in the bar
    */

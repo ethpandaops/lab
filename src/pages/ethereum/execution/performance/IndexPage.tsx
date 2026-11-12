@@ -263,7 +263,9 @@ function PerformanceSections({
     );
   }
 
-  if (rangeClients.length === 0) {
+  const fastest = rangeClients[0];
+  const slowest = rangeClients.at(-1);
+  if (!fastest || !slowest) {
     return (
       <Alert
         variant="info"
@@ -277,8 +279,6 @@ function PerformanceSections({
     );
   }
 
-  const fastest = rangeClients[0];
-  const slowest = rangeClients[rangeClients.length - 1];
   const budgetMs = Number(budget);
   const ceilings = (clients ?? [])
     .map(c => ({ client: c, mgas: gasCeiling(ceilingBasis === 'p50' ? c.fitP50 : c.fitP95, budgetMs) }))
@@ -363,7 +363,7 @@ function PerformanceSections({
                 tooltipFormatter={params => throughputTooltip(params, daily)}
               />
             ) : (
-              <div className="h-[340px] animate-pulse rounded-xs bg-background" />
+              <div className="h-85 animate-pulse rounded-xs bg-background" />
             )
           }
         </PopoutCard>
@@ -541,8 +541,9 @@ function throughputTooltip(params: unknown, daily: boolean): string {
     value?: [number, number];
     color?: string;
   }[];
-  if (!points.length) return '';
-  const time = new Date(points[0].value?.[0] ?? 0).toLocaleString(
+  const [first] = points;
+  if (!first) return '';
+  const time = new Date(first.value?.[0] ?? 0).toLocaleString(
     [],
     daily
       ? { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }
@@ -568,14 +569,15 @@ function GasCeiling({
   ceilings: { client: ClientPerformance; mgas: number }[];
   gasLimitM: number;
   basis: 'p50' | 'p95';
-}): JSX.Element {
+}): JSX.Element | null {
   const max = Math.max(...ceilings.map(c => c.mgas), gasLimitM);
   const step = max > 4000 ? 1000 : max > 2000 ? 500 : max > 800 ? 200 : 100;
   const axisMax = Math.ceil(max / step) * step;
   const ticks = Array.from({ length: axisMax / step + 1 }, (_, i) => i * step);
   // Phones label at most four ticks so the labels don't run together
   const phoneTickEvery = Math.ceil((ticks.length - 1) / 3);
-  const network = ceilings[ceilings.length - 1];
+  const network = ceilings.at(-1);
+  if (!network) return null;
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
@@ -595,7 +597,7 @@ function GasCeiling({
 
       {/* Bars, today's marker and ticks share the middle column; the bar track keeps room on its
           right for the value label after the longest bar */}
-      <div className="grid min-w-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-3 pt-5 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
+      <div className="grid min-w-0 flex-1 grid-cols-auto-fill items-center gap-3 pt-5 sm:grid-cols-auto-fill-auto">
         {ceilings.map(({ client, mgas }, i) => {
           const fit = basis === 'p50' ? client.fitP50 : client.fitP95;
           return (
@@ -609,7 +611,7 @@ function GasCeiling({
               </div>
               <div className="relative col-start-2 mr-12 h-7" style={{ gridRow: i + 1 }}>
                 <div
-                  className="absolute inset-y-0 left-0 rounded-xs transition-[width] duration-500"
+                  className="absolute inset-y-0 left-0 rounded-xs transition-width duration-500"
                   style={{ width: `${(mgas / axisMax) * 100}%`, backgroundColor: client.color }}
                 />
                 <span
@@ -634,7 +636,7 @@ function GasCeiling({
           style={{ gridRow: `1 / span ${ceilings.length}` }}
         >
           <div
-            className="absolute inset-y-0 border-l-2 border-dashed border-foreground/60"
+            className="absolute inset-y-0 border-l-2 border-dashed border-foreground-60"
             style={{ left: `${(gasLimitM / axisMax) * 100}%` }}
           >
             <span className="absolute -top-5 -translate-x-1/2 text-xs font-semibold whitespace-nowrap text-foreground">
@@ -804,13 +806,7 @@ function WorkloadSensitivity({ clients }: { clients: ClientPerformance[] }): JSX
       </table>
       <div className="mt-3 flex items-center justify-end gap-2 text-xs text-muted">
         <span>Slower</span>
-        <div
-          className="h-2 w-32 rounded-full"
-          style={{
-            background:
-              'linear-gradient(to right, color-mix(in oklab, var(--color-chart-3) 70%, transparent), transparent, color-mix(in oklab, var(--color-chart-0) 70%, transparent))',
-          }}
-        />
+        <div className="h-2 w-32 rounded-full bg-slower-to-faster" />
         <span>Faster</span>
       </div>
     </div>
@@ -874,13 +870,13 @@ function SlowBlocks({ blocks }: { blocks: SlowBlock[] }): JSX.Element {
                     '–'
                   )}
                 </td>
-                <td className="min-w-40 px-3 py-2.5 xl:w-[38%] xl:min-w-64">
+                <td className="min-w-40 px-3 py-2.5 xl:w-38/100 xl:min-w-64">
                   <div className="relative h-5 rounded-xs bg-background">
                     {b.perClient.map(p => (
                       <span
                         key={p.client}
                         title={`${p.client} · ${Math.round(p.ms)} ms`}
-                        className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-surface"
+                        className="absolute top-1/2 size-3 -translate-1/2 rounded-full ring-2 ring-surface"
                         style={{ left: `${(p.ms / maxMs) * 100}%`, backgroundColor: getExecutionClientColor(p.client) }}
                       />
                     ))}

@@ -3,7 +3,7 @@ import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 
 /** A strip of stat cells */
-export function StatsSkeleton({ count = 6 }: { count?: number }): JSX.Element {
+function StatsSkeleton({ count = 6 }: { count?: number }): JSX.Element {
   return (
     <div className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-border bg-border lg:grid-cols-3 2xl:grid-cols-6">
       {Array.from({ length: count }).map((_, i) => (
@@ -37,7 +37,7 @@ export function TableCardSkeleton({ rows = 8 }: { rows?: number }): JSX.Element 
 }
 
 /** A card holding a chart */
-export function ChartCardSkeleton(): JSX.Element {
+function ChartCardSkeleton(): JSX.Element {
   return (
     <Card rounded>
       <div className="flex flex-col gap-4">

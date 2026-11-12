@@ -12,14 +12,47 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot, getExecutionClientColor, normalizeClientName } from '@/utils';
 import type { FctEngineGetBlobsByElClientHourly, FctEngineGetBlobsByElClientDaily } from '@/api/types.gen';
-import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from '../../IndexPage.types';
-import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
+import type { EngineTimingsData } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
+import {
+  PER_SLOT_CHART_RANGES,
+  HOURLY_CHART_RANGES,
+  TIME_RANGE_CONFIG,
+  type TimeRange,
+} from '@/pages/ethereum/execution/timings/IndexPage.types';
+import { ClientVersionBreakdown } from '@/pages/ethereum/execution/timings/components/ClientVersionBreakdown';
 
 export interface GetBlobsTabProps {
   data: EngineTimingsData;
   timeRange: TimeRange;
   isLoading?: boolean;
+}
+
+/**
+ * A stat card: label and value
+ */
+function StatCardSkeleton(): JSX.Element {
+  return (
+    <Card>
+      <div className="space-y-2 p-4">
+        <LoadingContainer className="h-3 w-20 rounded-xs" />
+        <LoadingContainer className="h-8 w-24 rounded-xs" />
+      </div>
+    </Card>
+  );
+}
+
+/**
+ * A chart card: title and plot
+ */
+function ChartCardSkeleton(): JSX.Element {
+  return (
+    <Card>
+      <div className="space-y-4 p-4">
+        <LoadingContainer className="h-5 w-32 rounded-xs" />
+        <LoadingContainer className="h-93.75 w-full rounded-xs" />
+      </div>
+    </Card>
+  );
 }
 
 /**
@@ -30,14 +63,10 @@ function GetBlobsTabSkeleton(): JSX.Element {
     <div className="space-y-6">
       {/* Stats skeleton */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <Card key={index}>
-            <div className="space-y-2 p-4">
-              <LoadingContainer className="h-3 w-20 rounded-xs" />
-              <LoadingContainer className="h-8 w-24 rounded-xs" />
-            </div>
-          </Card>
-        ))}
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+        <StatCardSkeleton />
       </div>
 
       {/* Client breakdown skeleton */}
@@ -50,14 +79,8 @@ function GetBlobsTabSkeleton(): JSX.Element {
 
       {/* Charts skeleton */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {Array.from({ length: 2 }).map((_, index) => (
-          <Card key={index}>
-            <div className="space-y-4 p-4">
-              <LoadingContainer className="h-5 w-32 rounded-xs" />
-              <LoadingContainer className="h-[375px] w-full rounded-xs" />
-            </div>
-          </Card>
-        ))}
+        <ChartCardSkeleton />
+        <ChartCardSkeleton />
       </div>
     </div>
   );
@@ -197,7 +220,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             height={375}
           />
         ) : (
-          <div className="flex h-[375px] items-center justify-center text-muted">No histogram data available</div>
+          <div className="flex h-93.75 items-center justify-center text-muted">No histogram data available</div>
         )}
       </div>
     </PopoutCard>
@@ -383,9 +406,9 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
     };
   });
 
-  // Ensure valid bounds (fallback to now if no data)
-  if (trendMinTime === Infinity) trendMinTime = Date.now() - 3600000;
-  if (trendMaxTime === -Infinity) trendMaxTime = Date.now();
+  // Without duration points, the axis spans whatever points the chart has
+  const trendAxisMin = trendMinTime === Infinity ? 'dataMin' : trendMinTime;
+  const trendAxisMax = trendMaxTime === -Infinity ? 'dataMax' : trendMaxTime;
 
   // Axis and tooltip labels for the trend charts' hourly/daily buckets
   const formatTrendAxis = (value: number | string): string => {
@@ -527,7 +550,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   enableDataZoom={true}
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
+                <div className="flex h-75 items-center justify-center text-muted">No slot data available</div>
               )}
             </div>
           </PopoutCard>
@@ -557,8 +580,8 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: trendMinTime,
-                    max: trendMaxTime,
+                    min: trendAxisMin,
+                    max: trendAxisMax,
                     formatter: formatTrendAxis,
                   }}
                   yAxis={{
@@ -593,7 +616,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   }}
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No data available</div>
+                <div className="flex h-75 items-center justify-center text-muted">No data available</div>
               )}
             </div>
           </PopoutCard>
@@ -612,8 +635,8 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: trendMinTime,
-                    max: trendMaxTime,
+                    min: trendAxisMin,
+                    max: trendAxisMax,
                     formatter: formatTrendAxis,
                   }}
                   yAxis={{
@@ -650,7 +673,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
                   }}
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No data available</div>
+                <div className="flex h-75 items-center justify-center text-muted">No data available</div>
               )}
             </div>
           </PopoutCard>
@@ -671,7 +694,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
             {statusData.some(d => d.value > 0) ? (
               <BarChart data={statusData} labels={statusLabels} height={250} orientation="horizontal" />
             ) : (
-              <div className="flex h-[250px] items-center justify-center text-muted">No status data available</div>
+              <div className="flex h-62.5 items-center justify-center text-muted">No status data available</div>
             )}
           </div>
         </PopoutCard>
@@ -688,9 +711,7 @@ export function GetBlobsTab({ data, timeRange, isLoading }: GetBlobsTabProps): J
               {blobCountData.length > 0 ? (
                 <BarChart data={blobCountData} labels={blobCountLabels} color={themeColors.accent} height={250} />
               ) : (
-                <div className="flex h-[250px] items-center justify-center text-muted">
-                  No blob count data available
-                </div>
+                <div className="flex h-62.5 items-center justify-center text-muted">No blob count data available</div>
               )}
             </div>
           </PopoutCard>

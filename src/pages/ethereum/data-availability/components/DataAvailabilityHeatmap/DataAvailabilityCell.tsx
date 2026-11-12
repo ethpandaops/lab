@@ -8,17 +8,16 @@ import type { DataAvailabilityCellProps, CellSize } from './DataAvailabilityHeat
  */
 const getPercentageColor = (availability: number, hasData: boolean): string => {
   // No data - show empty cell with inset shadow (doesn't affect sizing)
-  if (!hasData)
-    return 'bg-background shadow-[inset_0_0_0_1px_rgba(128,128,128,0.2)] hover:shadow-[inset_0_0_0_1px_rgba(128,128,128,0.3)]';
+  if (!hasData) return 'bg-background inset-ring inset-ring-cell-empty hover:inset-ring-cell-empty-hover';
 
   // Has data - color based on availability percentage
-  if (availability >= 0.95) return 'bg-success/90 hover:bg-success';
-  if (availability >= 0.8) return 'bg-success/70 hover:bg-success/80';
-  if (availability >= 0.6) return 'bg-warning/70 hover:bg-warning/80';
-  if (availability >= 0.4) return 'bg-warning/50 hover:bg-warning/60';
-  if (availability >= 0.2) return 'bg-danger/50 hover:bg-danger/60';
+  if (availability >= 0.95) return 'bg-success-90 hover:bg-success';
+  if (availability >= 0.8) return 'bg-success-70 hover:bg-success-80';
+  if (availability >= 0.6) return 'bg-warning-70 hover:bg-warning-80';
+  if (availability >= 0.4) return 'bg-warning-50 hover:bg-warning-60';
+  if (availability >= 0.2) return 'bg-danger-50 hover:bg-danger-60';
   // 0-20% availability (including 0%) = red
-  return 'bg-danger/70 hover:bg-danger/80';
+  return 'bg-danger-70 hover:bg-danger-80';
 };
 
 /**
@@ -27,7 +26,7 @@ const getPercentageColor = (availability: number, hasData: boolean): string => {
 const getSizeClass = (size: CellSize): string => {
   const sizes: Record<CellSize, string> = {
     '3xs': 'aspect-square w-full', // Responsive - fills grid cell
-    '2xs': 'size-[9px]', // 9px - compact
+    '2xs': 'size-2.25', // 9px - compact
     xs: 'size-2.5', // 10px
     sm: 'size-3', // 12px
     md: 'size-4', // 16px
@@ -41,7 +40,7 @@ const getSizeClass = (size: CellSize): string => {
  * Gets the disabled cell color (for rows with no data, e.g., slots with no blobs)
  */
 const getDisabledColor = (): string => {
-  return 'bg-muted/10';
+  return 'bg-muted-10';
 };
 
 /**
@@ -92,7 +91,7 @@ export const DataAvailabilityCell = ({
 
   const tooltipContent = (
     <div
-      className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs bg-surface px-3 py-2 text-sm/6 whitespace-nowrap text-foreground"
+      className="pointer-events-none fixed z-9999 -translate-x-1/2 -translate-y-full rounded-xs bg-surface px-3 py-2 text-sm/6 whitespace-nowrap text-foreground"
       style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
     >
       <div className="font-medium">Column {displayColumnIndex}</div>
@@ -133,7 +132,7 @@ export const DataAvailabilityCell = ({
           'transition-all duration-150',
           colorClass,
           isSelected && 'ring-3 ring-accent ring-offset-2 ring-offset-background',
-          isHighlighted && !isSelected && 'ring-2 ring-accent/80',
+          isHighlighted && !isSelected && 'ring-2 ring-accent-80',
           isDimmed && 'opacity-10',
           onClick && 'cursor-pointer active:scale-95',
           !onClick && 'cursor-default'

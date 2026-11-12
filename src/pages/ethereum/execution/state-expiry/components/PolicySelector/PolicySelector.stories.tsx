@@ -18,24 +18,24 @@ const EXAMPLE_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
     slot: {
       label: 'Slot',
       icon: CubeIcon,
-      textColor: 'text-blue-600 dark:text-blue-400',
-      selectedBg: 'bg-blue-500/25',
-      selectedRing: 'ring-blue-500 dark:ring-blue-400',
-      hoverBg: 'hover:bg-blue-500/20 dark:hover:bg-blue-500/25',
-      rowHoverBg: 'bg-blue-500/10 dark:bg-blue-500/15',
-      cellBg: 'bg-blue-500/10 dark:bg-blue-500/10',
-      fillColor: 'bg-blue-500/30 dark:bg-blue-500/25',
+      textColor: 'text-data-blue',
+      selectedBg: 'bg-data-blue-25',
+      selectedRing: 'ring-data-blue',
+      hoverBg: 'hover:bg-data-blue-hover',
+      rowHoverBg: 'bg-data-blue-row',
+      cellBg: 'bg-data-blue-10',
+      fillColor: 'bg-data-blue-fill',
     },
     contract: {
       label: 'Contract',
       icon: DocumentTextIcon,
-      textColor: 'text-violet-600 dark:text-violet-400',
-      selectedBg: 'bg-violet-500/25',
-      selectedRing: 'ring-violet-500 dark:ring-violet-400',
-      hoverBg: 'hover:bg-violet-500/20 dark:hover:bg-violet-500/25',
-      rowHoverBg: 'bg-violet-500/10 dark:bg-violet-500/15',
-      cellBg: 'bg-violet-500/10 dark:bg-violet-500/10',
-      fillColor: 'bg-violet-500/30 dark:bg-violet-500/25',
+      textColor: 'text-data-violet',
+      selectedBg: 'bg-data-violet-25',
+      selectedRing: 'ring-data-violet',
+      hoverBg: 'hover:bg-data-violet-hover',
+      rowHoverBg: 'bg-data-violet-row',
+      cellBg: 'bg-data-violet-10',
+      fillColor: 'bg-data-violet-fill',
     },
   },
   policyConfig: {
@@ -63,15 +63,33 @@ const EXAMPLE_CONFIG: PolicySelectorConfig<ExpiryType, ExpiryPolicy> = {
   },
 };
 
+/** The current state the savings compare against, with formatters like the page's */
+const BASELINE = {
+  currentBytes: 250 * 1024 ** 3,
+  currentSlots: 1_400_000_000,
+  formatBytes: (bytes: number): string => `${(bytes / 1024 ** 3).toFixed(1)} GiB`,
+  formatSlots: (slots: number): string => `${(slots / 1_000_000_000).toFixed(2)}B`,
+};
+
+/** A cell's savings and the state left after them */
+function cell(bytesPercent: number, slotsPercent: number): PolicyData {
+  return {
+    bytesPercent,
+    slotsPercent,
+    afterBytes: BASELINE.currentBytes * (1 + bytesPercent / 100),
+    afterSlots: Math.round(BASELINE.currentSlots * (1 + slotsPercent / 100)),
+  };
+}
+
 /** Example savings data */
 const EXAMPLE_SAVINGS_DATA: Record<ExpiryType, Record<ExpiryPolicy, PolicyData>> = {
   slot: {
-    '12m': { bytesPercent: -45, slotsPercent: -42 },
-    '24m': { bytesPercent: -32, slotsPercent: -30 },
+    '12m': cell(-45, -42),
+    '24m': cell(-32, -30),
   },
   contract: {
-    '12m': { bytesPercent: -38, slotsPercent: -35 },
-    '24m': { bytesPercent: -25, slotsPercent: -22 },
+    '12m': cell(-38, -35),
+    '24m': cell(-25, -22),
   },
 };
 
@@ -80,7 +98,7 @@ const meta: Meta<typeof PolicySelector<ExpiryType, ExpiryPolicy>> = {
   component: PolicySelector,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-xs bg-surface p-6">
+      <div className="min-w-150 rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),
@@ -88,6 +106,7 @@ const meta: Meta<typeof PolicySelector<ExpiryType, ExpiryPolicy>> = {
   parameters: {
     layout: 'centered',
   },
+  args: BASELINE,
 };
 
 export default meta;
@@ -109,6 +128,7 @@ function InteractivePolicySelector(): JSX.Element {
         }}
         savingsData={EXAMPLE_SAVINGS_DATA}
         config={EXAMPLE_CONFIG}
+        {...BASELINE}
       />
       <p className="text-sm text-muted">
         Selected: <strong>{selectedType}</strong> + <strong>{selectedPolicy}</strong>
@@ -142,14 +162,15 @@ export const ContractSelected: Story = {
 };
 
 /** Example with some missing data */
+const MISSING: PolicyData = { bytesPercent: null, slotsPercent: null, afterBytes: null, afterSlots: null };
 const PARTIAL_DATA: Record<ExpiryType, Record<ExpiryPolicy, PolicyData>> = {
   slot: {
-    '12m': { bytesPercent: -45, slotsPercent: -42 },
-    '24m': { bytesPercent: null, slotsPercent: null },
+    '12m': cell(-45, -42),
+    '24m': MISSING,
   },
   contract: {
-    '12m': { bytesPercent: -38, slotsPercent: -35 },
-    '24m': { bytesPercent: null, slotsPercent: null },
+    '12m': cell(-38, -35),
+    '24m': MISSING,
   },
 };
 

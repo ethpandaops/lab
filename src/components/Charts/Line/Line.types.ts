@@ -1,4 +1,11 @@
+import type { Ref } from 'react';
+import type ReactEChartsCore from 'echarts-for-react/lib/core';
+
 export interface LineChartProps {
+  /**
+   * Ref to the underlying echarts-for-react instance
+   */
+  ref?: Ref<ReactEChartsCore>;
   /**
    * Chart data series (null values create gaps when connectNulls is false)
    */

@@ -10,11 +10,15 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import type { DimClientRelease, FctHeadFirstSeenByNodeDaily } from '@/api/types.gen';
 import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { CENSUS_TABLES, RESOLVED_STATUSES, type FctPeerCountByElClientDaily } from '../../api/client-models';
-import { useCensus, useClientNodes, useNodeVersions, useVersionCounts } from '../../hooks';
-import { ANGLE_COLORS } from '../../utils/angle-colors';
-import { censusVersionCounts, PEER_SOURCE, sum } from '../../utils/census';
-import type { ClientLayer } from '../../utils/client-share';
+import {
+  CENSUS_TABLES,
+  RESOLVED_STATUSES,
+  type FctPeerCountByElClientDaily,
+} from '@/pages/ethereum/clients/api/client-models';
+import { useCensus, useClientNodes, useNodeVersions, useVersionCounts } from '@/pages/ethereum/clients/hooks';
+import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
+import { censusVersionCounts, PEER_SOURCE, sum } from '@/pages/ethereum/clients/utils/census';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 import {
   adoptionByDay,
   countVersionsByDay,
@@ -24,7 +28,7 @@ import {
   type AdoptionPoint,
   type VersionCount,
   type VersionDay,
-} from '../../utils/client-versions';
+} from '@/pages/ethereum/clients/utils/client-versions';
 
 /** Whether the chart draws the share on exactly the version or on it or newer */
 type ShareMode = 'atLeast' | 'exact';
@@ -50,8 +54,9 @@ function shareNowStat(
   fromRangeStart = true
 ): { value: string; delta?: { value: string; type: 'neutral' } } {
   const counted = points.filter(point => point.atLeast !== null);
-  if (now == null || counted.length < 2 || !fromRangeStart) return { value: shareText(now) };
-  const change = Math.round((now - counted[0].atLeast!) * 10) / 10;
+  const first = counted[0]?.atLeast;
+  if (now == null || first == null || counted.length < 2 || !fromRangeStart) return { value: shareText(now) };
+  const change = Math.round((now - first) * 10) / 10;
   return {
     value: shareText(now),
     delta: { value: `${change > 0 ? '+' : ''}${change.toFixed(1)} pts over ${window}`, type: 'neutral' },
@@ -139,14 +144,14 @@ function AngleTitle({ title, color }: { title: string; color: string }): JSX.Ele
  * table so three fit side by side: labels and notes wrap instead of scrolling.
  */
 function AngleCard({ title, color, subtitle, version, previous, rows, children }: AngleCardProps): JSX.Element {
-  const cell = 'border-t border-border/60 py-2';
+  const cell = 'border-t border-border-60 py-2';
   return (
     <Card rounded title={<AngleTitle title={title} color={color} />} subtitle={subtitle}>
       <div className="flex flex-col gap-3">
         <div
           className={clsx(
             'grid items-baseline text-sm/5',
-            previous ? 'grid-cols-[minmax(6rem,1fr)_auto_auto]' : 'grid-cols-[minmax(6rem,1fr)_auto]'
+            previous ? 'grid-cols-label-auto-2' : 'grid-cols-label-auto'
           )}
         >
           <span className="pb-2 text-xs/5 text-muted">Metric</span>
@@ -255,7 +260,7 @@ export function VersionAdoption({
     entityCounts.isLoading ||
     peers.isLoading ||
     (consensus && (nodesLoading || nodeDays.isLoading));
-  if (isLoading) return <LoadingContainer className="h-[40rem] rounded-sm" />;
+  if (isLoading) return <LoadingContainer className="h-160 rounded-sm" />;
 
   const blocksNow = angleFacts(version, blocksNowDay);
   const blocksBefore = angleFacts(previousVersion, blocksNowDay);
@@ -420,7 +425,7 @@ export function VersionAdoption({
             { metric: `Entities, ${window}`, current: entityCount(version), previous: entityCount(previousVersion) },
           ]}
         >
-          <dl className="flex items-baseline justify-between gap-4 border-t border-border/60 pt-2 text-sm/5">
+          <dl className="flex items-baseline justify-between gap-4 border-t border-border-60 pt-2 text-sm/5">
             <dt className="text-muted">{formatClientName(client)} blocks with a known release, last 24h</dt>
             <dd className="font-medium text-foreground tabular-nums">{knownShare}</dd>
           </dl>

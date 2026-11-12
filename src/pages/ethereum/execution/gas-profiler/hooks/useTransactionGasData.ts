@@ -4,10 +4,17 @@ import { intTransactionCallFrameServiceList, intTransactionOpcodeGasServiceList 
 import type { IntTransactionCallFrame, IntTransactionOpcodeGas } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import type { TransactionMetadata, CallTreeNode, OpcodeStats } from '../IndexPage.types';
+import type {
+  TransactionMetadata,
+  CallTreeNode,
+  OpcodeStats,
+} from '@/pages/ethereum/execution/gas-profiler/IndexPage.types';
 import { useContractOwners, type ContractOwnerMap } from './useContractOwners';
 import { useFunctionSignatures, type FunctionSignatureMap } from './useFunctionSignatures';
-import { getPrecompileOwnerMap, isPrecompileAddress } from '../utils/precompileNames';
+import {
+  getPrecompileOwnerMap,
+  isPrecompileAddress,
+} from '@/pages/ethereum/execution/gas-profiler/utils/precompileNames';
 
 /**
  * Per-call-frame opcode statistics for "interesting" opcodes
@@ -33,7 +40,7 @@ export interface CallFrameOpcodeStats {
   hasError: boolean;
 }
 
-export interface TransactionGasData {
+interface TransactionGasData {
   /** Raw call frames from API */
   callFrames: IntTransactionCallFrame[];
   /** Raw opcode gas data from API */
@@ -67,7 +74,7 @@ export interface UseTransactionGasDataResult {
  * Get a display label for a contract address.
  * Prioritizes: contract_name > truncated address > fallback
  */
-export function getContractLabel(
+function getContractLabel(
   targetAddress: string | null | undefined,
   contractOwners: ContractOwnerMap,
   fallback = 'Root'
@@ -86,7 +93,7 @@ export function getContractLabel(
  * Get a function name from a selector.
  * Returns just the function name without parameters, or null if not found.
  */
-export function getFunctionName(
+function getFunctionName(
   functionSelector: string | null | undefined,
   functionSignatures: FunctionSignatureMap
 ): string | null {
@@ -95,7 +102,7 @@ export function getFunctionName(
   const sig = functionSignatures[functionSelector.toLowerCase()];
   if (sig?.name) {
     // Return just the function name without parameters
-    return sig.name.split('(')[0];
+    return sig.name.split('(')[0] ?? null;
   }
 
   return null;
@@ -316,9 +323,7 @@ export function useTransactionGasData({
         signal,
         throwOnError: true,
       });
-      const items = response.data?.int_transaction_call_frame ?? [];
-      if (items.length === 0) return null;
-      return items[0].block_number ?? null;
+      return response.data?.int_transaction_call_frame?.[0]?.block_number ?? null;
     },
     enabled: !!currentNetwork && !!transactionHash && providedBlockNumber == null,
     staleTime: Infinity, // Block number for a tx never changes

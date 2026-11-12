@@ -1,7 +1,7 @@
 /**
  * Common probe data interface - fields shared between IntCustodyProbe and IntCustodyProbeOrderBySlot
  */
-export interface ProbeData {
+interface ProbeData {
   slot?: number;
   column_indices?: number[];
   meta_peer_implementation?: string;

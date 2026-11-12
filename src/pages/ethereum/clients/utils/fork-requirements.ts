@@ -12,7 +12,7 @@ export interface ForkRequirement {
  */
 export function forkRequirements(network: Network | null | undefined, client: string): ForkRequirement[] {
   if (!network) return [];
-  return Object.entries(network.forks.consensus)
+  return Object.entries(network.forks.consensus ?? {})
     .flatMap(([fork, config]) => {
       const minVersion = (config?.min_client_versions as Record<string, string | undefined> | undefined)?.[client];
       return config && minVersion ? [{ fork, epoch: config.epoch, minVersion }] : [];

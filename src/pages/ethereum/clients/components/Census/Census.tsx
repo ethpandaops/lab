@@ -22,10 +22,10 @@ import {
   type FctPeerForkReadinessByClClientDaily,
   type FctPeerForkReadinessByElClientDaily,
   type FctPeerProtocolByClClientDaily,
-} from '../../api/client-models';
-import { useCensus } from '../../hooks/useCensus';
-import { ANGLE_COLORS } from '../../utils/angle-colors';
-import type { ClientLayer } from '../../utils/client-share';
+} from '@/pages/ethereum/clients/api/client-models';
+import { useCensus } from '@/pages/ethereum/clients/hooks/useCensus';
+import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 import {
   CUSTODY_BUCKETS,
   censusVersions,
@@ -36,10 +36,15 @@ import {
   sum,
   upcomingFork,
   type CensusVersion,
-} from '../../utils/census';
-import { countVersionsByDay, sinceSuffix, summariseVersions, type VersionCount } from '../../utils/client-versions';
-import { ShareTable } from '../ShareTable';
-import { VersionShareChart } from '../VersionShareChart';
+} from '@/pages/ethereum/clients/utils/census';
+import {
+  countVersionsByDay,
+  sinceSuffix,
+  summariseVersions,
+  type VersionCount,
+} from '@/pages/ethereum/clients/utils/client-versions';
+import { ShareTable } from '@/pages/ethereum/clients/components/ShareTable';
+import { VersionShareChart } from '@/pages/ethereum/clients/components/VersionShareChart';
 
 /** Formats a share, or a dash when nothing was counted */
 function percent(part: number, total: number): string {

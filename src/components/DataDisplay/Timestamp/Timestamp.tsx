@@ -114,7 +114,9 @@ export function Timestamp({
           'inline-flex cursor-pointer items-center text-left text-sm/5 whitespace-nowrap underline decoration-dotted underline-offset-4 hover:text-primary',
           className
         )}
-        aria-label={`View timestamp details: ${formattedTimestamp}`}
+        aria-label={
+          typeof formattedTimestamp === 'string' ? `View timestamp details: ${formattedTimestamp}` : undefined
+        }
       >
         {formattedTimestamp}
       </button>

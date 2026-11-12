@@ -5,7 +5,7 @@ import { Table } from '@/components/Lists/Table';
 import type { Column } from '@/components/Lists/Table/Table.types';
 import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { isKnownClient } from '@/utils/ethereum';
-import type { ClientPairSummary } from '../../utils/client-share';
+import type { ClientPairSummary } from '@/pages/ethereum/clients/utils/client-share';
 
 export interface ClientPairsProps {
   /** Pair totals, largest first */

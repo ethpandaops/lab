@@ -27,7 +27,7 @@ function nodeMatches(nodeName: string, selectedNode: string): boolean {
 
 function percentile(sorted: number[], p: number): number {
   const idx = Math.floor(sorted.length * p);
-  return sorted[Math.min(idx, sorted.length - 1)];
+  return sorted[Math.min(idx, sorted.length - 1)] ?? NaN;
 }
 
 function clampFraction(value: number): number {
@@ -47,6 +47,8 @@ interface AnnotationSwimLanesProps {
 }
 
 interface LaneMark {
+  /** The event a mark shows: its node and timing, or the lane's spread when no node is selected */
+  id: string;
   leftPct: number;
   widthPct: number;
   color: string;
@@ -83,9 +85,11 @@ export function AnnotationSwimLanes({
 
           const startFrac = clampFraction(rawStartFrac);
           const endFrac = clampFraction(rawEndFrac);
+          const id = `${anno.nodeName}-${anno.timeMs}-${anno.endMs ?? ''}`;
 
           if (hasRange) {
             marks.push({
+              id,
               leftPct: startFrac * 100,
               widthPct: Math.max((endFrac - startFrac) * 100, MIN_MARK_FRAC * 100),
               color,
@@ -93,6 +97,7 @@ export function AnnotationSwimLanes({
             });
           } else {
             marks.push({
+              id,
               leftPct: Math.max(0, startFrac - MIN_MARK_FRAC / 2) * 100,
               widthPct: MIN_MARK_FRAC * 100,
               color,
@@ -110,13 +115,14 @@ export function AnnotationSwimLanes({
         if (hasRanges) {
           const starts = events.map(e => e.timeMs).sort((a, b) => a - b);
           const ends = events.map(e => e.endMs ?? e.timeMs).sort((a, b) => a - b);
-          const rawStartFrac = starts[0] / SLOT_DURATION_MS;
+          const rawStartFrac = percentile(starts, 0) / SLOT_DURATION_MS;
           const rawEndFrac = percentile(ends, 0.95) / SLOT_DURATION_MS;
           if (rawEndFrac < 0 || rawStartFrac > 1) continue;
 
           const startFrac = clampFraction(rawStartFrac);
           const endFrac = clampFraction(rawEndFrac);
           marks.push({
+            id: 'spread',
             leftPct: startFrac * 100,
             widthPct: Math.max((endFrac - startFrac) * 100, MIN_MARK_FRAC * 100),
             color,
@@ -124,7 +130,7 @@ export function AnnotationSwimLanes({
           });
         } else {
           const times = events.map(e => e.timeMs).sort((a, b) => a - b);
-          const rawMinFrac = times[0] / SLOT_DURATION_MS;
+          const rawMinFrac = percentile(times, 0) / SLOT_DURATION_MS;
           const rawP95Frac = percentile(times, 0.95) / SLOT_DURATION_MS;
           if (rawP95Frac < 0 || rawMinFrac > 1) continue;
 
@@ -134,6 +140,7 @@ export function AnnotationSwimLanes({
           if (width < MIN_MARK_FRAC) {
             const medFrac = clampFraction(percentile(times, 0.5) / SLOT_DURATION_MS);
             marks.push({
+              id: 'spread',
               leftPct: Math.max(0, medFrac - MIN_MARK_FRAC / 2) * 100,
               widthPct: MIN_MARK_FRAC * 100,
               color,
@@ -141,6 +148,7 @@ export function AnnotationSwimLanes({
             });
           } else {
             marks.push({
+              id: 'spread',
               leftPct: minFrac * 100,
               widthPct: (p95Frac - minFrac) * 100,
               color,
@@ -163,24 +171,20 @@ export function AnnotationSwimLanes({
   return (
     <div className="mt-2 flex flex-col gap-0.5" style={{ paddingRight: gridRight }}>
       {lanes.map(lane => (
-        <div key={lane.type} className="flex items-center" style={{ height: 14 }}>
-          <span
-            className="shrink-0 truncate text-muted"
-            style={{ width: gridLeft, fontSize: 9, lineHeight: '14px', textAlign: 'right', paddingRight: 6 }}
-          >
+        <div key={lane.type} className="flex h-3.5 items-center">
+          <span className="shrink-0 truncate pr-1.5 text-right text-swim-lane text-muted" style={{ width: gridLeft }}>
             {lane.label}
           </span>
-          <div className="relative grow bg-foreground/[0.03]" style={{ height: 10, borderRadius: 2 }}>
-            {lane.marks.map((mark, i) => (
+          <div className="relative h-2.5 grow rounded-2xs bg-foreground-3">
+            {lane.marks.map(mark => (
               <div
-                key={i}
-                className="absolute top-0 h-full cursor-pointer"
+                key={mark.id}
+                className="absolute top-0 h-full cursor-pointer rounded-px"
                 style={{
                   left: `${mark.leftPct}%`,
                   width: `${mark.widthPct}%`,
                   backgroundColor: mark.color,
                   opacity: mark.opacity,
-                  borderRadius: 1,
                 }}
                 onMouseEnter={() =>
                   onHighlight?.({

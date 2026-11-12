@@ -50,7 +50,7 @@ export function TableToolbar<TData>({
   return (
     <div
       className={clsx(
-        'flex items-center justify-between gap-4 bg-surface/50 px-(--toolbar-inset) py-2',
+        'flex items-center justify-between gap-4 bg-surface-50 px-toolbar-inset py-2',
         position === 'top' ? 'border-b border-border' : 'border-t border-border'
       )}
     >
@@ -62,7 +62,7 @@ export function TableToolbar<TData>({
             <MenuButton
               className={clsx(
                 'flex items-center gap-1.5 rounded-sm px-2 py-1 text-xs font-medium transition-colors',
-                'border border-border bg-background text-muted hover:border-primary/50 hover:text-foreground'
+                'border border-border bg-background text-muted hover:border-primary-50 hover:text-foreground'
               )}
             >
               <ViewColumnsIcon className="size-3.5" />
@@ -99,7 +99,7 @@ export function TableToolbar<TData>({
                 </div>
 
                 {/* Column toggles */}
-                <div className="max-h-[300px] overflow-y-auto">
+                <div className="max-h-75 overflow-y-auto">
                   {hideableColumns.map(column => (
                     <button
                       key={column.id}
@@ -107,7 +107,7 @@ export function TableToolbar<TData>({
                       onClick={() => column.toggleVisibility()}
                       className={clsx(
                         'flex w-full cursor-pointer items-center gap-2 px-3 py-1.5 text-left text-xs transition-colors',
-                        'hover:bg-primary/10 hover:text-primary'
+                        'hover:bg-primary-10 hover:text-primary'
                       )}
                     >
                       <Checkbox
@@ -162,9 +162,10 @@ export function TableToolbar<TData>({
           <button
             onClick={() => table.previousPage()}
             disabled={!canPreviousPage}
+            aria-label="Previous page"
             className={clsx(
               'flex items-center justify-center rounded-sm p-1 transition-colors',
-              canPreviousPage ? 'text-muted hover:bg-primary/10 hover:text-primary' : 'cursor-not-allowed text-muted/30'
+              canPreviousPage ? 'text-muted hover:bg-primary-10 hover:text-primary' : 'cursor-not-allowed text-muted-30'
             )}
           >
             <ChevronLeftIcon className="size-4" />
@@ -172,9 +173,10 @@ export function TableToolbar<TData>({
           <button
             onClick={() => table.nextPage()}
             disabled={!canNextPage}
+            aria-label="Next page"
             className={clsx(
               'flex items-center justify-center rounded-sm p-1 transition-colors',
-              canNextPage ? 'text-muted hover:bg-primary/10 hover:text-primary' : 'cursor-not-allowed text-muted/30'
+              canNextPage ? 'text-muted hover:bg-primary-10 hover:text-primary' : 'cursor-not-allowed text-muted-30'
             )}
           >
             <ChevronRightIcon className="size-4" />

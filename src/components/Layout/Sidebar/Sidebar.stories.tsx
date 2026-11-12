@@ -9,7 +9,7 @@ const meta = {
   component: Sidebar,
   decorators: [
     Story => (
-      <div className="min-h-screen min-w-[600px]">
+      <div className="min-h-screen min-w-150">
         <Story />
       </div>
     ),
@@ -32,24 +32,30 @@ type Story = StoryObj<typeof meta>;
 // Wrapper component for interactive state with toggle button
 function SidebarWrapper(props: { initialOpen?: boolean; showToggle?: boolean }): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(props.initialOpen ?? false);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <div className="relative min-h-screen bg-background">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+      />
 
       {/* Mock header bar (mobile only) */}
-      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface px-4 py-4 lg:hidden">
+      <div className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-surface p-4 lg:hidden">
         <div className="flex items-center gap-4">
           <button
             type="button"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="group -m-2.5 flex h-10 w-10 flex-col items-center justify-center gap-1.5 p-2.5"
+            className="group -m-2.5 flex size-10 flex-col items-center justify-center gap-1.5 p-2.5"
             aria-label="Toggle sidebar"
             aria-pressed={sidebarOpen}
           >
-            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:translate-y-2 group-[[aria-pressed=true]]:rotate-45" />
-            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:opacity-0" />
-            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:-translate-y-2 group-[[aria-pressed=true]]:-rotate-45" />
+            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:translate-y-2 group-aria-pressed:rotate-45" />
+            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:opacity-0" />
+            <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:-translate-y-2 group-aria-pressed:-rotate-45" />
           </button>
           <span className="text-lg font-semibold text-foreground">The Lab</span>
         </div>

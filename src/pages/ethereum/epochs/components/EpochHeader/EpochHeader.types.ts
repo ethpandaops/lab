@@ -1,4 +1,4 @@
-import type { EpochStats } from '../../hooks';
+import type { EpochStats } from '@/pages/ethereum/epochs/hooks';
 
 /**
  * Props for EpochHeader component

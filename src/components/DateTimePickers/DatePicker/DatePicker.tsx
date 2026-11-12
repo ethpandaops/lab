@@ -19,7 +19,7 @@ import type { DatePickerProps } from './DatePicker.types';
  */
 export function DatePicker({ wrapperClassName, inline = true, ...props }: DatePickerProps): JSX.Element {
   return (
-    <div className={clsx('date-picker-wrapper', wrapperClassName)}>
+    <div className={clsx('inline-block', wrapperClassName)}>
       <ReactDatePicker inline={inline} {...props} />
     </div>
   );

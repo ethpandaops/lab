@@ -1,2 +1,2 @@
-export { GasHistogram, TRANSACTION_BUCKETS, CALL_BUCKETS } from './GasHistogram';
-export type { GasHistogramProps, HistogramBucket } from './GasHistogram';
+export { GasHistogram } from './GasHistogram';
+export { TRANSACTION_BUCKETS } from './constants';

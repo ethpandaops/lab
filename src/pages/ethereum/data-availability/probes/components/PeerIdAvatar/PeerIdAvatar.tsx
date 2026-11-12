@@ -39,24 +39,21 @@ function hashNumber(n: number, seed: number): number {
 }
 
 /**
- * Generates a unique 4x4 grid pattern based on a peer ID
+ * Generates a unique 4x4 grid pattern based on a peer ID: the cells to fill, row by row
  * The pattern is mirrored horizontally for a symmetric look
  */
-function generatePattern(peerId: number): boolean[][] {
-  const grid: boolean[][] = [];
+function generatePattern(peerId: number): Array<{ row: number; col: number }> {
+  const cells: Array<{ row: number; col: number }> = [];
 
   for (let row = 0; row < 4; row++) {
-    const rowData: boolean[] = [];
-    for (let col = 0; col < 2; col++) {
-      // Use hash to determine if cell is filled
-      const hash = hashNumber(peerId, row * 10 + col);
-      rowData.push(hash > 0.4);
+    for (let col = 0; col < 4; col++) {
+      // Use hash to determine if cell is filled; the right half mirrors the left
+      const hash = hashNumber(peerId, row * 10 + (col < 2 ? col : 3 - col));
+      if (hash > 0.4) cells.push({ row, col });
     }
-    // Mirror the pattern horizontally
-    grid.push([...rowData, ...rowData.reverse()]);
   }
 
-  return grid;
+  return cells;
 }
 
 /**
@@ -64,7 +61,7 @@ function generatePattern(peerId: number): boolean[][] {
  */
 function getColor(peerId: number): string {
   const index = Math.abs(peerId) % COLORS.length;
-  return COLORS[index];
+  return COLORS[index] ?? DATA_COLORS.orange;
 }
 
 /**
@@ -105,21 +102,17 @@ export function PeerIdAvatar({ peerId, size = 24, className = '' }: PeerIdAvatar
       <rect width={size} height={size} fill={backgroundColor} rx={size * 0.1} />
 
       {/* Pattern cells */}
-      {pattern.map((row, rowIndex) =>
-        row.map((filled, colIndex) =>
-          filled ? (
-            <rect
-              key={`${rowIndex}-${colIndex}`}
-              x={colIndex * cellSize}
-              y={rowIndex * cellSize}
-              width={cellSize}
-              height={cellSize}
-              fill={color}
-              rx={cellSize * 0.2}
-            />
-          ) : null
-        )
-      )}
+      {pattern.map(({ row, col }) => (
+        <rect
+          key={`${row}-${col}`}
+          x={col * cellSize}
+          y={row * cellSize}
+          width={cellSize}
+          height={cellSize}
+          fill={color}
+          rx={cellSize * 0.2}
+        />
+      ))}
     </svg>
   );
 }

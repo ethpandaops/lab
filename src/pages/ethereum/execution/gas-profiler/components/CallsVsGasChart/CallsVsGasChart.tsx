@@ -8,7 +8,7 @@ import { ECHARTS_THEME } from '@/utils/echarts-theme';
 /**
  * Data point for the scatter chart
  */
-export interface CallsVsGasDataPoint {
+interface CallsVsGasDataPoint {
   /** Number of calls (call frames) */
   calls: number;
   /** Gas used */
@@ -129,16 +129,21 @@ export function CallsVsGasChart({
                 onClick={() => setUseLogScale(!useLogScale)}
                 className={clsx(
                   'rounded-xs px-2 py-1 text-xs transition-colors',
-                  useLogScale ? 'bg-primary/10 text-primary' : 'bg-surface text-muted hover:text-foreground'
+                  useLogScale ? 'bg-primary-10 text-primary' : 'bg-surface text-muted hover:text-foreground'
                 )}
               >
                 Log Scale {useLogScale ? 'On' : 'Off'}
               </button>
             </div>
-            <ReactECharts theme={ECHARTS_THEME} option={chartOption} style={{ height: inModal ? 380 : 260 }} />
+            <ReactECharts
+              theme={ECHARTS_THEME}
+              option={chartOption}
+              // The ! outranks the 300px height echarts-for-react sets inline when style gives none
+              className={inModal ? 'h-95!' : 'h-65!'}
+            />
           </div>
         ) : (
-          <div className="flex items-center justify-center text-sm text-muted" style={{ height: inModal ? 400 : 280 }}>
+          <div className={clsx('flex items-center justify-center text-sm text-muted', inModal ? 'h-100' : 'h-70')}>
             No data
           </div>
         )

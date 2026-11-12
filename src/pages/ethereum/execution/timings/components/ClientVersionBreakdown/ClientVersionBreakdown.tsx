@@ -161,19 +161,39 @@ function formatActiveRange(firstSeen: number, lastSeen: number, bucketSeconds: n
 }
 
 /**
+ * Sort direction arrow, shown on the sorted column only
+ */
+function SortIcon({
+  field,
+  sortField,
+  sortDirection,
+}: {
+  field: SortField;
+  sortField: SortField;
+  sortDirection: SortDirection;
+}): JSX.Element | null {
+  if (sortField !== field) return null;
+  return sortDirection === 'asc' ? (
+    <ChevronUpIcon className="ml-1 inline size-4" />
+  ) : (
+    <ChevronDownIcon className="ml-1 inline size-4" />
+  );
+}
+
+/**
  * Get status badge styling
  */
 function getStatusStyle(status?: string): { bg: string; text: string } {
   switch (status?.toUpperCase()) {
     case 'VALID':
-      return { bg: 'bg-success/10', text: 'text-success' };
+      return { bg: 'bg-success-10', text: 'text-success' };
     case 'ERROR':
     case 'INVALID':
-      return { bg: 'bg-danger/10', text: 'text-danger' };
+      return { bg: 'bg-danger-10', text: 'text-danger' };
     case 'SYNCING':
-      return { bg: 'bg-warning/10', text: 'text-warning' };
+      return { bg: 'bg-warning-10', text: 'text-warning' };
     default:
-      return { bg: 'bg-muted/10', text: 'text-muted' };
+      return { bg: 'bg-muted-10', text: 'text-muted' };
   }
 }
 
@@ -238,7 +258,7 @@ function ExpandedRowContent({
   if (isLoading) {
     return (
       <tr>
-        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+        <td colSpan={colSpan} className="bg-background-50 px-4 py-3">
           <div className="ml-8 flex items-center gap-2 text-sm text-muted">
             <div className="size-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             Loading observations...
@@ -251,7 +271,7 @@ function ExpandedRowContent({
   if (error) {
     return (
       <tr>
-        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+        <td colSpan={colSpan} className="bg-background-50 px-4 py-3">
           <div className="ml-8 text-sm text-danger">Failed to load observations</div>
         </td>
       </tr>
@@ -261,7 +281,7 @@ function ExpandedRowContent({
   if (observations.length === 0) {
     return (
       <tr>
-        <td colSpan={colSpan} className="bg-background/50 px-4 py-3">
+        <td colSpan={colSpan} className="bg-background-50 px-4 py-3">
           <div className="ml-8 text-sm text-muted">No individual observations found</div>
         </td>
       </tr>
@@ -270,7 +290,7 @@ function ExpandedRowContent({
 
   return (
     <tr>
-      <td colSpan={colSpan} className="bg-background/50 p-0">
+      <td colSpan={colSpan} className="bg-background-50 p-0">
         <div className="ml-8 border-l-2 border-border py-2 pl-4">
           <table className="w-full">
             <thead>
@@ -281,12 +301,13 @@ function ExpandedRowContent({
               </tr>
             </thead>
             <tbody>
-              {observations.map((obs: IntEngineNewPayload, idx: number) => {
+              {observations.map((obs: IntEngineNewPayload) => {
                 const statusStyle = getStatusStyle(obs.status);
                 const clusterName = extractClusterFromNodeName(obs.meta_client_name ?? '');
                 const clusterColor = clusterName ? CLUSTER_COLORS[clusterName] : null;
+                // An observation is one node's call for one block at one time
                 return (
-                  <tr key={`${obs.meta_client_name}-${idx}`} className="text-sm">
+                  <tr key={`${obs.block_hash}-${obs.meta_client_name}-${obs.event_date_time}`} className="text-sm">
                     <td className="px-2 py-1.5">
                       <span className="flex items-center gap-1.5 text-muted" title={obs.meta_client_name}>
                         {clusterColor && clusterName && (
@@ -296,7 +317,7 @@ function ExpandedRowContent({
                               e.stopPropagation();
                               onClusterClick(clusterName);
                             }}
-                            className="rounded-xs p-0.5 transition-colors hover:bg-primary/10"
+                            className="rounded-xs p-0.5 transition-colors hover:bg-primary-10"
                             title={`View ${clusterName} cluster specs`}
                           >
                             <ServerIcon className={clsx('size-3.5 shrink-0', clusterColor)} />
@@ -354,10 +375,10 @@ export function ClientVersionBreakdown({
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   // Track which clients are expanded (for expandable mode)
-  const [expandedClients, setExpandedClients] = useState<Set<string>>(new Set());
+  const [expandedClients, setExpandedClients] = useState<Set<string>>(() => new Set());
 
   // Track which client groups are expanded (for multi-version collapsing)
-  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => new Set());
 
   // Cluster specs modal state
   const [clusterSpecsOpen, setClusterSpecsOpen] = useState(false);
@@ -594,10 +615,12 @@ export function ClientVersionBreakdown({
 
     clientMap.forEach(versions => {
       const sorted = [...versions].sort((a, b) => b.lastSeen - a.lastSeen || b.observations - a.observations);
+      const [newest] = sorted;
+      if (!newest) return;
 
       if (sorted.length === 1) {
         result.push({
-          ...sorted[0],
+          ...newest,
           versions: [],
           versionCount: 1,
         });
@@ -637,10 +660,10 @@ export function ClientVersionBreakdown({
         }
       );
 
-      const allVersions = rangePercentiles?.get(`${sorted[0].client}|`);
+      const allVersions = rangePercentiles?.get(`${newest.client}|`);
       result.push({
-        client: sorted[0].client,
-        version: sorted[0].version,
+        client: newest.client,
+        version: newest.version,
         avgDuration: summary.durationObs > 0 ? summary.totalWeightedAvg / summary.durationObs : 0,
         p50Duration: rangePercentiles
           ? (allVersions?.p50 ?? 0)
@@ -657,7 +680,7 @@ export function ClientVersionBreakdown({
         observations: summary.observations,
         avgBlobCount: summary.observations > 0 ? summary.totalWeightedBlobCount / summary.observations : 0,
         firstSeen: summary.firstSeen,
-        lastSeen: sorted[0].lastSeen,
+        lastSeen: newest.lastSeen,
         versions: sorted,
         versionCount: sorted.length,
       });
@@ -718,22 +741,13 @@ export function ClientVersionBreakdown({
     }
   };
 
-  const SortIcon = ({ field }: { field: SortField }): JSX.Element | null => {
-    if (sortField !== field) return null;
-    return sortDirection === 'asc' ? (
-      <ChevronUpIcon className="ml-1 inline size-4" />
-    ) : (
-      <ChevronDownIcon className="ml-1 inline size-4" />
-    );
-  };
-
   const headerClass =
-    'cursor-pointer select-none py-3 px-3 text-left text-sm font-semibold text-foreground hover:text-accent transition-colors';
+    'cursor-pointer select-none p-3  text-left text-sm font-semibold text-foreground hover:text-accent transition-colors';
 
   if (aggregatedData.length === 0) {
     const emptyContent = (
       <>
-        <div className="flex h-[200px] items-center justify-center text-muted">No client version data available</div>
+        <div className="flex h-50 items-center justify-center text-muted">No client version data available</div>
       </>
     );
 
@@ -756,51 +770,51 @@ export function ClientVersionBreakdown({
             <tr>
               <th className={clsx(headerClass, 'pl-4')} onClick={() => handleSort('client')}>
                 Client
-                <SortIcon field="client" />
+                <SortIcon field="client" sortField={sortField} sortDirection={sortDirection} />
               </th>
               <th className={headerClass} onClick={() => handleSort('version')}>
                 Version
-                <SortIcon field="version" />
+                <SortIcon field="version" sortField={sortField} sortDirection={sortDirection} />
               </th>
               {hasActivity && (
                 <th className={headerClass} onClick={() => handleSort('active')}>
                   Active
-                  <SortIcon field="active" />
+                  <SortIcon field="active" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
               <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgDuration')}>
                 Avg (ms)
-                <SortIcon field="avgDuration" />
+                <SortIcon field="avgDuration" sortField={sortField} sortDirection={sortDirection} />
               </th>
               {hasHourlyData && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('p50Duration')}>
                   P50 (ms)
-                  <SortIcon field="p50Duration" />
+                  <SortIcon field="p50Duration" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
               {hasHourlyData && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('p95Duration')}>
                   P95 (ms)
-                  <SortIcon field="p95Duration" />
+                  <SortIcon field="p95Duration" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
               {!hideRange && <th className={clsx(headerClass, 'text-right')}>Range</th>}
               {showBlobCount && (
                 <th className={clsx(headerClass, 'text-right')} onClick={() => handleSort('avgBlobCount')}>
                   {blobCountLabel}
-                  <SortIcon field="avgBlobCount" />
+                  <SortIcon field="avgBlobCount" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
               {!hideObservations && (
                 <th className={clsx(headerClass, 'pr-4 text-right')} onClick={() => handleSort('observations')}>
                   Observations
-                  <SortIcon field="observations" />
+                  <SortIcon field="observations" sortField={sortField} sortDirection={sortDirection} />
                 </th>
               )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-surface">
-            {sortedData.map((row, index) => {
+            {sortedData.map(row => {
               const isGroupExpanded = expandedGroups.has(row.client);
               const hasMultipleVersions = row.versionCount > 1;
               const rowKey = `${row.client}-${row.version}`;
@@ -845,7 +859,7 @@ export function ClientVersionBreakdown({
               const renderMetricCells = (metricRow: AggregatedRow): JSX.Element => (
                 <>
                   {hasActivity && (
-                    <td className="px-3 py-3">
+                    <td className="p-3">
                       {metricRow.lastSeen > 0 ? (
                         <span
                           className="text-sm whitespace-nowrap text-muted"
@@ -858,7 +872,7 @@ export function ClientVersionBreakdown({
                       )}
                     </td>
                   )}
-                  <td className="px-3 py-3 text-right">
+                  <td className="p-3 text-right">
                     {metricRow.avgDuration > 0 ? (
                       <span
                         className={clsx(
@@ -873,7 +887,7 @@ export function ClientVersionBreakdown({
                     )}
                   </td>
                   {hasHourlyData && (
-                    <td className="px-3 py-3 text-right">
+                    <td className="p-3 text-right">
                       {metricRow.p50Duration > 0 ? (
                         <span
                           className={clsx(
@@ -889,7 +903,7 @@ export function ClientVersionBreakdown({
                     </td>
                   )}
                   {hasHourlyData && (
-                    <td className="px-3 py-3 text-right">
+                    <td className="p-3 text-right">
                       {metricRow.p95Duration > 0 ? (
                         <span
                           className={clsx(
@@ -905,7 +919,7 @@ export function ClientVersionBreakdown({
                     </td>
                   )}
                   {!hideRange && (
-                    <td className="px-3 py-3 text-right">
+                    <td className="p-3 text-right">
                       {metricRow.maxDuration > 0 ? (
                         <span className="text-sm text-muted">
                           {metricRow.minDuration.toFixed(0)} – {metricRow.maxDuration.toFixed(0)} ms
@@ -916,7 +930,7 @@ export function ClientVersionBreakdown({
                     </td>
                   )}
                   {showBlobCount && (
-                    <td className="px-3 py-3 text-right">
+                    <td className="p-3 text-right">
                       <span className="text-sm text-muted">{(metricRow.avgBlobCount ?? 0).toFixed(1)}</span>
                     </td>
                   )}
@@ -929,7 +943,7 @@ export function ClientVersionBreakdown({
               );
 
               return (
-                <React.Fragment key={`${row.client}-${row.version}-${index}`}>
+                <React.Fragment key={row.client}>
                   {/* Primary row */}
                   <tr
                     className={clsx(
@@ -950,7 +964,7 @@ export function ClientVersionBreakdown({
                         {!compactClient && <span className="text-sm font-medium text-foreground">{row.client}</span>}
                       </div>
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="p-3">
                       {hasMultipleVersions ? (
                         <span title={`Aggregate across ${row.versionCount} versions for the selected period`}>
                           <Badge variant="flat" size="small">
@@ -977,7 +991,7 @@ export function ClientVersionBreakdown({
                   {/* Group expansion: per-version sub-rows, newest first */}
                   {hasMultipleVersions &&
                     isGroupExpanded &&
-                    row.versions.map((subRow, subIndex) => {
+                    row.versions.map(subRow => {
                       const subRowKey = `${subRow.client}-${subRow.version}`;
                       const isSubNodeExpanded = expandedClients.has(subRowKey);
 
@@ -995,16 +1009,16 @@ export function ClientVersionBreakdown({
                       };
 
                       return (
-                        <React.Fragment key={`sub-${subRow.client}-${subRow.version}-${subIndex}`}>
+                        <React.Fragment key={subRowKey}>
                           <tr
                             className={clsx(
-                              'bg-background/50 transition-colors hover:bg-background',
+                              'bg-background-50 transition-colors hover:bg-background',
                               canExpandNode && 'cursor-pointer',
                               isSubNodeExpanded && 'bg-background'
                             )}
                             onClick={handleSubRowClick}
                           >
-                            <td className="border-l-2 border-primary/30 py-3 pr-3 pl-10">
+                            <td className="border-l-2 border-primary-30 py-3 pr-3 pl-10">
                               <div className="flex items-center gap-2">
                                 {canExpandNode && (
                                   <ChevronRightIcon
@@ -1016,7 +1030,7 @@ export function ClientVersionBreakdown({
                                 )}
                               </div>
                             </td>
-                            <td className="px-3 py-3">
+                            <td className="p-3">
                               <span className="font-mono text-sm text-muted">{subRow.version}</span>
                             </td>
                             {renderMetricCells(subRow)}

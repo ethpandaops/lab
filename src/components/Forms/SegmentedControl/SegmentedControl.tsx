@@ -6,7 +6,7 @@ import type { SegmentedControlProps } from './SegmentedControl.types';
  * Single-choice control for short option sets such as time windows.
  *
  * Shares the 32px control height and rounded-sm radius with SelectMenu and Button so a row of
- * filters lines up. The selected segment uses the app-wide selected state (`bg-primary/15
+ * filters lines up. The selected segment uses the app-wide selected state (`bg-primary-15
  * text-primary`) rather than a solid fill. When the options overflow a narrow screen, the control
  * narrows to the whole segments around the selected one and scrolls sideways to the rest, so no
  * segment is cut in half.
@@ -37,15 +37,24 @@ export function SegmentedControl<T extends string>({
         const rect = button.getBoundingClientRect();
         return { left: rect.left - origin, right: rect.right - origin };
       });
-      const inset = edges[0].left;
+      const start = edges[0];
+      const selectedEdge = edges[selected];
+      if (!start || !selectedEdge) return;
+      const inset = start.left;
       const room = group.clientWidth - 2 * inset;
       // As many whole segments as fit, from as early as the selected one allows
-      let first = selected;
-      while (first > 0 && edges[selected].right - edges[first - 1].left <= room) first--;
-      let last = selected;
-      while (last < edges.length - 1 && edges[last + 1].right - edges[first].left <= room) last++;
-      group.style.width = `${edges[last].right - edges[first].left + 2 * inset}px`;
-      group.scrollLeft = edges[first].left - inset;
+      let left = selectedEdge.left;
+      for (const edge of edges.slice(0, selected).reverse()) {
+        if (selectedEdge.right - edge.left > room) break;
+        left = edge.left;
+      }
+      let right = selectedEdge.right;
+      for (const edge of edges.slice(selected + 1)) {
+        if (edge.right - left > room) break;
+        right = edge.right;
+      }
+      group.style.width = `${right - left + 2 * inset}px`;
+      group.scrollLeft = left - inset;
     };
     fit();
     // Refit when the screen width changes, not on the height changes of a mobile browser's toolbar
@@ -79,9 +88,9 @@ export function SegmentedControl<T extends string>({
             disabled={option.disabled}
             onClick={() => onChange(option.value)}
             className={clsx(
-              'h-full shrink-0 rounded-xs px-2.5 text-xs font-medium whitespace-nowrap transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary/50',
-              isSelected ? 'bg-primary/15 text-primary' : 'text-muted hover:bg-muted/10 hover:text-foreground',
-              'disabled:cursor-not-allowed disabled:text-muted/40 disabled:hover:bg-transparent'
+              'h-full shrink-0 rounded-xs px-2.5 text-xs font-medium whitespace-nowrap transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary-50',
+              isSelected ? 'bg-primary-15 text-primary' : 'text-muted hover:bg-muted-10 hover:text-foreground',
+              'disabled:cursor-not-allowed disabled:text-muted-40 disabled:hover:bg-transparent'
             )}
           >
             {option.label}

@@ -20,6 +20,9 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Input } from '@/components/Forms/Input';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 
+/** The loading state's placeholder rows, which carry no data, only their place in the table */
+const LOADING_ROWS = ['loading-1', 'loading-2', 'loading-3', 'loading-4', 'loading-5'];
+
 export function DataTable<TData>({
   data,
   columns,
@@ -185,17 +188,17 @@ export function DataTable<TData>({
   return (
     <div
       className={clsx(
-        'group/datatable w-full [--table-inset:--spacing(3)] [--toolbar-inset:--spacing(4)] sm:[--toolbar-inset:--spacing(6)]',
+        'group/datatable w-full data-table-inset',
         // Inside a Card body: flush to the card edges, with edge columns on the card's inset so they
         // line up with the card title
-        'in-data-[slot=card-body]:-mx-(--card-inset) in-data-[slot=card-body]:w-auto',
-        'in-data-[slot=card-body]:[--table-inset:var(--card-inset)] in-data-[slot=card-body]:[--toolbar-inset:var(--card-inset)]',
-        'in-data-[slot=card-body]:first:-mt-(--card-inset-y) in-data-[slot=card-body]:last:-mb-(--card-inset-y)'
+        'in-data-[slot=card-body]:mx-card-bleed in-data-[slot=card-body]:w-auto',
+        'in-data-[slot=card-body]:inset-from-card',
+        'in-data-[slot=card-body]:first:mt-card-bleed in-data-[slot=card-body]:last:mb-card-bleed'
       )}
     >
       {/* Header section */}
       {(title || description) && (
-        <div className="mb-4 px-(--toolbar-inset)">
+        <div className="mb-4 px-toolbar-inset">
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:flex-auto">
               {title && <h2 className="text-sm/6 font-semibold text-foreground">{title}</h2>}
@@ -207,7 +210,7 @@ export function DataTable<TData>({
 
       {/* Global search (if enabled) */}
       {!hideGlobalFilter && (
-        <div className="mb-4 px-(--toolbar-inset)">
+        <div className="mb-4 px-toolbar-inset">
           <div className="sm:max-w-xs">
             <Input size="sm">
               <Input.Leading>
@@ -262,9 +265,9 @@ export function DataTable<TData>({
                           'text-left text-xs font-medium whitespace-nowrap text-muted',
                           comfortable ? 'py-2.5' : 'py-1.5',
                           headerIndex === 0
-                            ? `${gap.right} pl-(--table-inset)`
+                            ? `${gap.right} pl-table-inset`
                             : headerIndex === headerGroup.headers.length - 1
-                              ? `pr-(--table-inset) ${gap.left}`
+                              ? `pr-table-inset ${gap.left}`
                               : gap.both,
                           (header.column.columnDef.meta as DataTableColumnMeta | undefined)?.columnClassName
                         )}
@@ -314,8 +317,8 @@ export function DataTable<TData>({
                 <tr>
                   <td colSpan={columns.length} className="py-8">
                     <div className="flex flex-col gap-2">
-                      {[...Array(5)].map((_, i) => (
-                        <LoadingContainer key={i} className="h-12 w-full" />
+                      {LOADING_ROWS.map(row => (
+                        <LoadingContainer key={row} className="h-12 w-full" />
                       ))}
                     </div>
                   </td>
@@ -349,9 +352,9 @@ export function DataTable<TData>({
                               'whitespace-nowrap tabular-nums',
                               comfortable ? 'py-2.5 text-sm' : 'py-1.5 text-xs',
                               cellIndex === 0
-                                ? `${gap.right} pl-(--table-inset)`
+                                ? `${gap.right} pl-table-inset`
                                 : cellIndex === row.getVisibleCells().length - 1
-                                  ? `pr-(--table-inset) ${gap.left}`
+                                  ? `pr-table-inset ${gap.left}`
                                   : gap.both,
                               (cell.column.columnDef.meta as DataTableColumnMeta | undefined)?.cellClassName ||
                                 'text-muted',
@@ -363,8 +366,8 @@ export function DataTable<TData>({
                         ))}
                       </tr>
                       {expanded !== null && (
-                        <tr className="bg-background/50">
-                          <td colSpan={row.getVisibleCells().length} className="px-(--table-inset) py-3">
+                        <tr className="bg-background-50">
+                          <td colSpan={row.getVisibleCells().length} className="px-table-inset py-3">
                             {expanded}
                           </td>
                         </tr>

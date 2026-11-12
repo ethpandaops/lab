@@ -4,7 +4,7 @@
  */
 import { client as apiClient } from '@/api/client.gen';
 import type { fetchAllPages } from '@/utils/api-pagination';
-import type { AttestationColumns, ProposalColumns } from '../utils/performance';
+import type { AttestationColumns, ProposalColumns } from '@/pages/ethereum/entities/utils/performance';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 
@@ -67,16 +67,6 @@ export interface FctValidatorStakeByEntityGroupDaily {
   entity_count?: number;
   active_validator_count?: number;
   active_effective_balance?: number;
-}
-
-export interface FctAttestationVoteCorrectnessByEntityGroupDaily extends AttestationColumns {
-  day_start_date?: string;
-  entity_group?: string;
-}
-
-export interface FctBlockProposalByEntityGroupDaily extends ProposalColumns {
-  day_start_date?: string;
-  entity_group?: string;
 }
 
 export const fctValidatorStakeByEntityGroupDailyList = listByPath(ENTITY_TABLES.groupStake);

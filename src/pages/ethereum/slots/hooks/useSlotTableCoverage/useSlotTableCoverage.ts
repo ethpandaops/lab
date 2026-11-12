@@ -3,7 +3,7 @@ import { useBounds } from '@/hooks/useBounds';
 import { useNetwork } from '@/hooks/useNetwork';
 
 /** Settled attestation tables the slot page reads, each with a head counterpart for slots they don't cover yet */
-export type SettledAttestationTable =
+type SettledAttestationTable =
   | 'fct_attestation_correctness'
   | 'fct_attestation_vote_by_block_root'
   | 'fct_attestation_liveness_by_entity';

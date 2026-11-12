@@ -1,8 +1,14 @@
 import type { JSX } from 'react';
 import type { FctPeerSyncStatusByClClientDaily } from '@/api/types.gen';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { SeriesCard } from '../SeriesCard';
-import { clientShareLines, dayShares, line, seriesDays, stackLayer } from '../../utils/network-series';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import {
+  clientShareLines,
+  dayShares,
+  line,
+  seriesDays,
+  stackLayer,
+} from '@/pages/ethereum/network/utils/network-series';
 
 type Row = FctPeerSyncStatusByClClientDaily;
 

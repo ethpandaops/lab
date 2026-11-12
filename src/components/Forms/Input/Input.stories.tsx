@@ -15,7 +15,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] bg-surface p-6">
+      <div className="min-w-150 bg-surface p-6">
         <Story />
       </div>
     ),
@@ -539,7 +539,7 @@ export const UserInteractions: Story = {
 
     return (
       <div className="flex flex-col gap-4">
-        <div className="rounded-md bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-900/20 dark:text-blue-200">
+        <div className="rounded-md bg-data-blue-10 p-4 text-sm text-foreground">
           <strong>Interaction Testing:</strong> This story tests onChange, onBlur, and onFocus events. Open the
           Interactions panel to see event handlers being called.
         </div>
@@ -584,7 +584,7 @@ export const UserInteractions: Story = {
 export const InputTypes: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
-      <div className="rounded-md bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-900/20 dark:text-blue-200">
+      <div className="rounded-md bg-data-blue-10 p-4 text-sm text-foreground">
         <strong>Input Types:</strong> Testing different HTML input types with proper attributes.
       </div>
       <Input label="Password">
@@ -831,13 +831,13 @@ export const ReactHookFormIntegration: Story = {
 
     return (
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-        <div className="mb-4 rounded-md bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-900/20 dark:text-blue-200">
+        <div className="mb-4 rounded-md bg-data-blue-10 p-4 text-sm text-foreground">
           <strong>React Hook Form + Zod:</strong> This example uses react-hook-form with Zod validation. The submit
           button is disabled until all required fields are valid. Try filling out the form to see validation in action.
         </div>
 
         {submitted && submittedData && (
-          <div className="rounded-md bg-green-50 p-4 text-sm text-green-900 dark:bg-green-900/20 dark:text-green-200">
+          <div className="rounded-md bg-success-10 p-4 text-sm text-foreground">
             <strong>✅ Form Submitted Successfully!</strong>
             <pre className="mt-2 overflow-auto text-xs">{JSON.stringify(submittedData, null, 2)}</pre>
           </div>
@@ -910,7 +910,7 @@ export const ReactHookFormIntegration: Story = {
           {!isFormValid && isDirty && (
             <span className="text-sm text-muted">Please fill all required fields correctly</span>
           )}
-          {isFormValid && <span className="text-sm text-green-600 dark:text-green-400">✓ Form is ready to submit</span>}
+          {isFormValid && <span className="text-sm text-success">✓ Form is ready to submit</span>}
         </div>
       </form>
     );
@@ -965,7 +965,7 @@ export const ReactHookFormIntegration: Story = {
 export const ErrorHandlingPatterns: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
-      <div className="rounded-md bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-900/20 dark:text-blue-200">
+      <div className="rounded-md bg-data-blue-10 p-4 text-sm text-foreground">
         <strong>Error Handling Best Practices:</strong>
         <ul className="mt-2 list-inside list-disc space-y-1">
           <li>Use error + errorMessage for validation failures</li>
@@ -1105,7 +1105,7 @@ export const CustomValidationExamples: Story = {
 
     return (
       <div className="flex flex-col gap-6">
-        <div className="rounded-md bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-900/20 dark:text-blue-200">
+        <div className="rounded-md bg-data-blue-10 p-4 text-sm text-foreground">
           <strong>Custom Validation Patterns:</strong> These examples show common validation scenarios with appropriate
           inputMode for better mobile UX. Try filling out the fields to see validation in action.
         </div>

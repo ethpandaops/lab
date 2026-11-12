@@ -1,0 +1,44 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import * as Stories from './Layout.stories';
+
+<Meta of={Stories} />
+
+# Layout
+
+## Spacing
+
+Spacing and sizing multiply one step, so any number works: a fixed size is `h-75`, never `h-[300px]`; lint rejects
+arbitrary values. Layouts Tailwind has no class for (grid templates, a size less the viewport, card insets) are named
+utilities in `src/styles/utilities.css`.
+
+<Story of={Stories.Spacing} />
+
+## Widths
+
+<Story of={Stories.Widths} />
+
+## Radius
+
+<Story of={Stories.Radii} />
+
+## Breakpoints
+
+Tailwind's, plus two for ultrawide monitors.
+
+<Story of={Stories.Breakpoints} />
+
+## Shadows
+
+<Story of={Stories.Shadows} />
+
+## Motion
+
+<Story of={Stories.Easing} />
+
+<Story of={Stories.Animations} />
+
+## Defaults
+
+What a transition without its own duration or easing takes, and the root font before `body` sets one.
+
+<Story of={Stories.Defaults} />

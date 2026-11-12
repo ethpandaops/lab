@@ -19,8 +19,13 @@ import { useTableBounds } from '@/hooks/useBounds';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { completeBucketEnd, completeUtcDays, currentUtcDate, toUtcDate } from '@/utils/time';
 import { fillTimeKeys } from '@/pages/ethereum/execution/overview/overview.utils';
-import { PAGE_SIZE, TIME_RANGE_CONFIG, type TimePeriod } from '../constants';
-import { entityQuery, isEntityGroup, toClientCountRecords, type ClientCountRecord } from '../utils/client-share';
+import { PAGE_SIZE, TIME_RANGE_CONFIG, type TimePeriod } from '@/pages/ethereum/clients/constants';
+import {
+  entityQuery,
+  isEntityGroup,
+  toClientCountRecords,
+  type ClientCountRecord,
+} from '@/pages/ethereum/clients/utils/client-share';
 import { chunksFor } from './useVersionCounts';
 
 export interface UseClientCountsResult {
@@ -166,7 +171,8 @@ export function useClientCounts(timePeriod: TimePeriod, entity?: string): UseCli
 
   const records = useMemo(() => query.data ?? [], [query.data]);
   // While another window loads, the previous window's records stay, keyed by their own bucket: days have dashes
-  const recordsDaily = query.isPlaceholderData && records.length > 0 ? records[0].key.includes('-') : isDaily;
+  const firstRecord = records[0];
+  const recordsDaily = query.isPlaceholderData && firstRecord ? firstRecord.key.includes('-') : isDaily;
 
   const keys = useMemo(() => {
     const unique = [...new Set(records.map(record => record.key))].sort();

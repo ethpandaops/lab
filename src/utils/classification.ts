@@ -15,13 +15,13 @@
 export function getClassificationBadgeClasses(classification: string): string {
   switch (classification) {
     case 'individual':
-      return 'bg-primary/10 text-primary inset-ring-primary/20 dark:bg-primary/10 dark:text-primary dark:inset-ring-primary/10';
+      return 'bg-primary-10 text-primary inset-ring-primary-halo';
     case 'corporate':
-      return 'bg-purple-500/10 text-purple-600 inset-ring-purple-500/20 dark:bg-purple-500/10 dark:text-purple-400 dark:inset-ring-purple-500/10';
+      return 'bg-contributor-corporate-bg text-contributor-corporate inset-ring-contributor-corporate-ring';
     case 'internal':
-      return 'bg-blue-500/10 text-blue-600 inset-ring-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400 dark:inset-ring-blue-500/10';
+      return 'bg-contributor-internal-bg text-contributor-internal inset-ring-contributor-internal-ring';
     default:
-      return 'bg-muted/10 text-muted inset-ring-muted/20 dark:bg-muted/10 dark:text-muted dark:inset-ring-muted/10';
+      return 'bg-muted-10 text-muted inset-ring-muted-halo';
   }
 }
 
@@ -45,28 +45,9 @@ export function getClassificationLabel(classification: string): string {
 }
 
 /**
- * Get the description for a contributor classification
- *
- * @param classification - The classification type
- * @returns Description of the classification
- */
-export function getClassificationDescription(classification: string): string {
-  switch (classification) {
-    case 'individual':
-      return 'Public contributors (likely home stakers)';
-    case 'corporate':
-      return 'Public contributors (likely running in datacenters)';
-    case 'internal':
-      return 'Xatu nodes run by the ethPandaOps team in datacenters';
-    default:
-      return 'Xatu nodes with unknown classification';
-  }
-}
-
-/**
  * Classification descriptions map with all known classifications
  */
-export const CLASSIFICATION_DESCRIPTIONS: Record<string, { label: string; description: string }> = {
+export const CLASSIFICATION_DESCRIPTIONS = {
   individual: {
     label: 'Individual',
     description: 'Public contributors (likely home stakers)',
@@ -83,4 +64,4 @@ export const CLASSIFICATION_DESCRIPTIONS: Record<string, { label: string; descri
     label: 'Unclassified',
     description: 'Xatu nodes with unknown classification',
   },
-};
+} satisfies Record<string, { label: string; description: string }>;

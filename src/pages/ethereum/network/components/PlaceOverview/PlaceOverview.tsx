@@ -9,8 +9,8 @@ import { formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
 import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
 import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
-import type { UseRangeEndsResult } from '../../hooks/useRangeEnds';
-import type { PlaceCensusRow } from '../../hooks/usePlaceCensus';
+import type { UseRangeEndsResult } from '@/pages/ethereum/network/hooks/useRangeEnds';
+import type { PlaceCensusRow } from '@/pages/ethereum/network/hooks/usePlaceCensus';
 import {
   countDelta,
   dayStart,
@@ -19,8 +19,8 @@ import {
   rankPlaces,
   shareDelta,
   total,
-} from '../../utils/network-census';
-import { clientSeries } from '../../utils/network-series';
+} from '@/pages/ethereum/network/utils/network-census';
+import { clientSeries } from '@/pages/ethereum/network/utils/network-series';
 
 export interface PlaceOverviewProps<T extends PlaceCensusRow> {
   /** The place's rows on the range's first and last days */
@@ -61,6 +61,8 @@ export function PlaceOverview<T extends PlaceCensusRow>({
     place.start && all.start ? { part: total(place.start, peers), whole: total(all.start, peers) } : null;
 
   const chart = useMemo(() => clientSeries(days), [days]);
+  const firstDay = chart.days[0];
+  const lastDay = chart.days.at(-1);
   const local = layerCounts(place.end, 'consensus', peers);
   const network = layerCounts(all.end, 'consensus', peers);
   const networkShare = new Map(network.clients.map(row => [row.client, (row.count / network.whole) * 100]));
@@ -98,8 +100,8 @@ export function PlaceOverview<T extends PlaceCensusRow>({
         rounded
         title="Consensus peers"
         subtitle={
-          chart.days.length > 0
-            ? `Each day by client, ${formatDataDate(dayStart(chart.days[0]))} to ${formatDataDate(dayStart(chart.days[chart.days.length - 1]))}`
+          firstDay !== undefined && lastDay !== undefined
+            ? `Each day by client, ${formatDataDate(dayStart(firstDay))} to ${formatDataDate(dayStart(lastDay))}`
             : undefined
         }
       >

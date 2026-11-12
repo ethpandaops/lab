@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@/test-utils';
 import { PreparedBlocksComparisonChart } from './PreparedBlocksComparisonChart';
 import type { FctPreparedBlock } from '@/api/types.gen';
 import type { ProposedBlockData } from './PreparedBlocksComparisonChart.types';
@@ -87,7 +87,9 @@ describe('PreparedBlocksComparisonChart', () => {
 
   it('compares the winning bid time in microseconds with prepared-at seconds', () => {
     // The bid arrived 1.5 s into the slot; Besu's block was prepared 3 s in, after it
-    const blocks = [mockPreparedBlocks[0], { ...mockPreparedBlocks[1], event_date_time: 1234567893 }];
+    const [geth, besu] = mockPreparedBlocks;
+    if (!geth || !besu) throw new Error('expected the Geth and Besu mock blocks');
+    const blocks = [geth, { ...besu, event_date_time: 1234567893 }];
 
     render(
       <PreparedBlocksComparisonChart

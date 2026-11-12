@@ -4,7 +4,12 @@ import type { FctBlockGraffiti } from '@/api/types.gen';
 import { useTableBounds } from '@/hooks/useBounds';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchNewestFirst, nowEnd } from '@/utils/widening-window';
-import { DEFAULT_BLOCK_PAGE_SIZE, graffitiBlocksQuery, isNewestFirst, type BlockSearch } from '../utils/block-filters';
+import {
+  DEFAULT_BLOCK_PAGE_SIZE,
+  graffitiBlocksQuery,
+  isNewestFirst,
+  type BlockSearch,
+} from '@/pages/ethereum/clients/utils/block-filters';
 
 export interface UseGraffitiBlocksResult {
   blocks: FctBlockGraffiti[];

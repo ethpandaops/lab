@@ -7,9 +7,9 @@ import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { Card } from '@/components/Layout/Card';
 import { getClassificationBadgeClasses, getClassificationLabel } from '@/utils';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
-import type { NodeRow } from '../../hooks/useNodeRows';
-import { formatMs, formatNodeLocation, shortVersion, type SyncState } from '../../utils/node-stats';
-import { NodeStatus } from '../NodeStatus';
+import type { NodeRow } from '@/pages/xatu/nodes/hooks/useNodeRows';
+import { formatMs, formatNodeLocation, shortVersion, type SyncState } from '@/pages/xatu/nodes/utils/node-stats';
+import { NodeStatus } from '@/pages/xatu/nodes/components/NodeStatus';
 import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
 export interface NodeHeaderProps {
@@ -59,8 +59,8 @@ export function NodeHeader({ row, execution, sync }: NodeHeaderProps): JSX.Eleme
                 className={clsx(
                   'inline-flex items-center rounded-xs px-1.5 py-0.5 text-xs font-medium inset-ring',
                   sync.state === 'in-sync'
-                    ? 'bg-muted/10 text-muted inset-ring-border'
-                    : 'bg-warning/10 text-warning inset-ring-warning/20'
+                    ? 'bg-muted-10 text-muted inset-ring-border'
+                    : 'bg-warning-10 text-warning inset-ring-warning-20'
                 )}
                 title={sync.state === 'catching-up' ? `${formatMs(sync.lagMs)} behind the network median` : undefined}
               >

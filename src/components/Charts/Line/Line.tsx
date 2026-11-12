@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef, useCallback } from 'react';
+import { type JSX, useMemo, useCallback } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { LineChart as EChartsLine } from 'echarts/charts';
@@ -17,7 +17,7 @@ import {
   getChartTooltipChrome,
   getChartValueAxisName,
   getChartValueSplitLine,
-} from '../chartChrome';
+} from '@/components/Charts/chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -37,32 +37,30 @@ echarts.use([EChartsLine, GridComponent, TooltipComponent, TitleComponent, Canva
  * />
  * ```
  */
-export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function LineChart(
-  {
-    data = [820, 932, 901, 934, 1290, 1330, 1320],
-    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    title,
-    titleFontSize = 14,
-    titleFontFamily,
-    titleFontWeight = 600,
-    titleLeft = 'center',
-    titleTop = 8,
-    height = 400,
-    smooth = true,
-    showArea = false,
-    color,
-    yMax,
-    xMax,
-    connectNulls = false,
-    animationDuration = 300,
-    xAxisLabelInterval = 'auto',
-    xAxisTitle,
-    yAxisTitle,
-    syncGroup,
-    tooltipFormatter,
-  },
-  ref
-): JSX.Element {
+export function LineChart({
+  data = [820, 932, 901, 934, 1290, 1330, 1320],
+  labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  title,
+  titleFontSize = 14,
+  titleFontFamily,
+  titleFontWeight = 600,
+  titleLeft = 'center',
+  titleTop = 8,
+  height = 400,
+  smooth = true,
+  showArea = false,
+  color,
+  yMax,
+  xMax,
+  connectNulls = false,
+  animationDuration = 300,
+  xAxisLabelInterval = 'auto',
+  xAxisTitle,
+  yAxisTitle,
+  syncGroup,
+  tooltipFormatter,
+  ref,
+}: LineChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
   // Get callback ref for crosshair sync
@@ -86,6 +84,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedColor = color ? resolveCssColorToHex(color) : undefined;
+  const lineColor = convertedColor || CHART_CATEGORICAL_COLORS[0] || themeColors.primary;
 
   const option = useMemo(
     () => ({
@@ -150,7 +149,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
           symbol: 'none',
           showSymbol: false,
           lineStyle: {
-            color: convertedColor || CHART_CATEGORICAL_COLORS[0],
+            color: lineColor,
             width: 3,
           },
           areaStyle: showArea
@@ -164,11 +163,11 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
                   colorStops: [
                     {
                       offset: 0,
-                      color: hexToRgba(convertedColor || CHART_CATEGORICAL_COLORS[0], 0.5),
+                      color: hexToRgba(lineColor, 0.5),
                     },
                     {
                       offset: 1,
-                      color: hexToRgba(convertedColor || CHART_CATEGORICAL_COLORS[0], 0.06),
+                      color: hexToRgba(lineColor, 0.06),
                     },
                   ],
                 },
@@ -182,7 +181,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
               width: 4,
             },
             itemStyle: {
-              color: convertedColor || CHART_CATEGORICAL_COLORS[0],
+              color: lineColor,
               borderColor: themeColors.background,
               borderWidth: 2,
             },
@@ -223,7 +222,7 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
       titleTop,
       smooth,
       showArea,
-      convertedColor,
+      lineColor,
       yMax,
       xMax,
       connectNulls,
@@ -237,16 +236,17 @@ export const LineChart = forwardRef<ReactEChartsCore, LineChartProps>(function L
   );
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={height === '100%' ? 'size-full' : 'w-full'}>
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         ref={combinedRef}
         echarts={echarts}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
       />
     </div>
   );
-});
+}

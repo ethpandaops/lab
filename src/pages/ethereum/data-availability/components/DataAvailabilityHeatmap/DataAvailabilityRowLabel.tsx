@@ -13,19 +13,25 @@ interface DataAvailabilityRowLabelProps extends RowLabelRenderProps {
 }
 
 /**
- * Get icon component for the row type based on granularity
+ * Icon for the row type based on granularity
  * The icon represents what type of data this row shows
  */
-function getRowIcon(granularity: DataAvailabilityGranularity): React.ComponentType<{ className?: string }> {
+function RowIcon({
+  granularity,
+  className,
+}: {
+  granularity: DataAvailabilityGranularity;
+  className: string;
+}): React.JSX.Element {
   switch (granularity) {
     case 'window':
-      return CalendarDaysIcon; // Days
+      return <CalendarDaysIcon className={className} />; // Days
     case 'day':
-      return ClockIcon; // Hours
+      return <ClockIcon className={className} />; // Hours
     case 'hour':
-      return CubeIcon; // Epochs
+      return <CubeIcon className={className} />; // Epochs
     case 'epoch':
-      return Square2StackIcon; // Slots
+      return <Square2StackIcon className={className} />; // Slots
   }
 }
 
@@ -65,7 +71,6 @@ export function DataAvailabilityRowLabel({
   disabled,
   disabledReason,
 }: DataAvailabilityRowLabelProps): React.JSX.Element {
-  const Icon = getRowIcon(granularity);
   const typeLabel = getRowTypeLabel(granularity);
 
   // Disabled rows can't be drilled down into
@@ -90,7 +95,7 @@ export function DataAvailabilityRowLabel({
       onMouseLeave={onMouseLeave}
       disabled={!effectiveCanDrillDown}
       className={clsx(
-        'group flex h-full w-full items-center gap-1.5 pr-2 text-left transition-all',
+        'group flex size-full items-center gap-1.5 pr-2 text-left transition-all',
         effectiveCanDrillDown ? 'cursor-pointer' : 'cursor-default',
         isDisabled ? 'opacity-40' : '',
         isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted'
@@ -98,10 +103,11 @@ export function DataAvailabilityRowLabel({
       title={tooltip}
     >
       {/* Type icon */}
-      <Icon
+      <RowIcon
+        granularity={granularity}
         className={clsx(
           'size-3 shrink-0 transition-colors',
-          isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted/60'
+          isHovered && effectiveCanDrillDown ? 'text-accent' : 'text-muted-60'
         )}
       />
 
@@ -109,7 +115,7 @@ export function DataAvailabilityRowLabel({
       <span
         className={clsx(
           'w-8 shrink-0 rounded-xs px-1 py-px text-center text-2xs font-medium transition-colors',
-          isHovered && effectiveCanDrillDown ? 'bg-accent/20 text-accent' : 'bg-muted/20 text-muted'
+          isHovered && effectiveCanDrillDown ? 'bg-accent-20 text-accent' : 'bg-muted-20 text-muted'
         )}
       >
         {typeLabel}
@@ -119,7 +125,7 @@ export function DataAvailabilityRowLabel({
       <span
         className={clsx(
           'flex-1 truncate text-right font-mono text-2xs transition-colors',
-          isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground/80'
+          isHovered && effectiveCanDrillDown ? 'font-semibold text-accent' : 'text-foreground-80'
         )}
       >
         {label}

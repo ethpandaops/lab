@@ -1,2 +1,2 @@
 export { useNetwork } from './useNetwork';
-export type { Network } from '../useConfig';
+export type { Network } from '@/hooks/useConfig';

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Field, Label } from '@headlessui/react';
 import { Checkbox } from './Checkbox';
 
 const meta = {
@@ -23,6 +24,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     id: 'default-checkbox',
+    'aria-label': 'Default',
     name: 'default',
   },
 };
@@ -30,6 +32,7 @@ export const Default: Story = {
 export const Checked: Story = {
   args: {
     id: 'checked-checkbox',
+    'aria-label': 'Checked',
     name: 'checked',
     defaultChecked: true,
   },
@@ -38,6 +41,7 @@ export const Checked: Story = {
 export const Indeterminate: Story = {
   args: {
     id: 'indeterminate-checkbox',
+    'aria-label': 'Indeterminate',
     name: 'indeterminate',
     indeterminate: true,
   },
@@ -46,6 +50,7 @@ export const Indeterminate: Story = {
 export const Disabled: Story = {
   args: {
     id: 'disabled-checkbox',
+    'aria-label': 'Disabled',
     name: 'disabled',
     disabled: true,
   },
@@ -54,6 +59,7 @@ export const Disabled: Story = {
 export const DisabledChecked: Story = {
   args: {
     id: 'disabled-checked-checkbox',
+    'aria-label': 'Disabled checked',
     name: 'disabled-checked',
     disabled: true,
     defaultChecked: true,
@@ -64,26 +70,26 @@ export const AllStates: Story = {
   render: () => (
     <div className="flex items-center gap-8">
       <div className="flex flex-col gap-4">
-        <label className="flex items-center gap-2 text-sm text-foreground">
+        <Field className="flex items-center gap-2 text-sm text-foreground">
           <Checkbox id="state-default" name="state-default" />
-          Default
-        </label>
-        <label className="flex items-center gap-2 text-sm text-foreground">
+          <Label>Default</Label>
+        </Field>
+        <Field className="flex items-center gap-2 text-sm text-foreground">
           <Checkbox id="state-checked" name="state-checked" defaultChecked />
-          Checked
-        </label>
-        <label className="flex items-center gap-2 text-sm text-foreground">
+          <Label>Checked</Label>
+        </Field>
+        <Field className="flex items-center gap-2 text-sm text-foreground">
           <Checkbox id="state-indeterminate" name="state-indeterminate" indeterminate />
-          Indeterminate
-        </label>
-        <label className="flex items-center gap-2 text-sm text-muted">
+          <Label>Indeterminate</Label>
+        </Field>
+        <Field className="flex items-center gap-2 text-sm text-muted">
           <Checkbox id="state-disabled" name="state-disabled" disabled />
-          Disabled
-        </label>
-        <label className="flex items-center gap-2 text-sm text-muted">
+          <Label>Disabled</Label>
+        </Field>
+        <Field className="flex items-center gap-2 text-sm text-muted">
           <Checkbox id="state-disabled-checked" name="state-disabled-checked" disabled defaultChecked />
-          Disabled Checked
-        </label>
+          <Label>Disabled Checked</Label>
+        </Field>
       </div>
     </div>
   ),
@@ -96,6 +102,7 @@ export const AllStates: Story = {
 export const Rounded: Story = {
   args: {
     id: 'rounded-checkbox',
+    'aria-label': 'Rounded',
     name: 'rounded',
     rounded: true,
   },
@@ -107,14 +114,14 @@ export const Rounded: Story = {
 export const RoundedComparison: Story = {
   render: () => (
     <div className="flex items-center gap-8">
-      <label className="flex items-center gap-2 text-sm text-foreground">
+      <Field className="flex items-center gap-2 text-sm text-foreground">
         <Checkbox id="no-rounded" name="no-rounded" />
-        No Rounded Corners
-      </label>
-      <label className="flex items-center gap-2 text-sm text-foreground">
+        <Label>No Rounded Corners</Label>
+      </Field>
+      <Field className="flex items-center gap-2 text-sm text-foreground">
         <Checkbox id="with-rounded" name="with-rounded" rounded />
-        With Rounded Corners
-      </label>
+        <Label>With Rounded Corners</Label>
+      </Field>
     </div>
   ),
 };

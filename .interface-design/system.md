@@ -18,39 +18,33 @@
 
 ### Color Architecture
 
-Two-tier system defined in `src/index.css`:
+Every colour is a token in `src/styles/tokens.css` (rules: `.claude/rules/styling.md`); Tailwind's palette is
+removed. Each base colour is a `light-dark(light, dark)` pair, and star, a dark scheme with its own palette, sets its
+values in `html.star`. Tints (`bg-primary-10`) and derived colours (`panel`, `on-solid`, `primary-hover`) follow all
+three themes, so components never carry `dark:` variants. Storybook's Foundations pages list every token.
 
-**Tier 1 — Primitives** (never use directly in components):
-- `terracotta` (50–950): warm accent, the brand signature
-- `sand` (50–950): warm neutrals for light mode
-- `neutral` (50–950): grayscale for dark mode
-- `aurora-*` (cyan, green, purple, pink, blue): star mode
-
-**Tier 2 — Semantic** (always use these):
 - `primary` / `secondary` / `accent` — brand
 - `background` / `surface` / `foreground` / `muted` / `border` — UI structure
 - `success` / `warning` / `danger` — state
 
-**Theme mappings:**
+**Theme values:**
 
-| Token | Light | Dark | Star |
-|---|---|---|---|
-| primary | terracotta-600 | terracotta-400 | aurora-cyan-400 |
-| secondary | sand-200 | neutral-900 | aurora-purple-600 |
-| accent | terracotta-500 | terracotta-300 | aurora-cyan-300 |
-| background | sand-100 | neutral-950 | aurora-blue-950 |
-| surface | sand-50 | #242424 | #0a1428 |
-| foreground | sand-950 | neutral-50 | aurora-cyan-50 |
-| muted | sand-600 | neutral-400 | aurora-cyan-700 |
-| border | sand-300 | neutral-800 | #1a2847 |
-| success | #337344 | #76be86 | #96c979 |
-| warning | #a56217 | #e8a95c | #e8a95c |
-| danger | #af3d36 | #e2726b | #e2726b |
-
-Star is a dark theme: the `dark:` variant matches `.star` too, and `star:` overrides it where star needs
-something different.
+| Token      | Light   | Dark    | Star    |
+| ---------- | ------- | ------- | ------- |
+| primary    | #c95f3f | #e09770 | #1af7f7 |
+| secondary  | #dedbca | #3d3d3d | #7d00e6 |
+| accent     | #d77651 | #ebbd9e | #4dffff |
+| background | #efeee5 | #0f0f0e | #000a1a |
+| surface    | #fbfaf6 | #181817 | #0a1428 |
+| foreground | #2c251e | #f5f5f4 | #e6ffff |
+| muted      | #7d6b51 | #a19f9a | #009999 |
+| border     | #dcd7c5 | #2c2b29 | #1a2847 |
+| success    | #337344 | #76be86 | #96c979 |
+| warning    | #a56217 | #e8a95c | #e8a95c |
+| danger     | #af3d36 | #e2726b | #e2726b |
 
 **Programmatic access:**
+
 ```tsx
 const colors = useThemeColors();
 // { primary, secondary, accent, background, surface, foreground, muted, border, success, warning, danger }
@@ -62,6 +56,7 @@ Constant across all themes. Every data colour maps to a **data hue** (`--color-d
 `bg-data-emerald`, `getDataVizColors().DATA_COLORS.emerald`): Tailwind's 500 hues at about 60%
 chroma, so charts sit with the earthy UI. Don't hard-code Tailwind hex in charts; series that
 encode a judgement (canonical, missed, accept, failed) use the status tokens instead.
+
 - **Chart categorical** (0–14): `--color-chart-{n}` — blue, emerald, amber, red, cyan, lime, orange, purple, pink, violet, teal, indigo, rose, fuchsia, sky
 - **Blob indices** (0–5): `--color-blob-{n}` — cyan, pink, amber, green, violet, red
 - **Continents**: `--color-continent-{code}` — af(red), as(amber), eu(emerald), na(blue), oc(cyan), sa(violet), an(slate)
@@ -74,12 +69,12 @@ encode a judgement (canonical, missed, accept, failed) use the status tokens ins
 Status colour is a judgement, and each colour has one meaning everywhere: badges, status pills,
 pass/fail values, tags, table cells, icons and dots.
 
-| Meaning | Text / fill | Badge | Examples |
-|---|---|---|---|
-| Good | `success` | `green` | canonical, included, signed, valid input, ready, delivered, passing a threshold, live, "Copied" |
-| Bad | `danger` | `red` | missed, failed, slashed, invalid input, failing a threshold, errors |
-| Warning | `warning` | `orange` | late, orphaned, degraded, lagging, near a threshold, transient failures |
-| Neutral | `foreground` / `muted` | `gray` | plain values and counts, identifiers, states that are neither good nor bad (pending, unknown) |
+| Meaning | Text / fill            | Badge    | Examples                                                                                        |
+| ------- | ---------------------- | -------- | ----------------------------------------------------------------------------------------------- |
+| Good    | `success`              | `green`  | canonical, included, signed, valid input, ready, delivered, passing a threshold, live, "Copied" |
+| Bad     | `danger`               | `red`    | missed, failed, slashed, invalid input, failing a threshold, errors                             |
+| Warning | `warning`              | `orange` | late, orphaned, degraded, lagging, near a threshold, transient failures                         |
+| Neutral | `foreground` / `muted` | `gray`   | plain values and counts, identifiers, states that are neither good nor bad (pending, unknown)   |
 
 Solid status fills take `text-white` in light mode and `text-background` in dark and star.
 
@@ -105,23 +100,23 @@ no shadows in light mode, no lift on hover. The palette has three clearly separa
 page (`background`), panel (`surface`), hairline (`border`) — so panels read without shadows.
 The sidebar uses the page background, so content panels are the only raised surfaces.
 
-| Token | Light | Dark |
-|---|---|---|
-| background | sand-100 | #0f0f0e |
-| surface | #fbfaf6 | #181817 |
-| border | #dcd7c5 | #2c2b29 |
-| muted | sand-700 | #a19f9a |
-| foreground | sand-950 | #f5f5f4 |
+| Token      | Light   | Dark    |
+| ---------- | ------- | ------- |
+| background | #efeee5 | #0f0f0e |
+| surface    | #fbfaf6 | #181817 |
+| border     | #dcd7c5 | #2c2b29 |
+| muted      | #7d6b51 | #a19f9a |
+| foreground | #2c251e | #f5f5f4 |
 
 ## Border Radius
 
-Two radii, set as tokens in `src/index.css`:
+Two radii, set as tokens in `src/styles/tokens.css`:
 
-| Class | Value | Use |
-|---|---|---|
-| `rounded-xs` | 4px | Inline marks: badges, tags, skeleton bars, toggle knobs |
-| `rounded-sm` | 6px | Every container and control: cards, buttons, inputs, selects, toggles, menus, nav items |
-| `rounded-full` | — | Dots, avatars, progress tracks only |
+| Class          | Value | Use                                                                                     |
+| -------------- | ----- | --------------------------------------------------------------------------------------- |
+| `rounded-xs`   | 4px   | Inline marks: badges, tags, skeleton bars, toggle knobs                                 |
+| `rounded-sm`   | 6px   | Every container and control: cards, buttons, inputs, selects, toggles, menus, nav items |
+| `rounded-full` | —     | Dots, avatars, progress tracks only                                                     |
 
 `rounded-md` through `rounded-3xl` alias to `rounded-sm`, so legacy classes can't drift. Card,
 Button, ButtonGroup, SelectMenu, Toggle and Checkbox are rounded by default; their `rounded` prop
@@ -131,16 +126,16 @@ exists only to opt out (for example a card bleeding into a page edge).
 
 **Base unit: 4px (Tailwind default)**
 
-| Context | Value | Classes |
-|---|---|---|
-| Container padding | responsive | `p-4 sm:p-6 lg:p-8` |
+| Context             | Value      | Classes                                                      |
+| ------------------- | ---------- | ------------------------------------------------------------ |
+| Container padding   | responsive | `p-4 sm:p-6 lg:p-8`                                          |
 | Container max-width | responsive | `max-w-screen-2xl 3xl:max-w-screen-3xl 4xl:max-w-screen-4xl` |
-| Card header padding | responsive | `px-4 py-3 sm:px-5` |
-| Card body padding | responsive | `p-4 sm:p-5` |
-| Card footer padding | responsive | `px-4 py-3 sm:px-5` |
-| Page header margin | 32px | `mb-8` |
-| Grid gap | 24px | `gap-6` |
-| Section dividers | divide-y | `divide-y divide-border` |
+| Card header padding | responsive | `px-4 py-3 sm:px-5`                                          |
+| Card body padding   | responsive | `p-4 sm:p-5`                                                 |
+| Card footer padding | responsive | `px-4 py-3 sm:px-5`                                          |
+| Page header margin  | 32px       | `mb-8`                                                       |
+| Grid gap            | 24px       | `gap-6`                                                      |
+| Section dividers    | divide-y   | `divide-y divide-border`                                     |
 
 ---
 
@@ -148,18 +143,18 @@ exists only to opt out (for example a card bleeding into a page edge).
 
 All UI text uses Geist (`font-sans`). Identifiers use Geist Mono (`font-mono`). Space Grotesk (`font-display`) is reserved for the brand.
 
-| Role | Classes |
-|---|---|
-| Page title (md) | `text-2xl/8 font-semibold tracking-tight text-foreground` |
-| Page title (sm) | `text-lg/7 font-semibold tracking-tight text-foreground` |
-| Page description | `text-sm/6 text-muted max-w-3xl` |
-| Card title | `text-sm/6 font-semibold text-foreground` (rendered by `Card title`) |
-| Card subtitle | `text-xs/5 text-muted` (rendered by `Card subtitle`) |
-| Section header | `text-xs font-semibold tracking-wider text-foreground` |
-| Subsection header | `text-2xs font-semibold tracking-wider text-muted/60 uppercase` |
-| Body text | `text-sm text-foreground` |
-| Metadata | `text-xs text-muted` |
-| Dense label | `text-2xs` (10px) — axis ticks, HUD keys, badges in tight cells |
+| Role              | Classes                                                              |
+| ----------------- | -------------------------------------------------------------------- |
+| Page title (md)   | `text-2xl/8 font-semibold tracking-tight text-foreground`            |
+| Page title (sm)   | `text-lg/7 font-semibold tracking-tight text-foreground`             |
+| Page description  | `text-sm/6 text-muted max-w-3xl`                                     |
+| Card title        | `text-sm/6 font-semibold text-foreground` (rendered by `Card title`) |
+| Card subtitle     | `text-xs/5 text-muted` (rendered by `Card subtitle`)                 |
+| Section header    | `text-xs font-semibold tracking-wider text-foreground`               |
+| Subsection header | `text-2xs font-semibold tracking-wider text-muted-60 uppercase`      |
+| Body text         | `text-sm text-foreground`                                            |
+| Metadata          | `text-xs text-muted`                                                 |
+| Dense label       | `text-2xs` (10px) — axis ticks, HUD keys, badges in tight cells      |
 
 The ramp is `text-2xs` → `xs` → `sm` → `base` → `lg` → `2xl`. Never use arbitrary pixel sizes
 (`text-[9px]`, `text-[11px]`); `text-2xs` is the floor.
@@ -170,24 +165,24 @@ The ramp is `text-2xs` → `xs` → `sm` → `base` → `lg` → `2xl`. Never us
 
 Filter rows mix selects, segmented controls and buttons, so they share one size:
 
-| Control | Recipe |
-|---|---|
-| Height | `h-8` (32px) for SelectMenu, SegmentedControl, Button `sm`, filter inputs |
-| Text | `text-sm` (selects, inputs, buttons), `text-xs font-medium` (segments) |
-| Surface | `bg-surface border border-border` — no blur, no shadow |
-| Hover | `hover:border-primary/40` |
-| Chevron | `size-4 text-muted` |
+| Control | Recipe                                                                    |
+| ------- | ------------------------------------------------------------------------- |
+| Height  | `h-8` (32px) for SelectMenu, SegmentedControl, Button `sm`, filter inputs |
+| Text    | `text-sm` (selects, inputs, buttons), `text-xs font-medium` (segments)    |
+| Surface | `bg-surface border border-border` — no blur, no shadow                    |
+| Hover   | `hover:border-primary-40`                                                 |
+| Chevron | `size-4 text-muted`                                                       |
 
 ## Interactive States
 
-| State | Pattern |
-|---|---|
-| Default link/nav | `text-muted` |
-| Hover | `hover:bg-primary/10 hover:text-primary` |
-| Active/Selected | `bg-primary/10 text-primary shadow-xs ring-1 ring-primary/20` |
-| Transition | `transition-all duration-200` or `transition-colors` |
-| Icon button | `rounded-sm p-1 transition-colors hover:bg-muted/20` |
-| Icon in button | `size-5 text-muted group-hover:text-foreground` |
+| State            | Pattern                                                       |
+| ---------------- | ------------------------------------------------------------- |
+| Default link/nav | `text-muted`                                                  |
+| Hover            | `hover:bg-primary-10 hover:text-primary`                      |
+| Active/Selected  | `bg-primary-10 text-primary shadow-xs ring-1 ring-primary-20` |
+| Transition       | `transition-all duration-200` or `transition-colors`          |
+| Icon button      | `rounded-sm p-1 transition-colors hover:bg-muted-20`          |
+| Icon in button   | `size-5 text-muted group-hover:text-foreground`               |
 
 ---
 
@@ -230,6 +225,7 @@ Wraps Card with expand-to-modal and download capabilities.
 Any list of a sequence that goes further back than one screen (slots, epochs, an entity's
 proposals) pages through its full indexed history. Never hard-cap to "the last N" and never use
 "Load more".
+
 - `RangePager` (`src/components/Lists/RangePager`): range on screen, Latest / Newer / Older, and
   "Go to" a number. Put it above the table (and below long tables).
 - Pages are addressed by their top number in the URL (`?from=`), so every page is linkable.
@@ -241,12 +237,12 @@ proposals) pages through its full indexed history. Never hard-cap to "the last N
 ### Stats (KPI strip)
 
 Headline numbers are one panel, not a card per number: a hairline panel split by internal rules.
+
 - Cell: `px-4 py-3.5 sm:px-5`; label `text-xs/5 font-medium text-muted` with an optional
   `size-3.5` icon (tinted by `iconColor` when given); value `text-2xl/8 font-semibold tracking-tight tabular-nums`
 - Delta: `text-xs` with a 16px arrow, inline after the value
 - `accentColor` draws a 2px rule on the cell's top edge
 - Pages control columns with `gridClassName`; gaps are always zero
-
 
 `Table` (`src/components/Lists/Table`) has one density for every list of records:
 
@@ -272,12 +268,12 @@ Page wrapper. `mx-auto p-4 sm:p-6 lg:p-8 max-w-screen-2xl`.
 
 ### App frame
 
-- Top bar: `h-12 border-b border-border bg-background/85 backdrop-blur-sm`, sticky on desktop, holds
+- Top bar: `h-12 border-b border-border bg-background`, sticky on desktop, holds
   the breadcrumb. Its rule continues the sidebar header's rule, so the frame is one line.
 - Breadcrumb: ancestors `text-muted hover:text-foreground`, current page `font-medium text-foreground`,
-  separators `text-muted/50`. No accent color.
-- Navigation states are neutral: hover `bg-foreground/5 text-foreground`, active
-  `bg-foreground/[0.07] text-foreground` with a primary icon. Primary color marks selection in
+  separators `text-muted-50`. No accent color.
+- Navigation states are neutral: hover `bg-foreground-5 text-foreground`, active
+  `bg-foreground-7 text-foreground` with a primary icon. Primary color marks selection in
   controls, not navigation.
 
 ### Sidebar
@@ -287,7 +283,7 @@ Page wrapper. `mx-auto p-4 sm:p-6 lg:p-8 max-w-screen-2xl`.
 - Border: `border-r border-border`
 - Nav items: `rounded-sm px-2 py-1 text-sm/5 font-medium`
 - Icons: `size-4 shrink-0`
-- Version badge: `text-[10px] text-muted/60`
+- Version badge: `text-2xs text-muted-60`
 
 ---
 
@@ -336,14 +332,16 @@ opts out. Legends stay: they toggle series.
 ### Legend (Interactive)
 
 Borderless toggles (not native ECharts legend), with no rule between legend and chart:
-- `rounded-xs px-1.5 py-0.5 text-xs/5 hover:bg-muted/10`
+
+- `rounded-xs px-1.5 py-0.5 text-xs/5 hover:bg-muted-10`
 - Visible: `text-foreground`, filled dot
-- Hidden: `text-muted/60`, hollow dot
+- Hidden: `text-muted-60`, hollow dot
 - Color indicator: `h-2 w-2 rounded-full`
 
 ### Synchronized Crosshairs
 
 Charts sharing x-axis domain use `syncGroup` prop:
+
 - `"consensus-overview"` — consensus charts
 - `"execution-overview"` — execution charts
 - Disabled in modal: `syncGroup={inModal ? undefined : 'group-name'}`
@@ -386,13 +384,15 @@ Two-column responsive grid with time controls:
 ### Time Period Selector
 
 `SegmentedControl` (`src/components/Forms/SegmentedControl`) — never hand-roll pill rows.
+
 - Track: `h-8 rounded-sm bg-surface p-0.5 ring-1 ring-border`
-- Selected segment: `bg-primary/15 text-primary` (the app-wide selected state)
-- Other segments: `text-muted hover:bg-muted/10 hover:text-foreground`
+- Selected segment: `bg-primary-15 text-primary` (the app-wide selected state)
+- Other segments: `text-muted hover:bg-muted-10 hover:text-foreground`
 
 ### Fork Annotations
 
 Vertical mark lines on time-series charts:
+
 - Consensus forks, execution forks, blob schedule changes
 - Different line styles per category
 - Shown/hidden via "Show Forks" toggle
@@ -401,14 +401,14 @@ Vertical mark lines on time-series charts:
 
 ## Animations
 
-| Name | Duration | Easing | Use |
-|---|---|---|---|
-| shimmer | 2s linear infinite | linear | Loading skeletons |
-| fade-in | 0.8s | ease-out | Page entry |
-| fade-in-delay | 0.8s, 0.2s delay | ease-out | Staggered entry |
-| highlight-new | 0.5s | ease-out | New items |
-| row-new | 0.3s | ease-out | Live data rows |
-| transitions | 0.2s | default | Interactive states |
+| Name          | Duration           | Easing   | Use                |
+| ------------- | ------------------ | -------- | ------------------ |
+| shimmer       | 2s linear infinite | linear   | Loading skeletons  |
+| fade-in       | 0.8s               | ease-out | Page entry         |
+| fade-in-delay | 0.8s, 0.2s delay   | ease-out | Staggered entry    |
+| highlight-new | 0.5s               | ease-out | New items          |
+| row-new       | 0.3s               | ease-out | Live data rows     |
+| transitions   | 0.2s               | default  | Interactive states |
 
 Elements with fade-in start with `opacity: 0`.
 
@@ -416,7 +416,7 @@ Elements with fade-in start with `opacity: 0`.
 
 ## Don't
 
-- Use primitive color scales directly (`bg-terracotta-500`, `bg-sand-100`)
+- Use Tailwind's palette, colour literals, opacity modifiers or `dark:` variants; use a token or add one
 - Use locale formatting for slots/epochs (no commas)
 - Override chart grid config in wrapper components unless necessary
 - Mix depth strategies (shadows in dark mode, outlines in light mode)

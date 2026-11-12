@@ -13,7 +13,7 @@ export function ContractStateExpirySkeleton(): JSX.Element {
       {/* Stats Cards - 3 cards with matching border colors */}
       <div className="grid gap-2 md:grid-cols-3 md:gap-3">
         {/* Current State - muted border */}
-        <Card className="border-l-2 border-l-muted/50 p-2 md:p-3">
+        <Card className="border-l-2 border-l-muted-50 p-2 md:p-3">
           <LoadingContainer className="h-3 w-24 rounded-xs" />
           <LoadingContainer className="mt-1.5 h-6 w-28 rounded-xs" />
           <LoadingContainer className="mt-1 h-3.5 w-20 rounded-xs" />
@@ -53,7 +53,7 @@ export function ContractStateExpirySkeleton(): JSX.Element {
             </div>
             {/* Chart area */}
             <div className="p-4">
-              <LoadingContainer className="h-[280px] w-full rounded-xs" />
+              <LoadingContainer className="h-70 w-full rounded-xs" />
             </div>
           </Card>
         ))}

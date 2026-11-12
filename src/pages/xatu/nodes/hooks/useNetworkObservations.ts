@@ -2,12 +2,12 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fctBlockFirstSeenByNodeServiceList } from '@/api/sdk.gen';
 import type { FctBlockFirstSeenByNode } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { NETWORK_WINDOW_SLOTS } from '../constants';
-import { quantile } from '../utils/node-stats';
+import { NETWORK_WINDOW_SLOTS } from '@/pages/xatu/nodes/constants';
+import { quantile } from '@/pages/xatu/nodes/utils/node-stats';
 import { useSlotWindow, type SlotWindow } from './useSlotWindow';
 
 /** Block arrival across every node in one slot */
-export interface SlotDistribution {
+interface SlotDistribution {
   slot: number;
   min: number | null;
   p10: number | null;
@@ -16,7 +16,7 @@ export interface SlotDistribution {
   nodeCount: number;
 }
 
-export interface NetworkObservations {
+interface NetworkObservations {
   window: SlotWindow;
   /** Every slot in the window, oldest first */
   slots: SlotDistribution[];
@@ -32,7 +32,7 @@ export interface UseNetworkObservationsResult {
  * Block arrival per slot across every node, from per-node rows. A node that reports a slot twice counts once, with
  * its earliest arrival.
  */
-export function buildNetworkObservations(window: SlotWindow, blocks: FctBlockFirstSeenByNode[]): NetworkObservations {
+function buildNetworkObservations(window: SlotWindow, blocks: FctBlockFirstSeenByNode[]): NetworkObservations {
   // slot → node → earliest block arrival
   const bySlot = new Map<number, Map<string, number>>();
   blocks.forEach(row => {
@@ -46,12 +46,13 @@ export function buildNetworkObservations(window: SlotWindow, blocks: FctBlockFir
   const slots: SlotDistribution[] = [];
   for (let slot = window.startSlot; slot < window.endSlot; slot++) {
     const values = [...(bySlot.get(slot)?.values() ?? [])].sort((a, b) => a - b);
+    const min = values[0];
     slots.push(
-      values.length === 0
+      min === undefined
         ? { slot, min: null, p10: null, p50: null, p90: null, nodeCount: 0 }
         : {
             slot,
-            min: values[0],
+            min,
             p10: quantile(values, 0.1),
             p50: quantile(values, 0.5),
             p90: quantile(values, 0.9),

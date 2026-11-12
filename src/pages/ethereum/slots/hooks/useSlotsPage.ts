@@ -14,7 +14,7 @@ import {
   fctBlockServiceList,
   intBlockProposerCanonicalServiceList,
 } from '@/api/sdk.gen';
-import type { SlotFilters, SlotSort } from '../IndexPage.types';
+import type { SlotFilters, SlotSort } from '@/pages/ethereum/slots/IndexPage.types';
 import {
   SORT_COLUMNS,
   applyRow,
@@ -30,7 +30,7 @@ import {
   type SlotFacts,
   type SlotRow,
   type SlotTable,
-} from '../utils/slot-query';
+} from '@/pages/ethereum/slots/utils/slot-query';
 
 /** Driver rows read per request while filters are checked here */
 const SCAN_BATCH = 250;
@@ -306,7 +306,8 @@ export async function fetchSlotsPage(
       const realNext = next === 'more' ? undefined : next;
       let index = skip;
       for (; index < slots.length && matched.length < pageSize; index++) {
-        if (passes(slots[index])) matched.push(facts.get(slots[index])!);
+        const slot = slots[index];
+        if (slot !== undefined && passes(slot)) matched.push(facts.get(slot)!);
       }
       if (matched.length === pageSize) {
         nextCursor =

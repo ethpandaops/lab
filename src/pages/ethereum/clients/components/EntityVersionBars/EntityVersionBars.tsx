@@ -13,7 +13,7 @@ import {
   summariseVersions,
   versionColors,
   type VersionCount,
-} from '../../utils/client-versions';
+} from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface EntityVersionBarsProps {
   client: string;
@@ -78,7 +78,9 @@ export function EntityVersionBars({
   const versions = useMemo(() => summariseVersions(blocks), [blocks]);
   const colors = useMemo(() => {
     const map = versionColors(versions, getDataVizColors().CHART_CATEGORICAL_COLORS);
-    if (focusVersion && !map.has(focusVersion)) map.set(focusVersion, getDataVizColors().CHART_CATEGORICAL_COLORS[0]);
+    if (focusVersion && !map.has(focusVersion)) {
+      map.set(focusVersion, getDataVizColors().CHART_CATEGORICAL_COLORS[0] ?? OTHER_VERSION_COLOR);
+    }
     return map;
   }, [versions, focusVersion]);
   const colorOf = (version: string): string =>
@@ -202,7 +204,7 @@ export function EntityVersionBars({
                   aria-pressed={highlight === version}
                   className={clsx(
                     'inline-flex items-center gap-1.5 rounded-xs px-1.5 py-0.5 text-xs/5 transition-opacity',
-                    isRelease ? 'cursor-pointer hover:bg-muted/20' : 'cursor-default',
+                    isRelease ? 'cursor-pointer hover:bg-muted-20' : 'cursor-default',
                     active ? 'opacity-100' : 'opacity-40',
                     highlight === version && 'ring-1 ring-border'
                   )}
@@ -224,7 +226,7 @@ export function EntityVersionBars({
           <p className="text-sm text-muted">No entity matches.</p>
         ) : (
           <div className="flex flex-col gap-1">
-            <div className="grid grid-cols-[minmax(0,1fr)_3.5rem_4rem] items-center gap-3 text-xs/5 text-muted sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem]">
+            <div className="grid grid-cols-fill-14-16 items-center gap-3 text-xs/5 text-muted sm:grid-cols-version-bars">
               <span>Entity</span>
               <span className="hidden truncate sm:block">
                 {scale === 'mix' ? 'Share of its blocks by version' : 'Blocks by version'}
@@ -243,7 +245,7 @@ export function EntityVersionBars({
               return (
                 <div
                   key={row.entity}
-                  className="grid grid-cols-[minmax(0,1fr)_3.5rem_4rem] items-center gap-x-3 gap-y-1 rounded-xs py-0.5 hover:bg-muted/10 sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_4rem_4.5rem]"
+                  className="grid grid-cols-fill-14-16 items-center gap-x-3 gap-y-1 rounded-xs py-0.5 hover:bg-muted-10 sm:grid-cols-version-bars"
                 >
                   <Link
                     to="/ethereum/entities/$entity"
@@ -255,7 +257,7 @@ export function EntityVersionBars({
                     {row.entity}
                   </Link>
                   {/* On a phone the bar gets a full-width line under the entity */}
-                  <div className="order-last col-span-full h-4 sm:order-none sm:col-span-1">
+                  <div className="order-last col-span-full h-4 sm:order-0 sm:col-span-1">
                     <div className="flex h-full overflow-hidden rounded-xs" style={{ width: `${width}%` }}>
                       {orderOf(row).map(version => {
                         const count = row.counts.get(version) ?? 0;
@@ -264,11 +266,13 @@ export function EntityVersionBars({
                           // An inset divider takes no width, so slivers of rare versions can't crowd out the rest
                           <span
                             key={version}
-                            className="h-full shadow-[inset_-1px_0_0_var(--color-surface)] last:shadow-none"
+                            className={clsx(
+                              'h-full shadow-edge last:shadow-none',
+                              dimmed ? 'opacity-25' : 'opacity-100'
+                            )}
                             style={{
                               width: `${(count / row.blocks) * 100}%`,
                               backgroundColor: colorOf(version),
-                              opacity: dimmed ? 0.25 : 1,
                             }}
                             title={`${version}: ${count.toLocaleString()} blocks, ${percent(count, row.blocks)} of ${row.entity}'s`}
                           />

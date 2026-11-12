@@ -20,7 +20,7 @@ export interface EntityMetricDataPoint {
 /**
  * X-axis configuration
  */
-export interface XAxisConfig {
+interface XAxisConfig {
   /** Axis label (e.g., 'Slot', 'Epoch', 'Block') */
   name: string;
   /** Optional minimum value (if not provided, calculated from data) */
@@ -39,7 +39,7 @@ export interface XAxisConfig {
 /**
  * Y-axis configuration
  */
-export interface YAxisConfig {
+interface YAxisConfig {
   /** Axis label (e.g., 'Missed Attestations', 'Count') */
   name: string;
   /**

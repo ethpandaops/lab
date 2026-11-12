@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { DimClientRelease } from '@/api/types.gen';
-import { displayVersion } from '../utils/client-versions';
+import { displayVersion } from '@/pages/ethereum/clients/utils/client-versions';
 import { useNodeVersions } from './useNodeVersions';
 
 export interface UseNodesByVersionResult {

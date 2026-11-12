@@ -64,8 +64,8 @@ describe('censusVersionCounts', () => {
     expect(counts.filter(row => row.stated === 'v1.16.7').map(row => row.count)).toEqual([900]);
     const [day] = adoptionByDay(countVersionsByDay(counts), 'v1.16.7');
     // 40 of the 100 resolved peers, not 940 of 1000
-    expect(day.exact).toBeCloseTo(40);
-    expect(day.atLeast).toBeCloseTo(100);
+    expect(day?.exact).toBeCloseTo(40);
+    expect(day?.atLeast).toBeCloseTo(100);
   });
 });
 

@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CardChain } from './CardChain';
 import type { CardChainItem } from './CardChain.types';
+import { seededRandom } from '@/test-utils/random';
+
+const random = seededRandom(16);
 
 /**
  * Format large numbers with K/M suffix for display
@@ -20,7 +23,7 @@ const meta: Meta<typeof CardChain> = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[900px] rounded-xs bg-background p-6">
+      <div className="min-w-225 rounded-xs bg-background p-6">
         <Story />
       </div>
     ),
@@ -146,7 +149,7 @@ const slotItems: CardChainItem[] = Array.from({ length: 6 }, (_, i) => ({
   label: 'Slot',
   value: 9123456 + i,
   stats: [{ label: 'Proposer', value: `0x${(12345 + i).toString(16).padStart(4, '0')}...` }],
-  fillPercentage: Math.floor(Math.random() * 100),
+  fillPercentage: Math.floor(random() * 100),
   isHighlighted: i === 5,
 }));
 

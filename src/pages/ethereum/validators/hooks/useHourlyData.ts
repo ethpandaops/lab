@@ -22,7 +22,7 @@ interface HourlyDataPoint {
 }
 
 /** Attestation hourly data point */
-export interface AttestationHourlyDataPoint extends HourlyDataPoint {
+interface AttestationHourlyDataPoint extends HourlyDataPoint {
   inclusionRate: number | null;
   headCorrectRate: number | null;
   targetCorrectRate: number | null;
@@ -31,12 +31,12 @@ export interface AttestationHourlyDataPoint extends HourlyDataPoint {
 }
 
 /** Sync committee hourly data point */
-export interface SyncCommitteeHourlyDataPoint extends HourlyDataPoint {
+interface SyncCommitteeHourlyDataPoint extends HourlyDataPoint {
   participationRate: number | null;
 }
 
 /** Balance hourly data point */
-export interface BalanceHourlyDataPoint extends HourlyDataPoint {
+interface BalanceHourlyDataPoint extends HourlyDataPoint {
   balance: number | null;
   minBalance: number | null;
   maxBalance: number | null;

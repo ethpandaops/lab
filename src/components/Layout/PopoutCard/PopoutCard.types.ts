@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { DialogSize } from '@/components/Overlays/Dialog';
 
-export interface PopoutCardRenderProps {
+interface PopoutCardRenderProps {
   /**
    * Whether the content is being rendered in the modal (true) or card (false)
    */
@@ -48,7 +48,7 @@ export interface PopoutCardProps {
    * // Dynamic content (larger in modal)
    * <PopoutCard title="Chart">
    *   {({ inModal }) => (
-   *     <div className={inModal ? "min-h-[600px]" : "h-72"}>
+   *     <div className={inModal ? "min-h-150" : "h-72"}>
    *       <MyChart />
    *     </div>
    *   )}

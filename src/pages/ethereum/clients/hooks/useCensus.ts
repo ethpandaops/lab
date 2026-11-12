@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { censusList, type CensusTable } from '../api/client-models';
-import { latestDay } from '../utils/census';
-import { windowStart } from '../utils/client-versions';
+import { censusList, type CensusTable } from '@/pages/ethereum/clients/api/client-models';
+import { latestDay } from '@/pages/ethereum/clients/utils/census';
+import { windowStart } from '@/pages/ethereum/clients/utils/client-versions';
 import { useDailyByClient } from './useDailyByClient';
 
 /** Days loaded to find the latest full day */

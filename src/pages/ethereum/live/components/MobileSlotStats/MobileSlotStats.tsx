@@ -2,8 +2,8 @@ import { type JSX, type ReactNode } from 'react';
 import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { weiToEth } from '@/utils';
-import type { ClientValidationRow } from '../../hooks/useSlotViewData/useSlotViewData.types';
-import type { BlockDetailsData } from '../../hooks/useBlockDetailsData/useBlockDetailsData.types';
+import type { ClientValidationRow } from '@/pages/ethereum/live/hooks/useSlotViewData/useSlotViewData.types';
+import type { BlockDetailsData } from '@/pages/ethereum/live/hooks/useBlockDetailsData/useBlockDetailsData.types';
 
 export interface MobileSlotStatsProps {
   clientValidation: ClientValidationRow[];
@@ -25,9 +25,9 @@ function formatEth(wei: string | null | undefined): string | null {
 }
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
-  canonical: { label: 'Proposed', cls: 'border-success/40 bg-success/10 text-success' },
-  orphaned: { label: 'Orphaned', cls: 'border-warning/40 bg-warning/10 text-warning' },
-  missed: { label: 'Missed', cls: 'border-danger/40 bg-danger/10 text-danger' },
+  canonical: { label: 'Proposed', cls: 'border-success-40 bg-success-10 text-success' },
+  orphaned: { label: 'Orphaned', cls: 'border-warning-40 bg-warning-10 text-warning' },
+  missed: { label: 'Missed', cls: 'border-danger-40 bg-danger-10 text-danger' },
 };
 
 function Chip({ label, children }: { label: string; children: ReactNode }): JSX.Element {

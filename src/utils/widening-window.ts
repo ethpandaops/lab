@@ -55,10 +55,10 @@ export async function fetchWidening<T>(
   enough: number,
   fetchWindow: (window: TimeWindow) => Promise<T[]>
 ): Promise<{ rows: T[]; window?: TimeWindow; last: boolean }> {
-  for (let index = 0; index < windows.length; index++) {
-    const rows = await fetchWindow(windows[index]);
+  for (const [index, window] of windows.entries()) {
+    const rows = await fetchWindow(window);
     const last = index === windows.length - 1;
-    if (rows.length >= enough || last) return { rows, window: windows[index], last };
+    if (rows.length >= enough || last) return { rows, window, last };
   }
   return { rows: [], last: true };
 }
@@ -138,7 +138,8 @@ export function nextTimeCursor<T>(
   skip: number,
   timeOf: (row: T) => number | undefined
 ): TimeCursor | undefined {
-  const oldest = page.length > 0 ? timeOf(page[page.length - 1]) : undefined;
+  const oldestRow = page.at(-1);
+  const oldest = oldestRow === undefined ? undefined : timeOf(oldestRow);
   if (oldest === undefined) return undefined;
   const sameSecond = page.filter(row => timeOf(row) === oldest).length;
   return { end: oldest + 1, skip: (oldest + 1 === end ? skip : 0) + sameSecond };

@@ -1,0 +1,25 @@
+{
+  // Tests, stories, test utilities, the token tooling, the Foundations docs and
+  // the Storybook preview: the app's settings plus the test globals, so those
+  // types never leak into the app. main.tsx registers the router's types.
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    "types": ["vite/client", "node", "@testing-library/jest-dom"]
+  },
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.stories.tsx",
+    "src/test-utils",
+    "src/design-docs",
+    "src/styles/**/*.ts",
+    "src/vite-env.d.ts",
+    "src/types/**/*.d.ts",
+    "src/main.tsx",
+    ".storybook/preview.tsx",
+    ".storybook/assetHandlers.ts",
+    ".storybook/vitest-setup.ts"
+  ],
+  "exclude": []
+}

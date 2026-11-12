@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { censusList, type CensusTable } from '@/pages/ethereum/clients/api/client-models';
 import { useDailyByClient } from '@/pages/ethereum/clients/hooks/useDailyByClient';
-import { dayStart } from '../utils/network-census';
+import { dayStart } from '@/pages/ethereum/network/utils/network-census';
 import { useRangeEnds, type UseRangeEndsResult } from './useRangeEnds';
 
 /** Census rows of one place: a client's peers on a day */

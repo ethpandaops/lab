@@ -49,7 +49,7 @@ export const RoundedComparison: Story = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[800px] rounded-sm bg-background p-8">
+      <div className="min-w-200 rounded-sm bg-background p-8">
         <Story />
       </div>
     ),
@@ -88,7 +88,7 @@ export const WithTitle: Story = {
     title: 'Consensus clients',
     subtitle: 'Share of proposed blocks over 7 days',
     actions: (
-      <button type="button" className="rounded-sm px-1.5 py-1 text-xs text-muted hover:bg-muted/20">
+      <button type="button" className="rounded-sm px-1.5 py-1 text-xs text-muted hover:bg-muted-20">
         Export
       </button>
     ),
@@ -153,7 +153,7 @@ export const InteractiveWithSections: Story = {
  */
 export const CustomStyled: Story = {
   args: {
-    className: 'border-4 border-blue-500',
+    className: 'border-4 border-data-blue',
     children: <p>This card has a custom blue border</p>,
   },
 };
@@ -166,7 +166,7 @@ export const StatsCard: Story = {
     header: (
       <div className="flex items-center justify-between">
         <h3 className="text-base/7 font-semibold text-foreground">Total Validators</h3>
-        <span className="rounded-sm bg-success/10 px-2 py-1 text-xs/5 font-semibold text-success">+12.5%</span>
+        <span className="rounded-sm bg-success-10 px-2 py-1 text-xs/5 font-semibold text-success">+12.5%</span>
       </div>
     ),
     children: (
@@ -191,7 +191,7 @@ export const ProfileCard: Story = {
   args: {
     header: (
       <div className="flex items-center gap-4">
-        <div className="flex size-12 items-center justify-center rounded-full bg-primary/10">
+        <div className="flex size-12 items-center justify-center rounded-full bg-primary-10">
           <span className="text-lg/6 font-bold text-primary">JD</span>
         </div>
         <div>
@@ -221,7 +221,7 @@ export const ProfileCard: Story = {
     ),
     footer: (
       <div className="flex gap-2">
-        <button className="flex-1 rounded-sm bg-primary px-3 py-2 text-sm/6 font-semibold text-white hover:bg-accent">
+        <button className="flex-1 rounded-sm bg-primary px-3 py-2 text-sm/6 font-semibold text-on-fill hover:bg-accent">
           Edit Profile
         </button>
         <button className="flex-1 rounded-sm border border-border px-3 py-2 text-sm/6 font-semibold text-foreground hover:bg-surface">
@@ -256,7 +256,7 @@ export const EmptyState: Story = {
         <h3 className="mt-2 text-sm/6 font-semibold text-foreground">No data available</h3>
         <p className="mt-1 text-sm/6 text-muted">Get started by creating a new item.</p>
         <div className="mt-6">
-          <button className="inline-flex items-center rounded-sm bg-primary px-3 py-2 text-sm/6 font-semibold text-white hover:bg-accent">
+          <button className="inline-flex items-center rounded-sm bg-primary px-3 py-2 text-sm/6 font-semibold text-on-fill hover:bg-accent">
             + New Item
           </button>
         </div>
@@ -274,7 +274,7 @@ export const GridLayout: Story = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[1200px] rounded-sm bg-background p-8">
+      <div className="min-w-300 rounded-sm bg-background p-8">
         <Story />
       </div>
     ),
@@ -285,7 +285,7 @@ export const GridLayout: Story = {
         header={
           <div className="flex items-center justify-between">
             <h3 className="text-base/7 font-semibold text-foreground">Validators</h3>
-            <span className="rounded-sm bg-success/10 px-2 py-1 text-xs/5 font-semibold text-success">+5.2%</span>
+            <span className="rounded-sm bg-success-10 px-2 py-1 text-xs/5 font-semibold text-success">+5.2%</span>
           </div>
         }
         footer={<span className="text-sm/6 text-muted">Last 24 hours</span>}
@@ -298,7 +298,7 @@ export const GridLayout: Story = {
         header={
           <div className="flex items-center justify-between">
             <h3 className="text-base/7 font-semibold text-foreground">Blocks</h3>
-            <span className="rounded-sm bg-primary/10 px-2 py-1 text-xs/5 font-semibold text-primary">Live</span>
+            <span className="rounded-sm bg-primary-10 px-2 py-1 text-xs/5 font-semibold text-primary">Live</span>
           </div>
         }
         footer={<span className="text-sm/6 text-muted">Updated just now</span>}
@@ -311,7 +311,7 @@ export const GridLayout: Story = {
         header={
           <div className="flex items-center justify-between">
             <h3 className="text-base/7 font-semibold text-foreground">Network Health</h3>
-            <span className="rounded-sm bg-success/10 px-2 py-1 text-xs/5 font-semibold text-success">Healthy</span>
+            <span className="rounded-sm bg-success-10 px-2 py-1 text-xs/5 font-semibold text-success">Healthy</span>
           </div>
         }
         footer={<button className="text-sm/6 font-semibold text-primary hover:text-accent">View details →</button>}
@@ -397,7 +397,7 @@ export const AllVariants: Story = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[1400px] rounded-sm bg-background p-8">
+      <div className="min-w-350 rounded-sm bg-background p-8">
         <Story />
       </div>
     ),
@@ -494,7 +494,7 @@ export const TallCard: Story = {
         <button className="text-sm/6 font-semibold text-primary hover:text-accent">View details →</button>
       </div>
     ),
-    featureImage: <img src="/images/experiments/fork-readiness.png" alt="Fork Readiness" />,
+    featureImage: <img src="/images/ethereum/clients.png" alt="Fork Readiness" />,
   },
   decorators: [
     Story => (
@@ -516,7 +516,7 @@ export const WideCard: Story = {
     header: (
       <div className="flex items-center justify-between">
         <h3 className="text-base/7 font-semibold text-foreground">Block Production Flow</h3>
-        <span className="rounded-sm bg-success/10 px-2 py-1 text-xs/5 font-semibold text-success">Live</span>
+        <span className="rounded-sm bg-success-10 px-2 py-1 text-xs/5 font-semibold text-success">Live</span>
       </div>
     ),
     children: (
@@ -540,7 +540,7 @@ export const WideCard: Story = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[800px] rounded-sm bg-background p-8">
+      <div className="min-w-200 rounded-sm bg-background p-8">
         <Story />
       </div>
     ),
@@ -557,7 +557,7 @@ export const MultipleExperimentImages: Story = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[1200px] rounded-sm bg-background p-8">
+      <div className="min-w-300 rounded-sm bg-background p-8">
         <Story />
       </div>
     ),
@@ -574,7 +574,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Live Slots</h3>}
-        featureImage={<img src="/images/experiments/live-slots.png" alt="Live Slots" />}
+        featureImage={<img src="/images/ethereum/live.png" alt="Live Slots" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">8,234</p>
         <p className="mt-1 text-sm/6 text-muted">Current slot</p>
@@ -582,7 +582,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Locally Built Blocks</h3>}
-        featureImage={<img src="/images/experiments/locally-built-blocks.png" alt="Locally Built Blocks" />}
+        featureImage={<img src="/images/ethereum/execution/locally-built-blocks.png" alt="Locally Built Blocks" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">67%</p>
         <p className="mt-1 text-sm/6 text-muted">Local block rate</p>
@@ -598,7 +598,7 @@ export const MultipleExperimentImages: Story = {
 
       <Card
         header={<h3 className="text-base/7 font-semibold text-foreground">Fork Readiness</h3>}
-        featureImage={<img src="/images/experiments/fork-readiness.png" alt="Fork Readiness" />}
+        featureImage={<img src="/images/ethereum/clients.png" alt="Fork Readiness" />}
       >
         <p className="text-3xl/9 font-bold text-foreground">98.5%</p>
         <p className="mt-1 text-sm/6 text-muted">Clients ready</p>

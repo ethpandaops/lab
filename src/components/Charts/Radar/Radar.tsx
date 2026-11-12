@@ -9,7 +9,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { RadarChartProps } from './Radar.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
-import { legendItem, legendItemSize } from '../chartChrome';
+import { legendItem, legendItemSize } from '@/components/Charts/chartChrome';
 
 // Get data visualization colors once at module level
 const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
@@ -97,7 +97,9 @@ export function RadarChart({
 
     // Build series configuration
     const seriesConfig = series.map((s, index) => {
-      const seriesColor = s.color ? resolveCssColorToHex(s.color) : extendedPalette[index % extendedPalette.length];
+      const seriesColor = s.color
+        ? resolveCssColorToHex(s.color)
+        : (extendedPalette[index % extendedPalette.length] ?? themeColors.primary);
 
       return {
         type: 'radar' as const,
@@ -187,6 +189,7 @@ export function RadarChart({
           let result = `<div style="font-weight: 600; margin-bottom: 4px;">${name}</div>`;
           indicators.forEach((ind, i) => {
             const val = value[i];
+            if (val === undefined) return;
             const percentage = ind.max > 0 ? ((val / ind.max) * 100).toFixed(1) : '0.0';
             result += `<div style="display: flex; justify-content: space-between; gap: 16px;">`;
             result += `<span>${ind.name}:</span>`;
@@ -221,15 +224,17 @@ export function RadarChart({
     themeColors.muted,
     themeColors.border,
     themeColors.surface,
+    themeColors.primary,
   ]);
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={height === '100%' ? 'size-full' : 'w-full'}>
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         echarts={echarts}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
       />

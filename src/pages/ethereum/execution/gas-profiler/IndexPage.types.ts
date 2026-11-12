@@ -64,7 +64,6 @@ export const gasProfilerTxSearchSchema = z.object({
  */
 export type GasProfilerHomeSearch = z.infer<typeof gasProfilerHomeSearchSchema>;
 export type GasProfilerBlockSearch = z.infer<typeof gasProfilerBlockSearchSchema>;
-export type GasProfilerTxSearch = z.infer<typeof gasProfilerTxSearchSchema>;
 
 /**
  * Transaction metadata derived from call frames

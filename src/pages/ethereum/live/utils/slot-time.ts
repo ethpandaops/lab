@@ -19,13 +19,3 @@ export function slotToTimestamp(slot: number, genesisTime: number): number {
 export function timestampToSlot(timestamp: number, genesisTime: number): number {
   return Math.floor((timestamp - genesisTime) / SECONDS_PER_SLOT);
 }
-
-/**
- * Gets the slot start timestamp for a given slot
- * @param slot - Beacon chain slot number
- * @param genesisTime - Network genesis time
- * @returns Slot start timestamp (Unix seconds)
- */
-export function getSlotStartTime(slot: number, genesisTime: number): number {
-  return slotToTimestamp(slot, genesisTime);
-}

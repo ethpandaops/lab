@@ -39,7 +39,8 @@ export interface ListContainerProps {
   className?: string;
 
   /**
-   * The HTML element to render as the list container
+   * The HTML element to render as the list container. A `div` is not a list, for items
+   * that carry another role, such as radio options.
    * @default 'ul'
    */
   as?: 'ul' | 'ol' | 'div';
@@ -60,4 +61,10 @@ export interface ListItemProps {
    * Click handler for interactive items
    */
   onClick?: () => void;
+
+  /**
+   * The HTML element to render; `div` when the container is a `div`
+   * @default 'li'
+   */
+  as?: 'li' | 'div';
 }

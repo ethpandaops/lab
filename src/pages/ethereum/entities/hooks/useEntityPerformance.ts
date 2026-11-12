@@ -8,9 +8,9 @@ import {
   ENTITY_TABLES,
   fctValidatorPerformanceByEntityRollingList,
   type FctValidatorPerformanceByEntityRolling,
-} from '../api/entity-models';
-import type { EntitiesWindow } from '../constants';
-import { addCounts, EMPTY_COUNTS, toCounts, type PerformanceCounts } from '../utils/performance';
+} from '@/pages/ethereum/entities/api/entity-models';
+import type { EntitiesWindow } from '@/pages/ethereum/entities/constants';
+import { addCounts, EMPTY_COUNTS, toCounts, type PerformanceCounts } from '@/pages/ethereum/entities/utils/performance';
 
 export interface UseEntityPerformanceResult {
   /** Counts per entity over the period; entities with no duties or proposals in it are absent */

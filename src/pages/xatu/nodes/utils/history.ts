@@ -1,12 +1,12 @@
-import { BEHIND_MS } from '../constants';
-import type { HistoryRow } from '../hooks/useNodeHistory';
+import { BEHIND_MS } from '@/pages/xatu/nodes/constants';
+import type { HistoryRow } from '@/pages/xatu/nodes/hooks/useNodeHistory';
 import { median } from './node-stats';
 import { weightedMedian } from './time-buckets';
 
 /**
  * Whether a node's bucket trails the network median by more than a slot, i.e. the node was catching up.
  */
-export function isBehind(row: HistoryRow, networkMedians: Map<number, number>): boolean {
+function isBehind(row: HistoryRow, networkMedians: Map<number, number>): boolean {
   const network = networkMedians.get(row.start);
   return network !== undefined && row.p50 - network > BEHIND_MS;
 }

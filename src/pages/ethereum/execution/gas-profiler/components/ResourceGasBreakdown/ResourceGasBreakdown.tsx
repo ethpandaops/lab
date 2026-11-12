@@ -3,8 +3,8 @@ import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Card } from '@/components/Layout/Card';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { BarChart } from '@/components/Charts/Bar';
-import type { ResourceGasEntry } from '../../utils/resourceGas';
-import { RESOURCE_COLORS } from '../../utils/resourceGas';
+import type { ResourceGasEntry } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
+import { RESOURCE_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
 
 export interface ResourceGasBreakdownProps {
   /** Resource gas entries sorted by gas desc */
@@ -106,6 +106,7 @@ export function ResourceGasBreakdown({
             barWidth="65%"
             tooltipFormatter={params => {
               const p = Array.isArray(params) ? params[0] : params;
+              if (!p) return '';
               const val = typeof p.value === 'number' ? p.value : 0;
               const pct = total > 0 ? ((val / total) * 100).toFixed(1) : '0.0';
               return `<strong>${p.name as string}</strong><br/>${formatGas(val)} gas (${pct}%)`;

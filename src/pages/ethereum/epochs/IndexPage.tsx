@@ -1,12 +1,11 @@
 import { type JSX, useCallback, useMemo } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { createColumnHelper } from '@tanstack/react-table';
 import clsx from 'clsx';
 
 import { Alert } from '@/components/Feedback/Alert';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { DataTable } from '@/components/DataTable';
+import { DataTable, type DataTableColumn } from '@/components/DataTable';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 
@@ -14,8 +13,6 @@ import { useEpochsData } from './hooks';
 import { EpochsFilters } from './components/EpochsFilters';
 import type { EpochRow } from './utils/epoch-query';
 import { DEFAULT_PAGE_SIZE, EPOCH_FILTER_KEYS, type EpochFilters, type EpochsSearch } from './IndexPage.types';
-
-const column = createColumnHelper<EpochRow>();
 
 /**
  * Epochs list: the latest epochs by default, narrowed by range, participation and missed-slot filters that live
@@ -79,51 +76,59 @@ export function IndexPage(): JSX.Element {
   );
 
   const columns = useMemo(
-    () => [
-      column.accessor('epoch', {
+    (): DataTableColumn<EpochRow>[] => [
+      {
+        accessorKey: 'epoch',
         header: 'Epoch',
         enableSorting: false,
-        cell: info => (
-          <span className={info.getValue() === currentEpoch ? 'text-primary' : undefined}>
-            <Epoch epoch={info.getValue()} />
+        cell: ({ row }) => (
+          <span className={row.original.epoch === currentEpoch ? 'text-primary' : undefined}>
+            <Epoch epoch={row.original.epoch} />
           </span>
         ),
         meta: { cellClassName: 'font-medium text-foreground' },
         enableHiding: false,
-      }),
-      column.accessor('startTime', {
+      },
+      {
+        accessorKey: 'startTime',
         id: 'start',
         header: 'Start time',
         enableSorting: false,
-        cell: info => <Timestamp timestamp={info.getValue()} format="short" />,
+        cell: ({ row }) => <Timestamp timestamp={row.original.startTime} format="short" />,
         // Age gives the same time in less width
         meta: { columnClassName: 'hidden sm:table-cell' },
-      }),
-      column.accessor('startTime', {
+      },
+      {
+        accessorKey: 'startTime',
         id: 'age',
         header: 'Age',
         enableSorting: false,
-        cell: info => <Timestamp timestamp={info.getValue()} format="relative" />,
-      }),
-      column.accessor('proposed', {
+        cell: ({ row }) => <Timestamp timestamp={row.original.startTime} format="relative" />,
+      },
+      {
+        accessorKey: 'proposed',
         header: 'Proposed',
         enableSorting: false,
-        cell: info => info.getValue(),
-      }),
-      column.accessor('missed', {
+        cell: ({ row }) => row.original.proposed,
+      },
+      {
+        accessorKey: 'missed',
         header: 'Missed',
         enableSorting: false,
-        cell: info => <span className={info.getValue() > 0 ? 'text-warning' : 'text-muted'}>{info.getValue()}</span>,
-      }),
-      column.accessor('participation', {
+        cell: ({ row }) => (
+          <span className={row.original.missed > 0 ? 'text-warning' : 'text-muted'}>{row.original.missed}</span>
+        ),
+      },
+      {
+        accessorKey: 'participation',
         header: 'Participation',
         enableSorting: false,
-        cell: info => {
-          const rate = info.getValue();
+        cell: ({ row }) => {
+          const rate = row.original.participation;
           if (rate === null) return <span className="text-muted">-</span>;
           return `${(rate * 100).toFixed(2)}%`;
         },
-      }),
+      },
     ],
     [currentEpoch]
   );

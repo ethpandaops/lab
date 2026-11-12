@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
 import { useActiveNodes } from '@/pages/xatu/nodes/hooks/useActiveNodes';
 import { extractExecutionClient, normalizeClientName } from '@/utils/ethereum';
-import type { ClientLayer } from '../utils/client-share';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 
 export interface UseClientNodesResult {
   /** Contributoor nodes running the client */

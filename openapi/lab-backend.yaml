@@ -1,0 +1,552 @@
+openapi: 3.1.0
+info:
+  title: Lab backend API
+  version: 0.1.0
+  description: >-
+    The routes lab-backend (github.com/ethpandaops/lab-backend) serves itself,
+    as the UI calls them: configuration, bounds, archive downloads and the gas
+    profiler. Every other `/api/v1/{network}/...` route is proxied to the CBT
+    API, whose own spec generates `src/api`. This spec generates `src/lab-api`:
+    `pnpm generate:api`. Keep it in step with the backend's handlers in
+    `internal/api`; responses are validated against it.
+tags:
+  - name: config
+    description: What the UI needs before it can render.
+  - name: download
+    description: Beacon blocks and blobs from the archives, as attachments.
+  - name: gas-profiler
+    description: Gas schedules and block simulations from the gas profiler.
+paths:
+  /api/v1/config:
+    get:
+      operationId: getConfig
+      tags: [config]
+      summary: Read the networks and features the UI offers
+      description: >-
+        The same object is injected into `index.html` as `window.__CONFIG__`,
+        so the first render does not wait for this request.
+      responses:
+        '200':
+          description: The configuration.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        default:
+          $ref: '#/components/responses/TextError'
+  /api/v1/{network}/bounds:
+    get:
+      operationId: getBounds
+      tags: [config]
+      summary: Read the range each CBT table holds for a network
+      description: >-
+        Every network's bounds are injected into `index.html` as
+        `window.__BOUNDS__`, keyed by network name.
+      parameters:
+        - $ref: '#/components/parameters/NetworkName'
+      responses:
+        '200':
+          description: The bounds, keyed by table name.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bounds'
+        default:
+          $ref: '#/components/responses/TextError'
+  /api/v1/download/{network}/block:
+    get:
+      operationId: downloadBlock
+      tags: [download]
+      summary: Download a beacon block from the block archive
+      parameters:
+        - $ref: '#/components/parameters/NetworkName'
+        - name: slot
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+        - name: block_root
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Hash32'
+        - name: format
+          in: query
+          schema:
+            $ref: '#/components/schemas/BlockDownloadFormat'
+      responses:
+        '200':
+          $ref: '#/components/responses/Attachment'
+        default:
+          $ref: '#/components/responses/JsonError'
+  /api/v1/download/{network}/blob:
+    get:
+      operationId: downloadBlob
+      tags: [download]
+      summary: Download a blob's raw bytes from the blob archive
+      description: >-
+        Blobs are archived once their slot finalizes. A payload that is not hex
+        is served as text.
+      parameters:
+        - $ref: '#/components/parameters/NetworkName'
+        - name: versioned_hash
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Hash32'
+      responses:
+        '200':
+          $ref: '#/components/responses/Attachment'
+        default:
+          $ref: '#/components/responses/JsonError'
+  /api/v1/gas-profiler/{network}/gas-schedule:
+    get:
+      operationId: getGasSchedule
+      tags: [gas-profiler]
+      summary: Read the gas schedule of the fork a block belongs to
+      parameters:
+        - $ref: '#/components/parameters/NetworkName'
+        - name: block
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: The fork's gas parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GasSchedule'
+        default:
+          $ref: '#/components/responses/JsonError'
+  /api/v1/gas-profiler/{network}/simulate-block:
+    post:
+      operationId: simulateBlock
+      tags: [gas-profiler]
+      summary: Re-execute a block under a modified gas schedule
+      parameters:
+        - $ref: '#/components/parameters/NetworkName'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimulateBlockRequest'
+      responses:
+        '200':
+          description: Gas used by the block and each transaction, before and after.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockSimulation'
+        default:
+          $ref: '#/components/responses/JsonError'
+components:
+  parameters:
+    NetworkName:
+      name: network
+      in: path
+      required: true
+      description: A network's `name` from the configuration.
+      schema:
+        type: string
+        examples: [mainnet]
+  responses:
+    Attachment:
+      description: The file, named in `Content-Disposition`.
+      headers:
+        Content-Disposition:
+          schema:
+            type: string
+            examples: ['attachment; filename="mainnet_slot_100_0x712f9943.json"']
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+    JsonError:
+      description: An error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    TextError:
+      description: An error, as plain text.
+      content:
+        text/plain:
+          schema:
+            type: string
+  schemas:
+    ApiError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: What went wrong, for people.
+    Hash32:
+      type: string
+      description: A 0x-prefixed 32-byte hex string.
+      pattern: '^0x[0-9a-fA-F]{64}$'
+    BlockDownloadFormat:
+      type: string
+      enum: [json, ssz]
+      default: json
+    Config:
+      type: object
+      required: [networks, features]
+      properties:
+        networks:
+          type: array
+          description: The enabled networks, sorted by name.
+          items:
+            $ref: '#/components/schemas/Network'
+        features:
+          type: array
+          description: Pages turned off on some networks, sorted by path.
+          items:
+            $ref: '#/components/schemas/Feature'
+    Network:
+      type: object
+      required: [name, display_name, chain_id, genesis_time, genesis_delay, forks]
+      properties:
+        name:
+          type: string
+          examples: [mainnet]
+        display_name:
+          type: string
+          examples: [Mainnet]
+        chain_id:
+          type: integer
+        genesis_time:
+          type: integer
+          description: Unix seconds.
+        genesis_delay:
+          type: integer
+          description: Seconds.
+        forks:
+          $ref: '#/components/schemas/Forks'
+        service_urls:
+          description: >-
+            Links to the network's services, by service name. Null for a
+            network configured outside cartographoor.
+          oneOf:
+            - $ref: '#/components/schemas/ServiceUrls'
+            - type: 'null'
+        blob_schedule:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlobScheduleItem'
+    ServiceUrls:
+      type: object
+      description: Cartographoor names more services than these; the UI links to these.
+      properties:
+        beaconExplorer:
+          type: string
+          description: Beaconcha.in.
+        explorer:
+          type: string
+          description: Execution layer explorer, such as Etherscan.
+        dora:
+          type: string
+        tracoor:
+          type: string
+        forkmon:
+          type: string
+        forky:
+          type: string
+        ethstats:
+          type: string
+    Forks:
+      type: object
+      required: [consensus]
+      properties:
+        consensus:
+          description: Null for a network configured outside cartographoor.
+          oneOf:
+            - $ref: '#/components/schemas/ConsensusForks'
+            - type: 'null'
+        execution:
+          $ref: '#/components/schemas/ExecutionForks'
+    ConsensusForks:
+      type: object
+      description: The network's consensus forks, by fork name.
+      properties:
+        phase0:
+          $ref: '#/components/schemas/ConsensusFork'
+        altair:
+          $ref: '#/components/schemas/ConsensusFork'
+        bellatrix:
+          $ref: '#/components/schemas/ConsensusFork'
+        capella:
+          $ref: '#/components/schemas/ConsensusFork'
+        deneb:
+          $ref: '#/components/schemas/ConsensusFork'
+        electra:
+          $ref: '#/components/schemas/ConsensusFork'
+        fulu:
+          $ref: '#/components/schemas/ConsensusFork'
+        gloas:
+          $ref: '#/components/schemas/ConsensusFork'
+        fusaka:
+          $ref: '#/components/schemas/ConsensusFork'
+    ConsensusFork:
+      type: object
+      required: [epoch]
+      properties:
+        epoch:
+          type: integer
+        timestamp:
+          type: integer
+          description: Unix seconds.
+        min_client_versions:
+          $ref: '#/components/schemas/MinClientVersions'
+    MinClientVersions:
+      type: object
+      description: The oldest release of each consensus client that supports the fork.
+      properties:
+        grandine:
+          type: string
+        lighthouse:
+          type: string
+        lodestar:
+          type: string
+        nimbus:
+          type: string
+        prysm:
+          type: string
+        teku:
+          type: string
+        tysm:
+          type: string
+    ExecutionForks:
+      type: object
+      description: The network's execution forks, by fork name.
+      properties:
+        frontier:
+          $ref: '#/components/schemas/ExecutionFork'
+        homestead:
+          $ref: '#/components/schemas/ExecutionFork'
+        dao:
+          $ref: '#/components/schemas/ExecutionFork'
+        tangerine_whistle:
+          $ref: '#/components/schemas/ExecutionFork'
+        spurious_dragon:
+          $ref: '#/components/schemas/ExecutionFork'
+        byzantium:
+          $ref: '#/components/schemas/ExecutionFork'
+        constantinople:
+          $ref: '#/components/schemas/ExecutionFork'
+        petersburg:
+          $ref: '#/components/schemas/ExecutionFork'
+        istanbul:
+          $ref: '#/components/schemas/ExecutionFork'
+        muir_glacier:
+          $ref: '#/components/schemas/ExecutionFork'
+        berlin:
+          $ref: '#/components/schemas/ExecutionFork'
+        london:
+          $ref: '#/components/schemas/ExecutionFork'
+        arrow_glacier:
+          $ref: '#/components/schemas/ExecutionFork'
+        gray_glacier:
+          $ref: '#/components/schemas/ExecutionFork'
+        paris:
+          $ref: '#/components/schemas/ExecutionFork'
+    ExecutionFork:
+      type: object
+      required: [block, timestamp]
+      properties:
+        block:
+          type: integer
+        timestamp:
+          type: integer
+          description: Unix seconds.
+    BlobScheduleItem:
+      type: object
+      description: The most blobs a block may carry from an epoch on.
+      required: [epoch, max_blobs_per_block]
+      properties:
+        epoch:
+          type: integer
+        timestamp:
+          type: integer
+          description: Unix seconds.
+        max_blobs_per_block:
+          type: integer
+    Feature:
+      type: object
+      description: A page, enabled on every network except those listed.
+      required: [path]
+      properties:
+        path:
+          type: string
+          examples: [/ethereum/data-availability/custody]
+        disabled_networks:
+          type: array
+          items:
+            type: string
+    Bounds:
+      type: object
+      description: The range each table holds, keyed by table name.
+      additionalProperties:
+        $ref: '#/components/schemas/TableBounds'
+    TableBounds:
+      type: object
+      required: [min, max]
+      properties:
+        min:
+          type: integer
+          description: The first position the table holds, in its interval units (Unix seconds or block numbers).
+        max:
+          type: integer
+          description: The end of the last interval the table holds.
+    GasSchedule:
+      type: object
+      required: [parameters]
+      properties:
+        parameters:
+          type: object
+          description: Gas parameters by name, such as `SLOAD_COLD`.
+          additionalProperties:
+            $ref: '#/components/schemas/GasParameter'
+    GasParameter:
+      type: object
+      required: [value, description]
+      properties:
+        value:
+          type: number
+        description:
+          type: string
+    SimulateBlockRequest:
+      type: object
+      required: [blockNumber, gasSchedule]
+      properties:
+        blockNumber:
+          type: integer
+          minimum: 0
+        gasSchedule:
+          type: object
+          required: [overrides]
+          properties:
+            overrides:
+              type: object
+              description: New values for gas parameters, by name.
+              additionalProperties:
+                type: number
+        maxGasLimit:
+          type: boolean
+          description: Lift the block gas limit, so a block that would exceed it still runs.
+    BlockSimulation:
+      type: object
+      required: [blockNumber, original, simulated, transactions, opcodeBreakdown]
+      properties:
+        blockNumber:
+          type: integer
+        original:
+          $ref: '#/components/schemas/BlockGasSummary'
+        simulated:
+          $ref: '#/components/schemas/BlockGasSummary'
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionSimulation'
+        opcodeBreakdown:
+          type: object
+          description: Gas by opcode.
+          additionalProperties:
+            $ref: '#/components/schemas/OpcodeGas'
+    BlockGasSummary:
+      type: object
+      required: [gasUsed, gasLimit, wouldExceedLimit]
+      properties:
+        gasUsed:
+          type: integer
+        gasLimit:
+          type: integer
+        wouldExceedLimit:
+          type: boolean
+    TransactionSimulation:
+      type: object
+      required:
+        - hash
+        - index
+        - originalStatus
+        - simulatedStatus
+        - originalGas
+        - simulatedGas
+        - deltaPercent
+        - diverged
+        - originalReverts
+        - simulatedReverts
+      properties:
+        hash:
+          type: string
+        index:
+          type: integer
+        originalStatus:
+          type: string
+          examples: [success]
+        simulatedStatus:
+          type: string
+          examples: [success]
+        originalGas:
+          type: integer
+        simulatedGas:
+          type: integer
+        deltaPercent:
+          type: number
+        diverged:
+          type: boolean
+          description: Whether the two executions ran different opcodes.
+        originalReverts:
+          type: integer
+        simulatedReverts:
+          type: integer
+        originalErrors:
+          oneOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/CallError'
+            - type: 'null'
+        simulatedErrors:
+          oneOf:
+            - type: array
+              items:
+                $ref: '#/components/schemas/CallError'
+            - type: 'null'
+        error:
+          type: string
+          description: Why the transaction failed before the EVM ran, such as "intrinsic gas too low".
+    CallError:
+      type: object
+      description: An error in a nested call.
+      required: [depth, type, error, address]
+      properties:
+        depth:
+          type: integer
+          description: 0 for the top-level call.
+        type:
+          type: string
+          examples: [DELEGATECALL]
+        error:
+          type: string
+          examples: [execution reverted]
+        address:
+          type: string
+          description: The called contract, truncated.
+    OpcodeGas:
+      type: object
+      required: [originalCount, originalGas, simulatedCount, simulatedGas]
+      properties:
+        originalCount:
+          type: integer
+        originalGas:
+          type: integer
+        simulatedCount:
+          type: integer
+        simulatedGas:
+          type: integer

@@ -4,9 +4,13 @@ import { FlameGraph } from '@/components/Charts/FlameGraph';
 import type { FlameGraphNode } from '@/components/Charts/FlameGraph/FlameGraph.types';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { Alert } from '@/components/Feedback/Alert';
-import type { CallTreeNode } from '../../IndexPage.types';
-import type { AllCallFrameOpcodesMap } from '../../hooks/useAllCallFrameOpcodes';
-import { addOpcodesToCallTree, FLAME_GRAPH_CALL_TYPE_COLORS, FLAME_GRAPH_COMBINED_COLORS } from '../../utils';
+import type { CallTreeNode } from '@/pages/ethereum/execution/gas-profiler/IndexPage.types';
+import type { AllCallFrameOpcodesMap } from '@/pages/ethereum/execution/gas-profiler/hooks/useAllCallFrameOpcodes';
+import {
+  addOpcodesToCallTree,
+  FLAME_GRAPH_CALL_TYPE_COLORS,
+  FLAME_GRAPH_COMBINED_COLORS,
+} from '@/pages/ethereum/execution/gas-profiler/utils';
 
 export interface CallTreeSectionProps {
   /** Call tree data for the FlameGraph */
@@ -81,7 +85,7 @@ export function CallTreeSection({
       disabled={isLoadingOpcodes}
       className={clsx(
         'rounded-xs px-2 py-1 text-xs transition-colors',
-        showOpcodes ? 'bg-primary/10 text-primary' : 'bg-surface text-muted hover:text-foreground',
+        showOpcodes ? 'bg-primary-10 text-primary' : 'bg-surface text-muted hover:text-foreground',
         isLoadingOpcodes && 'cursor-wait opacity-50'
       )}
     >
@@ -93,9 +97,7 @@ export function CallTreeSection({
     return (
       <PopoutCard title={title}>
         {() => (
-          <div className="flex h-[200px] items-center justify-center text-sm text-muted">
-            No call tree data available
-          </div>
+          <div className="flex h-50 items-center justify-center text-sm text-muted">No call tree data available</div>
         )}
       </PopoutCard>
     );

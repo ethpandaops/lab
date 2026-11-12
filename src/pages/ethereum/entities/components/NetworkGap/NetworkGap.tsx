@@ -14,7 +14,7 @@ import {
   METRICS,
   type MetricId,
   type PerformanceCounts,
-} from '../../utils/performance';
+} from '@/pages/ethereum/entities/utils/performance';
 
 export interface NetworkGapProps {
   /** Named entities, largest stake first */
@@ -32,11 +32,11 @@ type Mode = 'largest' | 'worst' | 'best';
 
 /** Bar colour for a verdict; differences inside chance stay neutral */
 const BAR_CLASS = {
-  better: 'bg-success/70',
-  worse: 'bg-danger/70',
-  apart: 'bg-primary/60',
-  level: 'bg-muted/40',
-  thin: 'bg-muted/40',
+  better: 'bg-success-70',
+  worse: 'bg-danger-70',
+  apart: 'bg-primary-60',
+  level: 'bg-muted-40',
+  thin: 'bg-muted-40',
 } as const;
 
 /**
@@ -152,12 +152,16 @@ export function NetworkGap({ entities, counts, network, window }: NetworkGapProp
                       className="block truncate text-foreground"
                     />
                   </td>
-                  <td className="hidden w-[40%] py-1 sm:table-cell">
+                  <td className="hidden w-40/100 py-1 sm:table-cell">
                     <span className="relative block h-2.5">
-                      <span className="absolute inset-y-[-3px] left-1/2 w-px bg-border" />
+                      <span className="absolute -inset-y-0.75 left-1/2 w-px bg-border" />
                       <span
-                        className={clsx('absolute inset-y-0 rounded-xs', BAR_CLASS[row.verdict])}
-                        style={towardsBetter ? { left: '50%', width } : { right: '50%', width }}
+                        className={clsx(
+                          'absolute inset-y-0 rounded-xs',
+                          towardsBetter ? 'left-1/2' : 'right-1/2',
+                          BAR_CLASS[row.verdict]
+                        )}
+                        style={{ width }}
                       />
                     </span>
                   </td>

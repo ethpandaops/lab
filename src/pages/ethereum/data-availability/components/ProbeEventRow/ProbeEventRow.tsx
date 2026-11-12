@@ -52,7 +52,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
       type="button"
       onClick={onClick}
       className={clsx(
-        'group flex w-full items-center gap-2.5 rounded-sm px-2 py-1.5 text-left transition-all hover:bg-muted/30',
+        'group flex w-full items-center gap-2.5 rounded-sm px-2 py-1.5 text-left transition-all hover:bg-muted-30',
         isNew && 'animate-highlight-new'
       )}
     >
@@ -95,7 +95,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
           <Timestamp
             timestamp={probe.probe_date_time ?? 0}
             format="relative"
-            className="!p-0 text-2xs !text-muted"
+            className="p-0! text-2xs text-muted!"
             disableModal
           />
         </div>
@@ -103,7 +103,7 @@ export function ProbeEventRow({ probe, onClick, isNew, showViewIcon }: ProbeEven
 
       {/* Optional: View icon */}
       {showViewIcon && (
-        <div className="flex shrink-0 items-center self-center rounded-sm bg-accent/10 p-1.5 text-accent transition-all group-hover:bg-accent/20">
+        <div className="flex shrink-0 items-center self-center rounded-sm bg-accent-10 p-1.5 text-accent transition-all group-hover:bg-accent-20">
           <EyeIcon className="size-4" />
         </div>
       )}

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-export type NotificationVariant = 'info' | 'success' | 'warning' | 'danger';
+type NotificationVariant = 'info' | 'success' | 'warning' | 'danger';
 
 export interface NotificationOptions {
   /**

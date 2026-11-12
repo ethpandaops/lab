@@ -11,9 +11,23 @@ import {
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { completeBucketEnd, completeUtcDays, currentUtcDate } from '@/utils/time';
-import { PAGE_SIZE, QUERY_RETRIES, TIME_RANGE_CONFIG } from '../constants';
-import type { PartialRecord, PathRecord, PeerRecord, TimePeriod } from '../IndexPage.types';
-import { bucketKeys, toPartialRecords, toPathRecords, toPeerRecords } from '../utils/partial-columns';
+import {
+  PAGE_SIZE,
+  QUERY_RETRIES,
+  TIME_RANGE_CONFIG,
+} from '@/pages/ethereum/data-availability/partial-columns/constants';
+import type {
+  PartialRecord,
+  PathRecord,
+  PeerRecord,
+  TimePeriod,
+} from '@/pages/ethereum/data-availability/partial-columns/IndexPage.types';
+import {
+  bucketKeys,
+  toPartialRecords,
+  toPathRecords,
+  toPeerRecords,
+} from '@/pages/ethereum/data-availability/partial-columns/utils/partial-columns';
 
 type ListFn = Parameters<typeof fetchAllPages>[0];
 

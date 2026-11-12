@@ -2,7 +2,7 @@ import { type JSX, useMemo } from 'react';
 import { Card } from '@/components/Layout/Card';
 import { StackedBar, type StackedBarSegment } from '@/components/Charts/StackedBar';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { useTokenStorageShare, type NormalizedDataPoint } from '../../hooks';
+import { useTokenStorageShare, type NormalizedDataPoint } from '@/pages/ethereum/execution/state-growth/hooks';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();

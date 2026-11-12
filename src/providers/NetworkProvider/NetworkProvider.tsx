@@ -6,11 +6,14 @@ import { useBounds } from '@/hooks/useBounds';
 import type { Network } from '@/hooks/useNetwork';
 import { NetworkContext, type NetworkContextValue } from '@/contexts/NetworkContext';
 import { client } from '@/api/client.gen';
-import { BASE_URL, PATH_PREFIX, isRootPath } from '@/utils/api-config';
+import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
 
 interface NetworkProviderProps {
   children: ReactNode;
 }
+
+/** The lab-api operations whose queries a network switch leaves alone (operationIds in openapi/lab-backend.yaml). */
+const NETWORK_FREE_QUERIES = new Set(['getConfig', 'getBounds']);
 
 /**
  * Internal component that fetches bounds data for the current network.
@@ -48,7 +51,7 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
   const search = useSearch({ strict: false });
   const hasRouter = navigate !== undefined && search !== undefined;
 
-  const [currentNetwork, setCurrentNetworkState] = useState<Network | null>(null);
+  const [currentNetwork, setCurrentNetwork] = useState<Network | null>(null);
 
   // Use ref to avoid stale closures in the interceptor
   const currentNetworkRef = useRef<Network | null>(null);
@@ -58,24 +61,22 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     currentNetworkRef.current = currentNetwork;
   }, [currentNetwork]);
 
-  // Set up request interceptor to rewrite URLs (only once)
+  // Set up request interceptor to rewrite CBT URLs to the current network (only once). lab-backend's own routes go
+  // through the lab-api client, which names the network itself.
   useEffect(() => {
     const unsubscribe = client.interceptors.request.use(async request => {
+      if (!currentNetworkRef.current) {
+        return request;
+      }
+
+      // Only rewrite if network is not already in the path
       const url = new URL(request.url);
+      const expectedPath = `${BASE_URL}${PATH_PREFIX}/${currentNetworkRef.current.name}/`;
+      if (!url.pathname.startsWith(expectedPath)) {
+        url.pathname = url.pathname.replace(`${BASE_URL}${PATH_PREFIX}/`, expectedPath);
 
-      if (!isRootPath(url.pathname)) {
-        if (!currentNetworkRef.current) {
-          return request;
-        }
-
-        // Only rewrite if network is not already in the path
-        const expectedPath = `${BASE_URL}${PATH_PREFIX}/${currentNetworkRef.current.name}/`;
-        if (!url.pathname.startsWith(expectedPath)) {
-          url.pathname = url.pathname.replace(`${BASE_URL}${PATH_PREFIX}/`, expectedPath);
-
-          // Create new request with rewritten URL
-          request = new Request(url.toString(), request);
-        }
+        // Create new request with rewritten URL
+        request = new Request(url.toString(), request);
       }
 
       return request;
@@ -90,10 +91,8 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     };
   }, []); // Only run once on mount - ref will always have latest value
 
-  // Initialize current network from URL params or default
-  useEffect(() => {
-    if (!networks.length || currentNetwork) return;
-
+  // Initialize current network from URL params or default, as soon as the networks load
+  if (!currentNetwork && networks.length > 0) {
     const urlNetworkName = search.network;
     let initialNetwork: Network | undefined;
 
@@ -107,54 +106,62 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
     }
 
     if (initialNetwork) {
-      setCurrentNetworkState(initialNetwork);
+      setCurrentNetwork(initialNetwork);
+    }
+  }
 
-      // Update URL to match the network selection (only if router is available)
-      // Remove network param for mainnet (it's the default)
-      // Add/update network param for non-mainnet networks
-      if (hasRouter) {
-        const shouldHaveParam = initialNetwork.name !== 'mainnet';
-        const hasParam = search.network !== undefined;
+  // Once the network is initialized, update URL to match it (only if router is available)
+  const isUrlInitializedRef = useRef(false);
+  useEffect(() => {
+    if (!currentNetwork || isUrlInitializedRef.current) return;
+    isUrlInitializedRef.current = true;
 
-        if (shouldHaveParam && search.network !== initialNetwork.name) {
-          // Non-mainnet network: add/update the param
-          navigate({
-            to: '.',
-            search: prev => ({ ...prev, network: initialNetwork.name }),
-            replace: true,
-          });
-        } else if (!shouldHaveParam && hasParam) {
-          // Mainnet: remove the param by setting to undefined
-          navigate({
-            to: '.',
-            search: prev => ({ ...prev, network: undefined }),
-            replace: true,
-          });
-        }
+    // Remove network param for mainnet (it's the default)
+    // Add/update network param for non-mainnet networks
+    if (hasRouter) {
+      const shouldHaveParam = currentNetwork.name !== 'mainnet';
+      const hasParam = search.network !== undefined;
+
+      if (shouldHaveParam && search.network !== currentNetwork.name) {
+        // Non-mainnet network: add/update the param
+        navigate({
+          to: '.',
+          search: prev => ({ ...prev, network: currentNetwork.name }),
+          replace: true,
+        });
+      } else if (!shouldHaveParam && hasParam) {
+        // Mainnet: remove the param by setting to undefined
+        navigate({
+          to: '.',
+          search: prev => ({ ...prev, network: undefined }),
+          replace: true,
+        });
       }
     }
-  }, [networks, currentNetwork, search.network, navigate, hasRouter]);
+  }, [currentNetwork, search.network, navigate, hasRouter]);
 
   // Invalidate queries when network changes (URL rewriting happens in interceptor)
   useEffect(() => {
     if (currentNetwork) {
-      // Invalidate all network-specific queries to refetch with new network
-      // Don't invalidate admin queries (config, etc)
+      // Refetch everything the network switch changes. Config has no network and bounds name theirs, so they stay.
       queryClient.invalidateQueries({
         predicate: query => {
-          const queryKey = query.queryKey[0];
-          if (typeof queryKey === 'string') {
-            return !['config', 'bounds'].includes(queryKey);
-          }
-          return true;
+          const [key] = query.queryKey;
+          return !(
+            typeof key === 'object' &&
+            key !== null &&
+            '_id' in key &&
+            NETWORK_FREE_QUERIES.has(String(key._id))
+          );
         },
       });
     }
   }, [currentNetwork, queryClient]);
 
-  const setCurrentNetwork = useCallback(
+  // Switch network and record the choice in the URL
+  const selectNetwork = useCallback(
     (network: Network): void => {
-      setCurrentNetworkState(network);
+      setCurrentNetwork(network);
 
       // Only add network param for non-mainnet networks (if router is available)
       if (hasRouter) {
@@ -180,11 +187,11 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
   const value: NetworkContextValue = useMemo(
     () => ({
       currentNetwork,
-      setCurrentNetwork,
+      setCurrentNetwork: selectNetwork,
       networks,
       isLoading,
     }),
-    [currentNetwork, setCurrentNetwork, networks, isLoading]
+    [currentNetwork, selectNetwork, networks, isLoading]
   );
 
   // Block rendering until network is initialized to prevent race condition
@@ -193,9 +200,9 @@ export function NetworkProvider({ children }: NetworkProviderProps): JSX.Element
   }
 
   return (
-    <NetworkContext.Provider value={value}>
+    <NetworkContext value={value}>
       <BoundsLoader />
       {children}
-    </NetworkContext.Provider>
+    </NetworkContext>
   );
 }

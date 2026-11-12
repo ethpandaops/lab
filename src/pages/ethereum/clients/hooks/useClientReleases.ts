@@ -4,8 +4,8 @@ import { dimClientReleaseServiceList } from '@/api/sdk.gen';
 import type { DimClientRelease } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS } from '@/utils/ethereum';
-import { PAGE_SIZE } from '../constants';
-import { latestRelease, sortReleases } from '../utils/client-versions';
+import { PAGE_SIZE } from '@/pages/ethereum/clients/constants';
+import { latestRelease, sortReleases } from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface UseClientReleasesResult {
   /** Every release of the client, newest first */

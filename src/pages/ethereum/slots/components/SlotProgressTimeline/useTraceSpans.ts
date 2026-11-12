@@ -200,6 +200,8 @@ export function useTraceSpans({
     dataColumnPropagation,
     attestations,
     mevBidding,
+    payloadPropagation,
+    ptcArrivals,
     rawExecutionNodes,
     selectedUsername,
     excludeOutliers,
@@ -230,8 +232,8 @@ function buildMevSpans(
 
   const sortedBids = [...validBids].sort((a, b) => (a.chunk_slot_start_diff ?? 0) - (b.chunk_slot_start_diff ?? 0));
 
-  const firstBidTime = sortedBids[0].chunk_slot_start_diff ?? 0;
-  const lastBidTime = sortedBids[sortedBids.length - 1].chunk_slot_start_diff ?? 0;
+  const firstBidTime = sortedBids[0]?.chunk_slot_start_diff ?? 0;
+  const lastBidTime = sortedBids.at(-1)?.chunk_slot_start_diff ?? 0;
   // Parent must cover all child spans: use the later of block first seen or last bid + chunk offset
   const mevEndTime = Math.max(blockFirstSeenMs ?? 0, lastBidTime + 50);
 

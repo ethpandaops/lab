@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { useNetwork } from './useNetwork';
 import { NetworkContext } from '@/contexts/NetworkContext';
 import type { NetworkContextValue } from '@/contexts/NetworkContext/NetworkContext.types';
 import type { Network } from '@/hooks/useConfig/useConfig.types';
-import { type ReactNode } from 'react';
+import { type JSX, type ReactNode } from 'react';
 
 describe('useNetwork', () => {
   const mockNetwork: Network = {
@@ -22,7 +22,7 @@ describe('useNetwork', () => {
     contextValue: NetworkContextValue | undefined
   ): (({ children }: { children: ReactNode }) => JSX.Element) => {
     const Wrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-      <NetworkContext.Provider value={contextValue}>{children}</NetworkContext.Provider>
+      <NetworkContext value={contextValue}>{children}</NetworkContext>
     );
     return Wrapper;
   };
@@ -188,7 +188,7 @@ describe('useNetwork', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <NetworkContext.Provider value={currentContextValue}>{children}</NetworkContext.Provider>
+        <NetworkContext value={currentContextValue}>{children}</NetworkContext>
       );
 
       const { result, rerender } = renderHook(() => useNetwork(), {
@@ -222,7 +222,7 @@ describe('useNetwork', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <NetworkContext.Provider value={currentContextValue}>{children}</NetworkContext.Provider>
+        <NetworkContext value={currentContextValue}>{children}</NetworkContext>
       );
 
       const { result, rerender } = renderHook(() => useNetwork(), {
@@ -253,7 +253,7 @@ describe('useNetwork', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <NetworkContext.Provider value={currentContextValue}>{children}</NetworkContext.Provider>
+        <NetworkContext value={currentContextValue}>{children}</NetworkContext>
       );
 
       const { result, rerender } = renderHook(() => useNetwork(), {
@@ -314,7 +314,7 @@ describe('useNetwork', () => {
       expect(result.current.currentNetwork?.chain_id).toBe(1);
       expect(result.current.currentNetwork?.genesis_time).toBe(1606824000);
       expect(result.current.currentNetwork?.genesis_delay).toBe(604800);
-      expect(result.current.currentNetwork?.forks.consensus.electra).toBeDefined();
+      expect(result.current.currentNetwork?.forks.consensus?.electra).toBeDefined();
     });
   });
 

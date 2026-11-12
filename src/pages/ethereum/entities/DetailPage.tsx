@@ -80,8 +80,9 @@ export function DetailPage(): JSX.Element {
       : '';
 
   const stakeDays = useMemo(() => {
-    if (windowDays === null || stake.days.length === 0) return stake.days;
-    const cutoff = new Date(Date.parse(`${stake.days[stake.days.length - 1].day}T00:00:00Z`) - windowDays * 86_400_000)
+    const lastDay = stake.days.at(-1);
+    if (windowDays === null || !lastDay) return stake.days;
+    const cutoff = new Date(Date.parse(`${lastDay.day}T00:00:00Z`) - windowDays * 86_400_000)
       .toISOString()
       .slice(0, 10);
     return stake.days.filter(d => d.day > cutoff);

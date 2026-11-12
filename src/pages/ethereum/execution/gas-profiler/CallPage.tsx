@@ -68,16 +68,16 @@ async function copyToClipboard(text: string): Promise<boolean> {
 function getCallTypeStyles(callType: string): { bg: string; text: string; border: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-data-orange/10', text: 'text-data-orange', border: 'border-data-orange/30' };
+      return { bg: 'bg-data-orange-10', text: 'text-data-orange', border: 'border-data-orange-30' };
     case 'CREATE2':
-      return { bg: 'bg-data-amber/10', text: 'text-data-amber', border: 'border-data-amber/30' };
+      return { bg: 'bg-data-amber-10', text: 'text-data-amber', border: 'border-data-amber-30' };
     case 'DELEGATECALL':
-      return { bg: 'bg-data-purple/10', text: 'text-data-purple', border: 'border-data-purple/30' };
+      return { bg: 'bg-data-purple-10', text: 'text-data-purple', border: 'border-data-purple-30' };
     case 'STATICCALL':
-      return { bg: 'bg-data-cyan/10', text: 'text-data-cyan', border: 'border-data-cyan/30' };
+      return { bg: 'bg-data-cyan-10', text: 'text-data-cyan', border: 'border-data-cyan-30' };
     case 'CALL':
     default:
-      return { bg: 'bg-data-blue/10', text: 'text-data-blue', border: 'border-data-blue/30' };
+      return { bg: 'bg-data-blue-10', text: 'text-data-blue', border: 'border-data-blue-30' };
   }
 }
 
@@ -190,7 +190,7 @@ export function CallPage(): JSX.Element {
   const currentFrame = useMemo<IntTransactionCallFrame | null>(() => {
     if (!txData?.callFrames) return null;
     return txData.callFrames.find(f => f.call_frame_id === callIdNum) ?? null;
-  }, [txData?.callFrames, callIdNum]);
+  }, [txData, callIdNum]);
 
   // Find child frames (frames whose parent is this frame)
   const childFrames = useMemo<IntTransactionCallFrame[]>(() => {
@@ -198,7 +198,7 @@ export function CallPage(): JSX.Element {
     return txData.callFrames
       .filter(f => f.parent_call_frame_id === callIdNum)
       .sort((a, b) => (a.call_frame_id ?? 0) - (b.call_frame_id ?? 0));
-  }, [txData?.callFrames, callIdNum]);
+  }, [txData, callIdNum]);
 
   // Find all descendant frames (for trace view) - current frame + all children recursively
   const descendantFrames = useMemo<IntTransactionCallFrame[]>(() => {
@@ -233,7 +233,7 @@ export function CallPage(): JSX.Element {
     }
 
     return descendants.sort((a, b) => (a.call_frame_id ?? 0) - (b.call_frame_id ?? 0));
-  }, [txData?.callFrames, currentFrame]);
+  }, [txData, currentFrame]);
 
   // Build breadcrumb path from root to current frame
   // Skip depth 0 (transaction root) since we show "TX" separately
@@ -251,7 +251,7 @@ export function CallPage(): JSX.Element {
 
     // Filter out depth 0 (TX root) since we show it separately
     return path.filter(f => (f.depth ?? 0) > 0);
-  }, [txData?.callFrames, currentFrame]);
+  }, [txData, currentFrame]);
 
   // Calculate child gas (cumulative - self)
   const childGas = useMemo(() => {
@@ -300,7 +300,7 @@ export function CallPage(): JSX.Element {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
-  }, [currentFrame?.target_address]);
+  }, [currentFrame]);
 
   // Tab state based on URL hash
   const getTabIndexFromHash = useCallback((): number => {
@@ -437,7 +437,7 @@ export function CallPage(): JSX.Element {
             <>
               <ChevronRightIcon className={`size-3 text-border ${breadcrumbPath.length <= 2 ? 'sm:hidden' : ''}`} />
               <div className={`group relative ${breadcrumbPath.length <= 2 ? 'sm:hidden' : ''}`}>
-                <button className="flex items-center gap-1 rounded-xs border border-border bg-surface/50 px-1.5 py-0.5 text-xs text-muted hover:border-primary/50 hover:text-foreground">
+                <button className="flex items-center gap-1 rounded-xs border border-border bg-surface-50 px-1.5 py-0.5 text-xs text-muted hover:border-primary-50 hover:text-foreground">
                   <EllipsisHorizontalIcon className="size-3.5" />
                   {/* Mobile: show total depth, Desktop: show collapsed count */}
                   <span className="sm:hidden">{breadcrumbPath.length}</span>
@@ -471,7 +471,7 @@ export function CallPage(): JSX.Element {
                         return isLast ? (
                           <div
                             key={frame.call_frame_id}
-                            className="flex items-center gap-2 rounded-xs bg-primary/10 px-2 py-1"
+                            className="flex items-center gap-2 rounded-xs bg-primary-10 px-2 py-1"
                           >
                             <span className={`rounded-xs px-1 py-0.5 text-xs ${frameStyles.bg} ${frameStyles.text}`}>
                               {frameCallType}
@@ -506,7 +506,8 @@ export function CallPage(): JSX.Element {
             <span className="hidden items-center gap-2 sm:inline-flex">
               <ChevronRightIcon className="size-3 text-border" />
               {(() => {
-                const parent = breadcrumbPath[breadcrumbPath.length - 2];
+                const parent = breadcrumbPath.at(-2);
+                if (!parent) return null;
                 const parentIsContractCreation = !parent.target_address && parent.depth === 0;
                 const parentCallType = parentIsContractCreation ? 'CREATE' : parent.call_type || 'CALL';
                 const parentStyles = getCallTypeStyles(parentCallType);

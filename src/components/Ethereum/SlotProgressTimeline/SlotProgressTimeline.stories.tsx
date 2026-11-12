@@ -19,7 +19,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -313,13 +313,13 @@ export const LiveAnimated: Story = {
           <div className="flex gap-2">
             <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary/90"
+              className="rounded-sm bg-primary px-3 py-1.5 text-xs font-medium text-on-fill hover:bg-primary-90"
             >
               {isPlaying ? 'Pause' : 'Play'}
             </button>
             <button
               onClick={() => setCurrentTime(0)}
-              className="rounded-sm bg-muted/20 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted/30"
+              className="rounded-sm bg-muted-20 px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted-30"
             >
               Reset
             </button>

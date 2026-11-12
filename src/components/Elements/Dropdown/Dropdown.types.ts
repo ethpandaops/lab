@@ -1,8 +1,8 @@
 import type { ReactNode, ComponentPropsWithoutRef } from 'react';
 import type { Menu as HeadlessMenu } from '@headlessui/react';
 
-export type DropdownAlign = 'left' | 'right';
-export type DropdownItemVariant = 'default' | 'danger';
+type DropdownAlign = 'left' | 'right';
+type DropdownItemVariant = 'default' | 'danger';
 
 export interface DropdownProps {
   /**

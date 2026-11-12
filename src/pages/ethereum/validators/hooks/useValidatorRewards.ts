@@ -16,8 +16,8 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { rollupPeriods } from '../utils/range';
-import { weekStartOf } from '../utils/week';
+import { rollupPeriods } from '@/pages/ethereum/validators/utils/range';
+import { weekStartOf } from '@/pages/ethereum/validators/utils/week';
 
 const GWEI = 1e9;
 const PAGE = 10_000;

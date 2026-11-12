@@ -1,7 +1,7 @@
 /**
  * A single data series for the radar chart
  */
-export interface RadarSeries {
+interface RadarSeries {
   /** Series name (displayed in legend) */
   name: string;
   /** Values for each indicator - must match indicators array length */
@@ -15,7 +15,7 @@ export interface RadarSeries {
 /**
  * Configuration for a radar chart indicator (axis/dimension)
  */
-export interface RadarIndicator {
+interface RadarIndicator {
   /** Display name for this indicator */
   name: string;
   /** Maximum value for this axis (for scaling) */

@@ -3,10 +3,10 @@ import { createBandSeries, createStatisticSeries } from '@/components/Charts/Mul
 import { Stats } from '@/components/DataDisplay/Stats';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils';
-import { rowsByBucket, type NodeHistory } from '../../hooks/useNodeHistory';
-import { rangeValue } from '../../utils/history';
-import { axisCeiling, formatMs } from '../../utils/node-stats';
-import { TimeSeriesChart } from '../TimeSeriesChart';
+import { rowsByBucket, type NodeHistory } from '@/pages/xatu/nodes/hooks/useNodeHistory';
+import { rangeValue } from '@/pages/xatu/nodes/utils/history';
+import { axisCeiling, formatMs } from '@/pages/xatu/nodes/utils/node-stats';
+import { TimeSeriesChart } from '@/pages/xatu/nodes/components/TimeSeriesChart';
 
 export interface EngineSectionProps {
   newPayload: NodeHistory;
@@ -19,7 +19,7 @@ export interface EngineSectionProps {
  */
 export function EngineSection({ newPayload, getBlobs, rangeLabel }: EngineSectionProps): JSX.Element {
   const colors = useThemeColors();
-  const blobsColor = getDataVizColors().CHART_CATEGORICAL_COLORS[0];
+  const blobsColor = getDataVizColors().CHART_CATEGORICAL_COLORS[0] ?? colors.muted;
   const payloadRows = rowsByBucket(newPayload.rows);
   const blobRows = rowsByBucket(getBlobs?.rows ?? []);
   const payload = newPayload.buckets.map(start => payloadRows.get(start) ?? null);

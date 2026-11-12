@@ -5,7 +5,7 @@ import type { Column } from '@/components/Lists/Table/Table.types';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { DimClientRelease, FctNodeActiveLast24h } from '@/api/types.gen';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
-import { matchReleaseVersion, shortVersion } from '../../utils/client-versions';
+import { matchReleaseVersion, shortVersion } from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface NodeTableProps {
   client: string;

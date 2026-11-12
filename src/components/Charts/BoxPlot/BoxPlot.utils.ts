@@ -1,6 +1,17 @@
 import type { BoxPlotStats } from './BoxPlot.types';
 
 /**
+ * Median of values sorted ascending, or `fallback` when there are none
+ */
+function sortedMedian(sorted: number[], fallback: number): number {
+  const mid = Math.floor(sorted.length / 2);
+  const upper = sorted[mid];
+  if (upper === undefined) return fallback;
+  if (sorted.length % 2 === 1) return upper;
+  return ((sorted[mid - 1] ?? upper) + upper) / 2;
+}
+
+/**
  * Calculates box plot statistics from an array of raw values
  *
  * @param data - Array of numeric values
@@ -18,22 +29,19 @@ export function calculateBoxPlotStats(data: number[]): BoxPlotStats {
   }
 
   const sorted = [...data].sort((a, b) => a - b);
-  const min = sorted[0];
-  const max = sorted[sorted.length - 1];
+  const min = sorted[0] ?? 0;
+  const max = sorted[sorted.length - 1] ?? 0;
 
   // Calculate median
-  const midpoint = sorted.length / 2;
-  const median = sorted.length % 2 === 0 ? (sorted[midpoint - 1] + sorted[midpoint]) / 2 : sorted[Math.floor(midpoint)];
+  const median = sortedMedian(sorted, 0);
 
   // Calculate Q1 (median of lower half)
   const lowerHalf = sorted.slice(0, Math.floor(sorted.length / 2));
-  const q1Mid = lowerHalf.length / 2;
-  const q1 = lowerHalf.length % 2 === 0 ? (lowerHalf[q1Mid - 1] + lowerHalf[q1Mid]) / 2 : lowerHalf[Math.floor(q1Mid)];
+  const q1 = sortedMedian(lowerHalf, median);
 
   // Calculate Q3 (median of upper half)
   const upperHalf = sorted.slice(Math.ceil(sorted.length / 2));
-  const q3Mid = upperHalf.length / 2;
-  const q3 = upperHalf.length % 2 === 0 ? (upperHalf[q3Mid - 1] + upperHalf[q3Mid]) / 2 : upperHalf[Math.floor(q3Mid)];
+  const q3 = sortedMedian(upperHalf, median);
 
   return [min, q1, median, q3, max];
 }

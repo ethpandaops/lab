@@ -44,7 +44,7 @@ export function ContractStorageButton({
         params={{ address }}
         onClick={handleClick}
         className={clsx(
-          'inline-flex items-center gap-2 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:border-primary/50 hover:bg-primary/20',
+          'inline-flex items-center gap-2 rounded-sm border border-primary-30 bg-primary-10 px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:border-primary-50 hover:bg-primary-20',
           className
         )}
       >
@@ -60,13 +60,13 @@ export function ContractStorageButton({
       params={{ address }}
       onClick={handleClick}
       className={clsx(
-        'group/storage relative flex shrink-0 items-center justify-center rounded-sm border border-border bg-surface/50 text-muted transition-colors hover:border-primary/30 hover:bg-surface hover:text-primary',
+        'group/storage relative flex shrink-0 items-center justify-center rounded-sm border border-border bg-surface-50 text-muted transition-colors hover:border-primary-30 hover:bg-surface hover:text-primary',
         size === 'sm' ? 'size-6' : 'size-7',
         className
       )}
       title="View contract storage"
     >
-      <CircleStackIcon className={size === 'sm' ? 'size-3.5' : 'size-4'} />
+      <CircleStackIcon className={clsx(size === 'sm' ? 'size-3.5' : 'size-4')} />
       <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-1 hidden -translate-x-1/2 rounded-sm border border-border bg-background px-2 py-1 text-xs whitespace-nowrap text-muted group-hover/storage:block">
         View contract storage
       </span>

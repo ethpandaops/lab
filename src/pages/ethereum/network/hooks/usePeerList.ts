@@ -6,7 +6,7 @@ import { useNetwork } from '@/hooks/useNetwork';
 import { useCursorPagination } from '@/pages/ethereum/validators/hooks/useCursorPagination';
 
 /** Peers a page of the list holds */
-export const PEER_PAGE_SIZE = 50;
+const PEER_PAGE_SIZE = 50;
 
 export interface UsePeerListResult {
   peers: IntPeerDaily[];

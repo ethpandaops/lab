@@ -1,7 +1,7 @@
 /**
  * Data point for blob count timeseries
  */
-export interface BlobCountDataPoint {
+interface BlobCountDataPoint {
   /** X-axis value (slot, epoch, timestamp, etc.) */
   x: number;
   /** Number of blobs */
@@ -16,7 +16,7 @@ export interface BlobCountDataPoint {
 /**
  * X-axis configuration for BlobCountChart
  */
-export interface BlobCountXAxisConfig {
+interface BlobCountXAxisConfig {
   /** Axis label (e.g., "Slot", "Epoch", "Block Number") */
   name: string;
   /** Optional minimum value */

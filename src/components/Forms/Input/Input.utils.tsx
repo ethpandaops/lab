@@ -18,19 +18,16 @@ export const getStyleConfig = (): {
   base: clsx(
     'block w-full border-0 bg-surface text-foreground placeholder:text-muted focus:ring-0',
     'disabled:cursor-not-allowed disabled:opacity-50',
-    'read-only:cursor-default read-only:opacity-50',
-    'dark:bg-surface dark:text-foreground dark:placeholder:text-muted'
+    'read-only:cursor-default read-only:opacity-50'
   ),
   outline: {
     default: clsx(
       'outline-1 -outline-offset-1 outline-border',
-      'focus:outline-2 focus:-outline-offset-2 focus:outline-primary',
-      'dark:outline-border dark:focus:outline-primary'
+      'focus:outline-2 focus:-outline-offset-2 focus:outline-primary'
     ),
     error: clsx(
-      'text-danger outline-1 -outline-offset-1 outline-danger/50',
-      'placeholder:text-danger/70 focus:outline-2 focus:-outline-offset-2 focus:outline-danger',
-      'dark:text-danger dark:outline-danger/50 dark:placeholder:text-danger/70 dark:focus:outline-danger'
+      'text-danger outline-1 -outline-offset-1 outline-danger-50',
+      'placeholder:text-danger-70 focus:outline-2 focus:-outline-offset-2 focus:outline-danger'
     ),
   },
   size: {
@@ -44,13 +41,19 @@ export const getStyleConfig = (): {
  * Renders select dropdown
  *
  * @param select - The select configuration
+ * @param slot - The side of the field the select sits on
  * @returns Rendered select dropdown or null
  */
-export const renderSelect = (select: SelectAddonProps | undefined): ReactNode | null => {
+export const renderSelect = (select: SelectAddonProps | undefined, slot: 'leading' | 'trailing'): ReactNode | null => {
   if (!select) return null;
 
   return (
-    <div className="grid shrink-0 grid-cols-1 focus-within:relative">
+    <div
+      data-input-slot=""
+      data-input-leading={slot === 'leading' ? '' : undefined}
+      data-input-trailing={slot === 'trailing' ? '' : undefined}
+      className="grid shrink-0 grid-cols-1 focus-within:relative"
+    >
       <select
         id={select.id}
         name={select.name}
@@ -61,7 +64,7 @@ export const renderSelect = (select: SelectAddonProps | undefined): ReactNode | 
         className={clsx(
           'col-start-1 row-start-1 w-full appearance-none border-0 py-1.5 pr-7 pl-3 text-base text-muted placeholder:text-muted sm:text-sm/6',
           'shadow-none outline-hidden focus:outline-hidden focus-visible:outline-hidden',
-          'dark:bg-transparent dark:text-muted dark:*:bg-surface dark:placeholder:text-muted',
+          'bg-transparent *:bg-surface',
           select.className
         )}
       >
@@ -73,7 +76,7 @@ export const renderSelect = (select: SelectAddonProps | undefined): ReactNode | 
       </select>
       <ChevronDownIcon
         aria-hidden="true"
-        className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-muted sm:size-4 dark:text-muted"
+        className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-muted sm:size-4"
       />
     </div>
   );

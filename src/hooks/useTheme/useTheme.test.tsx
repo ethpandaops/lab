@@ -1,16 +1,16 @@
 import { describe, it, expect, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { useTheme } from './useTheme';
 import { ThemeContext } from '@/contexts/ThemeContext';
 import type { ThemeContextValue, Theme } from '@/contexts/ThemeContext/ThemeContext.types';
-import { type ReactNode } from 'react';
+import { type JSX, type ReactNode } from 'react';
 
 describe('useTheme', () => {
   const createWrapper = (
     contextValue: ThemeContextValue | undefined
   ): (({ children }: { children: ReactNode }) => JSX.Element) => {
     const Wrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-      <ThemeContext.Provider value={contextValue}>{children}</ThemeContext.Provider>
+      <ThemeContext value={contextValue}>{children}</ThemeContext>
     );
     return Wrapper;
   };
@@ -155,7 +155,7 @@ describe('useTheme', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <ThemeContext.Provider value={currentContextValue}>{children}</ThemeContext.Provider>
+        <ThemeContext value={currentContextValue}>{children}</ThemeContext>
       );
 
       const { result, rerender } = renderHook(() => useTheme(), {
@@ -187,7 +187,7 @@ describe('useTheme', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <ThemeContext.Provider value={currentContextValue}>{children}</ThemeContext.Provider>
+        <ThemeContext value={currentContextValue}>{children}</ThemeContext>
       );
 
       const { result, rerender } = renderHook(() => useTheme(), {
@@ -219,7 +219,7 @@ describe('useTheme', () => {
       };
 
       const DynamicWrapper = ({ children }: { children: ReactNode }): JSX.Element => (
-        <ThemeContext.Provider value={currentContextValue}>{children}</ThemeContext.Provider>
+        <ThemeContext value={currentContextValue}>{children}</ThemeContext>
       );
 
       const { result, rerender } = renderHook(() => useTheme(), {

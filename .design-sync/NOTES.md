@@ -34,11 +34,11 @@ neither. The adaptations below make it work. Read these before a re-sync.
   auto-bundling of `.storybook/preview.tsx` decorators fails (the CSS/`.woff2` font import has
   no loader in the decorator esbuild pass), and lab's chain can't be expressed as static
   provider JSON (hydrated QueryClient + memory router). `DesignSyncProvider` replicates the
-  preview decorator (QueryClient hydrated with `mockConfig`/`mockBounds`, ThemeProvider,
-  ConfigGate, memory Router → NetworkProvider) and is added to the bundle via
-  `cfg.extraEntries`. **Theme is pinned to dark** (`themeOverride="dark"`) to match the
-  storybook default deterministically (storybook uses `withThemeByClassName` defaultTheme
-  `dark`, which the converter stubs to inert).
+  preview decorator (QueryClient hydrated with `configFixture`/`boundsFixture` from
+  `src/test-utils/handlers`, ThemeProvider, ConfigGate, memory Router → NetworkProvider)
+  and is added to the bundle via `cfg.extraEntries`. **Theme is pinned to dark**
+  (`themeOverride="dark"`) to match the storybook default deterministically (storybook uses
+  `withThemeByClassName` defaultTheme `dark`, which the converter stubs to inert).
 - **`.design-sync/ds-body-guard.ts`** (imported first by ds-providers) — lab computes dataviz
   colors at import time by probing CSS vars via `document.body.appendChild`
   (`getDataVizColors → resolveCssColorToHex`). The `[BUNDLE_EXPORT]` smoke check injects the

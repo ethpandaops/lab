@@ -77,7 +77,7 @@ export function LocallyBuiltBlocksSkeleton(): JSX.Element {
             <div className="w-28 shrink-0" />
             {[...Array(3)].map((_, i) => (
               <div key={i} className="flex min-w-20 flex-1 flex-col items-center gap-1">
-                <LoadingContainer className="h-4 w-4 rounded-full" />
+                <LoadingContainer className="size-4 rounded-full" />
                 <LoadingContainer className="h-4 w-16 rounded-sm" />
               </div>
             ))}

@@ -5,8 +5,8 @@ import { Stats } from '@/components/DataDisplay/Stats';
 import { InfoBox } from '@/components/Feedback/InfoBox';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT } from '../../constants';
-import { useNodesByVersion, useVersionCounts } from '../../hooks';
+import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS, SHARE_WINDOW_TEXT } from '@/pages/ethereum/clients/constants';
+import { useNodesByVersion, useVersionCounts } from '@/pages/ethereum/clients/hooks';
 import {
   UNRESOLVED_LABELS,
   adoptionByDay,
@@ -16,11 +16,11 @@ import {
   sinceSuffix,
   summariseVersions,
   windowStart,
-} from '../../utils/client-versions';
+} from '@/pages/ethereum/clients/utils/client-versions';
 import { Table } from '@/components/Lists/Table';
 import { Entity } from '@/components/Ethereum/Entity';
-import { VersionShareChart } from '../VersionShareChart';
-import { ReleasesTable } from '../ReleasesTable';
+import { VersionShareChart } from '@/pages/ethereum/clients/components/VersionShareChart';
+import { ReleasesTable } from '@/pages/ethereum/clients/components/ReleasesTable';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /** Formats a share, or a dash when nothing was counted */
@@ -58,10 +58,8 @@ export function VersionsTab({
     [blocks]
   );
   const blocksLoading = history.isLoading || releasesLoading || nodes.isLoading;
-  const latestPoints = useMemo(
-    () => (latest?.version ? adoptionByDay(days, latest.version) : []),
-    [days, latest?.version]
-  );
+  const latestVersion = latest?.version;
+  const latestPoints = useMemo(() => (latestVersion ? adoptionByDay(days, latestVersion) : []), [days, latestVersion]);
   const latestDay = [...latestPoints].reverse().find(point => point.atLeast !== null)?.day;
   const onLatest = shareStat(latestPoints, 'atLeast', SHARE_WINDOW_TEXT[shareWindow]);
 

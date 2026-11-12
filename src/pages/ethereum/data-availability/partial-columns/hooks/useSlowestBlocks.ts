@@ -2,7 +2,12 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fctBlockDataColumnCompletionServiceList } from '@/api/sdk.gen';
 import type { FctBlockDataColumnCompletion } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { QUERY_RETRIES, SLOWEST_BLOCKS, SLOWEST_BLOCKS_MAX_DAYS, WRAPPED_COMPLETION_MS } from '../constants';
+import {
+  QUERY_RETRIES,
+  SLOWEST_BLOCKS,
+  SLOWEST_BLOCKS_MAX_DAYS,
+  WRAPPED_COMPLETION_MS,
+} from '@/pages/ethereum/data-availability/partial-columns/constants';
 
 export interface UseSlowestBlocksResult {
   blocks: FctBlockDataColumnCompletion[];

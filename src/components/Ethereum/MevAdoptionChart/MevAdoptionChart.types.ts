@@ -1,7 +1,7 @@
 /**
  * Data point for MEV adoption
  */
-export interface MevAdoptionDataPoint {
+interface MevAdoptionDataPoint {
   /** Whether this data point used MEV-boost */
   hasMev: boolean;
 }

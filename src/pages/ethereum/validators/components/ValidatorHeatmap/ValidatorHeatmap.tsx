@@ -8,12 +8,15 @@ import { HeatmapChart } from '@/components/Charts/Heatmap';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { formatSlot } from '@/utils';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import type { AttestationDailyDataPoint, BlockProposalDataPoint } from '../../hooks/useValidatorsData.types';
-import { useHourlyData, useSlotData } from '../../hooks';
-import type { AttestationSlotDataPoint } from '../../hooks';
-import { formatStatusLabel } from '../../hooks/useValidatorStatus';
-import { weekSpan } from '../../utils/range';
-import { MISSED_OR_ORPHANED, type ProposalStatus } from '../../utils/proposal-status';
+import type {
+  AttestationDailyDataPoint,
+  BlockProposalDataPoint,
+} from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
+import { useHourlyData, useSlotData } from '@/pages/ethereum/validators/hooks';
+import type { AttestationSlotDataPoint } from '@/pages/ethereum/validators/hooks';
+import { formatStatusLabel } from '@/pages/ethereum/validators/hooks/useValidatorStatus';
+import { weekSpan } from '@/pages/ethereum/validators/utils/range';
+import { MISSED_OR_ORPHANED, type ProposalStatus } from '@/pages/ethereum/validators/utils/proposal-status';
 
 const DAY = 86_400;
 
@@ -276,6 +279,35 @@ function formatHourLabel(timestamp: number): string {
   return `${String(date.getUTCHours()).padStart(2, '0')}:00 UTC`;
 }
 
+/** Skeleton loader that mimics the heatmap grid layout during drill-down loading.
+ *  Padding matches ECharts grid defaults: top=16, right=90, bottom=50, left=60. */
+function HeatmapSkeleton({ rows, height }: { rows: number; height: number }): JSX.Element {
+  return (
+    <div className="relative" style={{ height }}>
+      {/* Y-axis label placeholders */}
+      <div className="absolute top-4 bottom-12.5 left-2 flex w-12 flex-col justify-evenly">
+        {Array.from({ length: rows }, (_, i) => (
+          <LoadingContainer key={i} className="h-3 w-full rounded-xs" shimmer={false} />
+        ))}
+      </div>
+      {/* Grid row shimmer bars */}
+      <div className="absolute top-4 right-22.5 bottom-12.5 left-15 flex flex-col justify-evenly gap-1">
+        {Array.from({ length: rows }, (_, i) => (
+          <LoadingContainer key={i} className="h-5 w-full rounded-xs" />
+        ))}
+      </div>
+      {/* X-axis placeholder */}
+      <div className="absolute right-22.5 bottom-6 left-15">
+        <LoadingContainer className="h-2 w-full rounded-xs" shimmer={false} />
+      </div>
+      {/* Visual map placeholder */}
+      <div className="absolute inset-y-1/4 right-6 w-4">
+        <LoadingContainer className="size-full rounded-xs" shimmer={false} />
+      </div>
+    </div>
+  );
+}
+
 /**
  * Heatmap visualization showing daily performance across multiple validators.
  * Supports drill-down from daily to hourly to slot-level granularity.
@@ -429,10 +461,12 @@ export function ValidatorHeatmap({
 
     const dataSlots = [...new Set(attestationSlot.map(d => d.slot))].sort((a, b) => a - b);
     const minSlot = dataSlots[0];
-    const maxSlot = dataSlots[dataSlots.length - 1];
+    const maxSlot = dataSlots.at(-1);
     const allSlots: number[] = [];
-    for (let s = minSlot; s <= maxSlot; s++) {
-      allSlots.push(s);
+    if (minSlot !== undefined && maxSlot !== undefined) {
+      for (let s = minSlot; s <= maxSlot; s++) {
+        allSlots.push(s);
+      }
     }
 
     const uniqueValidators = [...new Set(attestationSlot.map(d => d.validatorIndex))].sort((a, b) => a - b);
@@ -488,7 +522,7 @@ export function ValidatorHeatmap({
     const cellMap = new Map<string, number>();
     for (const p of blockProposals) {
       const dayTs = Math.floor(new Date(p.slotTimestamp * 1000).setUTCHours(0, 0, 0, 0) / 1000);
-      const dayIdx = timestampToIndex.get(stepDays === 7 ? columnTimestamps(dayTs, dayTs, 7)[0] : dayTs);
+      const dayIdx = timestampToIndex.get(stepDays === 7 ? (columnTimestamps(dayTs, dayTs, 7)[0] ?? dayTs) : dayTs);
       const valIdx = validatorToIndex.get(p.validatorIndex);
       if (dayIdx === undefined || valIdx === undefined) continue;
 
@@ -502,7 +536,7 @@ export function ValidatorHeatmap({
     }
 
     const chartData: [number, number, number][] = Array.from(cellMap.entries()).map(([key, value]) => {
-      const [x, y] = key.split(',').map(Number);
+      const [x = 0, y = 0] = key.split(',').map(Number);
       return [x, y, value];
     });
 
@@ -552,7 +586,7 @@ export function ValidatorHeatmap({
     }
 
     const chartData: [number, number, number][] = Array.from(cellMap.entries()).map(([key, value]) => {
-      const [x, y] = key.split(',').map(Number);
+      const [x = 0, y = 0] = key.split(',').map(Number);
       return [x, y, value];
     });
 
@@ -593,10 +627,12 @@ export function ValidatorHeatmap({
     } else if (hourProposals.length > 0) {
       const dataSlots = [...new Set(hourProposals.map(p => p.slot))].sort((a, b) => a - b);
       const minSlot = dataSlots[0];
-      const maxSlot = dataSlots[dataSlots.length - 1];
+      const maxSlot = dataSlots.at(-1);
       allSlots = [];
-      for (let s = minSlot; s <= maxSlot; s++) {
-        allSlots.push(s);
+      if (minSlot !== undefined && maxSlot !== undefined) {
+        for (let s = minSlot; s <= maxSlot; s++) {
+          allSlots.push(s);
+        }
       }
     } else {
       return {
@@ -781,38 +817,12 @@ export function ValidatorHeatmap({
   const hourlyChartHeight = Math.max(200, (activeHourlyYLabels.length || expectedRows) * ROW_HEIGHT + CHART_PADDING);
   const slotChartHeight = Math.max(200, (activeSlotYLabels.length || expectedRows) * ROW_HEIGHT + CHART_PADDING);
 
-  /** Skeleton loader that mimics the heatmap grid layout during drill-down loading.
-   *  Padding matches ECharts grid defaults: top=16, right=90, bottom=50, left=60. */
-  const HeatmapSkeleton = ({ rows, height }: { rows: number; height: number }): JSX.Element => (
-    <div className="relative" style={{ height }}>
-      {/* Y-axis label placeholders */}
-      <div className="absolute flex flex-col justify-evenly" style={{ top: 16, bottom: 50, left: 8, width: 48 }}>
-        {Array.from({ length: rows }, (_, i) => (
-          <LoadingContainer key={i} className="h-3 w-full rounded-xs" shimmer={false} />
-        ))}
-      </div>
-      {/* Grid row shimmer bars */}
-      <div className="absolute flex flex-col justify-evenly gap-1" style={{ top: 16, right: 90, bottom: 50, left: 60 }}>
-        {Array.from({ length: rows }, (_, i) => (
-          <LoadingContainer key={i} className="h-5 w-full rounded-xs" />
-        ))}
-      </div>
-      {/* X-axis placeholder */}
-      <div className="absolute" style={{ left: 60, right: 90, bottom: 24 }}>
-        <LoadingContainer className="h-2 w-full rounded-xs" shimmer={false} />
-      </div>
-      {/* Visual map placeholder */}
-      <div className="absolute" style={{ right: 24, top: '25%', bottom: '25%', width: 16 }}>
-        <LoadingContainer className="h-full w-full rounded-xs" shimmer={false} />
-      </div>
-    </div>
-  );
-
   // Daily tooltip formatter
   const dailyTooltipFormatter = (params: { value: [number, number, number] }): string => {
     const [dayIdx, validatorIdx, value] = params.value;
     const timestamp = activeDailyTimestamps[dayIdx];
     const validatorIndex = activeDailyValidators[validatorIdx];
+    if (timestamp === undefined || validatorIndex === undefined) return '';
     const dayText = (ts: number): string =>
       new Date(ts * 1000).toLocaleDateString('en-US', {
         weekday: 'short',
@@ -847,6 +857,7 @@ export function ValidatorHeatmap({
     const [hourIdx, validatorIdx, value] = params.value;
     const validators = isProposalsMetric ? proposalHourlyHeatmap.validatorIndices : hourlyHeatmap.validatorIndices;
     const validatorIndex = validators[validatorIdx];
+    if (validatorIndex === undefined) return '';
     if (value === NO_DATA) {
       const label = isProposalsMetric ? 'No duty' : 'No data';
       let statusLine = '';
@@ -867,6 +878,7 @@ export function ValidatorHeatmap({
     const slotSlots = isProposalsMetric ? proposalSlotHeatmap.slots : slotHeatmap.slots;
     const validatorIndex = slotValidators[validatorIdx];
     const slot = slotSlots[slotIdx];
+    if (validatorIndex === undefined || slot === undefined) return '';
     if (value === NO_DATA) {
       const label = isProposalsMetric ? 'No duty' : 'No data';
       return `<strong>Validator ${formatSlot(validatorIndex)}</strong><br/>Slot ${formatSlot(slot)}<br/><span style="opacity:0.5">${label}</span>`;
@@ -892,7 +904,7 @@ export function ValidatorHeatmap({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1 text-primary transition-colors hover:text-primary/80"
+      className="inline-flex items-center gap-1 text-primary transition-colors hover:text-primary-80"
     >
       <ArrowLeftIcon className="size-3" />
       {label}
@@ -904,7 +916,7 @@ export function ValidatorHeatmap({
   if (isLoading) {
     return (
       <Card title={dailyTitle} className={className}>
-        <div className="h-64 animate-pulse rounded-xs bg-muted/10" />
+        <div className="h-64 animate-pulse rounded-xs bg-muted-10" />
       </Card>
     );
   }
@@ -912,8 +924,8 @@ export function ValidatorHeatmap({
   if (data.length === 0 && blockProposals.length === 0 && validatorIndicesProp.length === 0) {
     return (
       <Card title={dailyTitle} className={className}>
-        <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
-          <ChartBarIcon className="size-8 text-muted/40" />
+        <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border-50">
+          <ChartBarIcon className="size-8 text-muted-40" />
           <p className="text-sm text-muted">No attestation data in this range.</p>
         </div>
       </Card>
@@ -940,8 +952,8 @@ export function ValidatorHeatmap({
             }
             if (isSlotEmpty) {
               return (
-                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
-                  <ChartBarIcon className="size-8 text-muted/40" />
+                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border-50">
+                  <ChartBarIcon className="size-8 text-muted-40" />
                   <p className="text-sm text-muted">
                     {isProposalsMetric ? 'No block proposals for this hour.' : 'No slot data available for this hour.'}
                   </p>
@@ -998,8 +1010,8 @@ export function ValidatorHeatmap({
             }
             if (isHourlyEmpty) {
               return (
-                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
-                  <ChartBarIcon className="size-8 text-muted/40" />
+                <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border-50">
+                  <ChartBarIcon className="size-8 text-muted-40" />
                   <p className="text-sm text-muted">
                     {isProposalsMetric ? 'No block proposals for this day.' : 'No hourly data available for this day.'}
                   </p>
@@ -1047,8 +1059,8 @@ export function ValidatorHeatmap({
       <div className="mb-4">{metricControl}</div>
       <div ref={containerRef}>
         {activeDailyData.length === 0 ? (
-          <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border/50">
-            <ChartBarIcon className="size-8 text-muted/40" />
+          <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-xs border border-dashed border-border-50">
+            <ChartBarIcon className="size-8 text-muted-40" />
             <p className="text-sm text-muted">
               {isProposalsMetric ? 'No block proposals in this range.' : 'No attestation data in this range.'}
             </p>

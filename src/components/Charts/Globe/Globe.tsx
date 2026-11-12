@@ -236,7 +236,8 @@ export function GlobeChart({
       <ReactECharts
         theme={ECHARTS_THEME}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         onChartReady={instance => setEchartsInstance(instance)}
         notMerge={false}
         lazyUpdate={true}

@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useState } from 'react';
 import { DataColumnDataAvailability } from './DataColumnDataAvailability';
 import type { DataColumnFirstSeenPoint } from './DataColumnDataAvailability.types';
+import { seededRandom } from '@/test-utils/random';
+
+const random = seededRandom(29);
 
 const meta: Meta<typeof DataColumnDataAvailability> = {
   title: 'Pages/Ethereum/SlotView/DataColumnDataAvailability',
@@ -12,7 +15,7 @@ const meta: Meta<typeof DataColumnDataAvailability> = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[1400px] rounded-sm bg-surface p-6">
+      <div className="min-w-350 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -53,7 +56,7 @@ const generateColumnData = (columnCount: number = 128): DataColumnFirstSeenPoint
     }
 
     // Add some randomness
-    const time = baseTime + Math.random() * variance;
+    const time = baseTime + random() * variance;
 
     data.push({
       columnId: i,
@@ -230,12 +233,12 @@ export const LateArrivals: Story = {
       if (i < 80) {
         return {
           columnId: i,
-          time: 800 + Math.random() * 3200, // 800-4000ms
+          time: 800 + random() * 3200, // 800-4000ms
         };
       }
       return {
         columnId: i,
-        time: 4000 + Math.random() * 4000, // 4000-8000ms - missed deadline!
+        time: 4000 + random() * 4000, // 4000-8000ms - missed deadline!
       };
     }),
   },
@@ -249,7 +252,7 @@ export const AllLate: Story = {
     blobCount: 6,
     firstSeenData: Array.from({ length: 128 }, (_, i) => ({
       columnId: i,
-      time: 4500 + Math.random() * 2000, // All between 4500-6500ms
+      time: 4500 + random() * 2000, // All between 4500-6500ms
     })),
   },
 };

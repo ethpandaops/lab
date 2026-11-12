@@ -1,0 +1,32 @@
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import * as Stories from './Typography.stories';
+
+<Meta of={Stories} />
+
+# Typography
+
+Geist for all UI text and numbers, Geist Mono for identifiers, Space Grotesk for the brand display face.
+
+<Story of={Stories.Families} />
+
+## Scale
+
+The sizes are Tailwind's, with `text-2xs` below them; never go smaller. Each size carries its line height, so
+`text-sm` sets both and lint rejects `leading-*`. A different line height goes on the size: `text-sm/6` for one on the
+spacing step, `text-sm/tight` for a named one.
+
+<Story of={Stories.Scale} />
+
+<Story of={Stories.Sizes} />
+
+## Weights
+
+<Story of={Stories.Weights} />
+
+## Tracking
+
+<Story of={Stories.Tracking} />
+
+## Line heights
+
+<Story of={Stories.LineHeights} />

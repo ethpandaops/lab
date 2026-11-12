@@ -22,7 +22,7 @@ function bytesToMB(bytes: number): number {
   return bytes / (1024 * 1024);
 }
 
-export type MemoryMetric = 'vm_rss' | 'rss_anon' | 'rss_file' | 'vm_swap';
+type MemoryMetric = 'vm_rss' | 'rss_anon' | 'rss_file' | 'vm_swap';
 
 const METRIC_OPTIONS = [
   { value: 'vm_rss' as MemoryMetric, label: 'RSS Total' },
@@ -92,8 +92,10 @@ export function MemoryUsageChart({
         const px0 = instance.convertToPixel({ gridIndex: 0 }, [0, 0]);
         const px12 = instance.convertToPixel({ gridIndex: 0 }, [12, 0]);
         const width = instance.getDom()?.clientWidth ?? 0;
-        if (px0 && px12 && width > 0) {
-          setGridOffsets({ left: Math.round(px0[0]), right: Math.round(width - px12[0]), height: Math.round(px0[1]) });
+        const [left, axisY] = px0 ?? [];
+        const [right] = px12 ?? [];
+        if (left !== undefined && axisY !== undefined && right !== undefined && width > 0) {
+          setGridOffsets({ left: Math.round(left), right: Math.round(width - right), height: Math.round(axisY) });
         }
       } catch {
         /* use defaults */
@@ -203,20 +205,20 @@ export function MemoryUsageChart({
     const lines: MarkLineConfig[] = [];
     let cumulativeSec = 0;
 
-    for (let i = 0; i < DEFAULT_BEACON_SLOT_PHASES.length - 1; i++) {
-      cumulativeSec += DEFAULT_BEACON_SLOT_PHASES[i].duration / 1000;
-      const nextPhase = DEFAULT_BEACON_SLOT_PHASES[i + 1];
-      const color = PHASE_BOUNDARY_COLORS[i + 1] ?? DATA_COLORS.slate;
-
-      lines.push({
-        xValue: cumulativeSec,
-        label: nextPhase.label,
-        labelPosition: 'insideEndTop',
-        color,
-        lineStyle: 'dotted',
-        lineWidth: 1,
-        distance: [0, -8],
-      });
+    // Every phase after the first gets a line where it starts
+    for (const [i, phase] of DEFAULT_BEACON_SLOT_PHASES.entries()) {
+      if (i > 0) {
+        lines.push({
+          xValue: cumulativeSec,
+          label: phase.label,
+          labelPosition: 'insideEndTop',
+          color: PHASE_BOUNDARY_COLORS[i] ?? DATA_COLORS.slate,
+          lineStyle: 'dotted',
+          lineWidth: 1,
+          distance: [0, -8],
+        });
+      }
+      cumulativeSec += phase.duration / 1000;
     }
 
     return lines;
@@ -276,9 +278,9 @@ export function MemoryUsageChart({
               onChartReady={handleChartReady}
               tooltipFormatter={(params: unknown) => {
                 const items = (Array.isArray(params) ? params : [params]) as EChartsTooltipParam[];
-                if (items.length === 0) return '';
-
                 const first = items[0];
+                if (!first) return '';
+
                 const xVal = Array.isArray(first.value) ? first.value[0] : first.axisValue;
                 const timeStr = typeof xVal === 'number' ? `${xVal.toFixed(2)}s` : `${xVal}s`;
 
@@ -309,12 +311,11 @@ export function MemoryUsageChart({
                 }}
               >
                 <div
-                  className="absolute inset-y-0"
+                  className="absolute inset-y-0 opacity-12"
                   style={{
                     left: `${highlight.startFrac * 100}%`,
                     width: `${highlight.widthFrac * 100}%`,
                     backgroundColor: highlight.color,
-                    opacity: 0.12,
                   }}
                 />
               </div>

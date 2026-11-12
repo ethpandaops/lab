@@ -9,7 +9,7 @@ This skill creates React components following Lab's established architecture pat
 
 ## Technology Stack
 
-- **React**: v19 (using forwardRef, JSX.Element)
+- **React**: v19 (`ref` as a prop, JSX.Element)
 - **TypeScript**: v5 (strict typing)
 - **Tailwind CSS**: v4 (semantic color tokens)
 - **Storybook**: v9 (autodocs with decorators)
@@ -23,6 +23,7 @@ This skill creates React components following Lab's established architecture pat
 **STOP AND ASK QUESTIONS** unless the user has provided complete specifications.
 
 Ask the user to clarify:
+
 1. **Component scope**: Is this reusable across pages (core) or page-specific?
 2. **Category**: Which category fits best? (see Component Categories below)
 3. **Functionality**: What should this component do? What props are needed?
@@ -34,8 +35,10 @@ Only proceed after understanding the requirements.
 ## Component Architecture
 
 ### Core Components (`src/components/`)
+
 **When**: Reusable across multiple pages/sections
 **Requirements**:
+
 - Generic and configurable via props
 - No page-specific business logic
 - No direct API calls (accept data via props)
@@ -44,8 +47,10 @@ Only proceed after understanding the requirements.
 - Compose from other core components when logical
 
 ### Page-Scoped Components (`src/pages/[section]/components/`)
+
 **When**: Used within specific page/section only
 **Requirements**:
+
 - Page-specific business logic allowed
 - Can use hooks (useNetwork, API hooks, etc.)
 - Compose/extend core components
@@ -55,9 +60,11 @@ Only proceed after understanding the requirements.
 ## Component Categories
 
 ### Core Component Categories (src/components/)
+
 - Use `ls` to list the components in the `src/components/` directory.
 
 ### Page Sections (src/pages/)
+
 - Use `ls` to list the pages in the `src/pages/` directory.
 
 ## Standard Component Structure
@@ -73,7 +80,9 @@ ComponentName/
 ## Implementation Steps
 
 ### 1. Research Existing Components
+
 Before implementing, examine similar existing components:
+
 - Check category for existing patterns
 - Review how props are structured
 - Observe Tailwind class patterns
@@ -82,11 +91,13 @@ Before implementing, examine similar existing components:
 ### 2. Create Component Structure
 
 **For Core Components:**
+
 ```
 src/components/[Category]/[ComponentName]/
 ```
 
 **For Page-Scoped Components:**
+
 ```
 src/pages/[section]/components/[ComponentName]/
 ```
@@ -94,8 +105,10 @@ src/pages/[section]/components/[ComponentName]/
 ### 3. Implement Component File
 
 **Key Patterns:**
+
 ```tsx
-import { forwardRef } from 'react';
+import type { JSX } from 'react';
+import clsx from 'clsx';
 import type { ComponentNameProps } from './ComponentName.types';
 
 // Inline Tailwind class definitions (not objects)
@@ -103,34 +116,36 @@ const baseClasses = 'inline-flex items-center font-semibold';
 
 // Variant classes when needed
 const variantClasses = {
-  primary: 'bg-primary text-white hover:bg-primary/90',
-  secondary: 'bg-white text-gray-900 hover:bg-gray-50',
+  primary: 'bg-primary text-on-fill hover:bg-primary-hover',
+  secondary: 'bg-surface text-foreground hover:bg-surface-hover',
 };
 
-export const ComponentName = forwardRef<HTMLElement, ComponentNameProps>(
-  ({ variant = 'primary', className = '', children, ...props }, ref) => {
-    const classes = [baseClasses, variantClasses[variant], className]
-      .filter(Boolean)
-      .join(' ');
-
-    return (
-      <element ref={ref} className={classes} {...props}>
-        {children}
-      </element>
-    );
-  }
-);
-
-ComponentName.displayName = 'ComponentName';
+// React 19 passes ref as a prop, so there is no forwardRef or displayName
+export function ComponentName({
+  variant = 'primary',
+  className,
+  children,
+  ref,
+  ...props
+}: ComponentNameProps): JSX.Element {
+  return (
+    <div ref={ref} className={clsx(baseClasses, variantClasses[variant], className)} {...props}>
+      {children}
+    </div>
+  );
+}
 ```
 
 **Semantic Colors:**
+
 - Use tokens: `bg-surface`, `text-foreground`, `text-muted`, `border-border`
 - Brand: `bg-primary`, `text-primary`, `bg-secondary`, `bg-accent`
-- States: `text-success`, `text-warning`, `text-error`
-- Avoid hard-coded colors (no `text-gray-500`)
+- States: `text-success`, `text-warning`, `text-danger`
+- Only token classes: no hard-coded colors (`text-gray-500`) or arbitrary values (`min-w-[600px]`); see
+  [Styling](../../rules/styling.md)
 
 **Conditional Classes:**
+
 ```tsx
 import { clsx } from 'clsx';
 
@@ -145,12 +160,17 @@ className={clsx(
 ### 4. Create Types File (when needed)
 
 ```tsx
-import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactNode, Ref } from 'react';
 
-export type ComponentVariant = 'primary' | 'secondary';
-export type ComponentSize = 'sm' | 'md' | 'lg';
+// Export a type only once another module imports it; pnpm knip fails on unused exports
+type ComponentVariant = 'primary' | 'secondary';
 
-export interface ComponentNameProps extends ComponentPropsWithoutRef<'element'> {
+export interface ComponentNameProps extends ComponentPropsWithoutRef<'div'> {
+  /**
+   * Ref to the rendered element
+   */
+  ref?: Ref<HTMLDivElement>;
+
   /**
    * The visual style variant
    * @default 'primary'
@@ -167,6 +187,7 @@ export interface ComponentNameProps extends ComponentPropsWithoutRef<'element'> 
 ### 5. Create Storybook Stories (Core Components Only)
 
 **Required Template:**
+
 ```tsx
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ComponentName } from './ComponentName';
@@ -179,7 +200,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -214,6 +235,7 @@ export const AllVariants: Story = {
 ```
 
 **Story Best Practices:**
+
 - Use full nested path: `Components/[Category]/ComponentName`
 - Include `decorators` with `bg-surface` wrapper
 - Show all variants/states
@@ -222,18 +244,16 @@ export const AllVariants: Story = {
 
 ### 6. Create Barrel Export
 
+Export what other modules import, usually just the component. Add a type only once a consumer imports it: `pnpm knip` fails on exports that nothing imports.
+
 ```tsx
 export { ComponentName } from './ComponentName';
-export type {
-  ComponentNameProps,
-  ComponentVariant,
-  ComponentSize
-} from './ComponentName.types';
 ```
 
 ## Composition Patterns
 
 ### Core Composing Core
+
 ```tsx
 // NetworkSelect composes SelectMenu
 import { SelectMenu } from '@/components/Forms/SelectMenu';
@@ -251,6 +271,7 @@ export function NetworkSelect({ showLabel = true }: Props) {
 ```
 
 ### Page-Scoped Composing Core
+
 ```tsx
 // UserCard composes Card, Badge, ClientLogo
 import { Card } from '@/components/Layout/Card';
@@ -271,19 +292,18 @@ export function UserCard({ username, clients }: Props) {
 ## Common Component Patterns
 
 ### Icon Handling (Heroicons)
-```tsx
-import { cloneElement, isValidElement } from 'react';
 
-// Clone icon element to apply size classes
-{leadingIcon && isValidElement(leadingIcon) &&
-  cloneElement(leadingIcon, {
-    'aria-hidden': 'true',
-    className: 'size-5',
-  } as Record<string, unknown>)
-}
+```tsx
+// Size the icon from a box-less wrapper, as Button does: the icon keeps its own classes and stays a flex item
+{leadingIcon && (
+  <span aria-hidden="true" className="contents *:size-5">
+    {leadingIcon}
+  </span>
+)}
 ```
 
 ### Size Variants
+
 ```tsx
 const sizeClasses = {
   sm: 'px-2 py-1 text-sm',
@@ -293,31 +313,33 @@ const sizeClasses = {
 ```
 
 ### Interactive States
+
 ```tsx
+// primary-hover is a light-dark() token, so no dark: variant is needed
 const baseClasses = `
   inline-flex items-center
-  hover:bg-primary/90
+  hover:bg-primary-hover
   focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
   disabled:cursor-not-allowed disabled:opacity-50
-  dark:hover:bg-primary/80
 `;
 ```
 
 ### Headless UI Integration
+
 ```tsx
 import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headlessui/react';
 
 <Listbox value={value} onChange={onChange}>
-  <ListboxButton className="relative cursor-pointer rounded-lg">
+  <ListboxButton className="relative cursor-pointer rounded-sm">
     {/* Button content */}
   </ListboxButton>
 
-  <ListboxOptions className="absolute z-[9999] mt-1 rounded-lg border">
-    {options.map((option, index) => (
+  <ListboxOptions className="absolute z-9999 mt-1 rounded-sm border">
+    {options.map(option => (
       <ListboxOption
-        key={index}
+        key={option.value}
         value={option.value}
-        className="data-focus:bg-primary/10 data-selected:text-primary"
+        className="data-focus:bg-primary-10 data-selected:text-primary"
       >
         {option.label}
       </ListboxOption>
@@ -329,6 +351,7 @@ import { Listbox, ListboxButton, ListboxOptions, ListboxOption } from '@headless
 ## Validation Checklist
 
 Before completing:
+
 - [ ] Matches existing component patterns in category
 - [ ] Uses semantic Tailwind tokens (not hard-coded colors)
 - [ ] TypeScript types properly defined
@@ -338,20 +361,23 @@ Before completing:
 - [ ] Stories include all variants/states
 - [ ] Component composes existing components when appropriate
 - [ ] No page-specific logic in core components
-- [ ] Accessibility attributes included (aria-*, role)
+- [ ] Accessibility attributes included (aria-\*, role)
 - [ ] Dark mode handled via semantic tokens
-- [ ] Icon handling uses cloneElement pattern
+- [ ] Icons are sized from a wrapper, never with cloneElement
 - [ ] `pnpm lint` passes
+- [ ] `pnpm knip` passes
 - [ ] `pnpm build` passes
 
 ## Testing in Storybook
 
 For core components, use Storybook for iteration:
+
 ```bash
 pnpm storybook
 ```
 
 Use Playwright MCP tools to:
+
 1. Navigate to component story
 2. Take screenshots of variants
 3. Test interactions
@@ -360,6 +386,7 @@ Use Playwright MCP tools to:
 ## Common Mistakes to Avoid
 
 ❌ **DON'T**:
+
 - Create new component without asking scope questions
 - Hard-code colors (`text-gray-500` instead of `text-muted`)
 - Skip Storybook stories for core components
@@ -369,6 +396,7 @@ Use Playwright MCP tools to:
 - Create standalone files (use folder structure)
 
 ✅ **DO**:
+
 - Research existing patterns first
 - Ask clarifying questions
 - Use semantic color tokens
@@ -403,6 +431,7 @@ Use Playwright MCP tools to:
 5. **Validate**:
    - Test in Storybook
    - Run `pnpm lint`
+   - Run `pnpm knip`
    - Run `pnpm build`
    - Verify all checklist items
 

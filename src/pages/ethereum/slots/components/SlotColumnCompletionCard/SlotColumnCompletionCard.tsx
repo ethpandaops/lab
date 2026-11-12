@@ -10,7 +10,7 @@ import {
 } from '@/pages/ethereum/data-availability/partial-columns/constants';
 import type { CompletionPath } from '@/pages/ethereum/data-availability/partial-columns/IndexPage.types';
 import { formatSeconds, formatShare } from '@/pages/ethereum/data-availability/partial-columns/utils/partial-columns';
-import type { SlotColumnCompletion } from '../../hooks/useSlotColumnCompletion';
+import type { SlotColumnCompletion } from '@/pages/ethereum/slots/hooks/useSlotColumnCompletion';
 
 export interface SlotColumnCompletionCardProps {
   data: SlotColumnCompletion;
@@ -104,7 +104,7 @@ export function SlotColumnCompletionCard({ data }: SlotColumnCompletionCardProps
                   <span
                     key={column.column_index}
                     title={title}
-                    className="flex h-4 overflow-hidden rounded-xs bg-border/50"
+                    className="flex h-4 overflow-hidden rounded-xs bg-border-50"
                   >
                     {total > 0 &&
                       COMPLETION_PATHS.filter(p => counts[p] > 0).map(p => (

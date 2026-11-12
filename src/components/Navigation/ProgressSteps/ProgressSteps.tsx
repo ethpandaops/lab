@@ -16,9 +16,9 @@ function SimpleVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
             {step.status === 'complete' ? (
               <Link
                 to={step.to || '#'}
-                className="group flex flex-col border-l-4 border-primary py-2 pl-4 hover:border-primary/80 md:border-t-4 md:border-l-0 md:pt-4 md:pb-0 md:pl-0"
+                className="group flex flex-col border-l-4 border-primary py-2 pl-4 hover:border-primary-80 md:border-t-4 md:border-l-0 md:pt-4 md:pb-0 md:pl-0"
               >
-                <span className="text-sm/6 font-medium text-primary group-hover:text-primary/80">{step.id}</span>
+                <span className="text-sm/6 font-medium text-primary group-hover:text-primary-80">{step.id}</span>
                 <span className="text-sm/6 font-medium text-foreground">{step.name}</span>
               </Link>
             ) : step.status === 'current' ? (
@@ -35,7 +35,7 @@ function SimpleVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
                 to={step.to || '#'}
                 className="group flex flex-col border-l-4 border-border py-2 pl-4 hover:border-muted md:border-t-4 md:border-l-0 md:pt-4 md:pb-0 md:pl-0"
               >
-                <span className="text-sm/6 font-medium text-muted group-hover:text-foreground/70">{step.id}</span>
+                <span className="text-sm/6 font-medium text-muted group-hover:text-foreground-70">{step.id}</span>
                 <span className="text-sm/6 font-medium text-foreground">{step.name}</span>
               </Link>
             )}
@@ -55,8 +55,8 @@ function PanelsVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
             {step.status === 'complete' ? (
               <Link to={step.to || '#'} className="group flex w-full items-center">
                 <span className="flex items-center px-6 py-4 text-sm/6 font-medium">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary group-hover:bg-primary/80">
-                    <CheckIcon aria-hidden="true" className="size-6 text-white" />
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary group-hover:bg-primary-80">
+                    <CheckIcon aria-hidden="true" className="size-6 text-on-fill" />
                   </span>
                   <span className="ml-4 text-sm/6 font-medium text-foreground">{step.name}</span>
                 </span>
@@ -112,13 +112,13 @@ function BulletsVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
         {steps.map(step => (
           <li key={step.name}>
             {step.status === 'complete' ? (
-              <Link to={step.to || '#'} className="block size-2.5 rounded-full bg-primary hover:bg-primary/80">
+              <Link to={step.to || '#'} className="block size-2.5 rounded-full bg-primary hover:bg-primary-80">
                 <span className="sr-only">{step.name}</span>
               </Link>
             ) : step.status === 'current' ? (
               <Link to={step.to || '#'} aria-current="step" className="relative flex items-center justify-center">
                 <span aria-hidden="true" className="absolute flex size-5 p-px">
-                  <span className="size-full rounded-full bg-primary/20" />
+                  <span className="size-full rounded-full bg-primary-20" />
                 </span>
                 <span aria-hidden="true" className="relative block size-2.5 rounded-full bg-primary" />
                 <span className="sr-only">{step.name}</span>
@@ -150,7 +150,7 @@ function CirclesVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
                   to={step.to || '#'}
                   className="relative flex size-8 items-center justify-center rounded-full bg-primary transition-transform hover:scale-110"
                 >
-                  <CheckIcon aria-hidden="true" className="size-5 text-white" />
+                  <CheckIcon aria-hidden="true" className="size-5 text-on-fill" />
                   <span className="sr-only">{step.name}</span>
                 </Link>
               </>
@@ -201,7 +201,7 @@ function BulletsTextVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
                   <span className="relative flex size-5 shrink-0 items-center justify-center">
                     <CheckCircleIcon
                       aria-hidden="true"
-                      className="size-full text-primary group-hover:text-primary/80"
+                      className="size-full text-primary group-hover:text-primary-80"
                     />
                   </span>
                   <span className="ml-3 text-sm/6 font-medium text-muted group-hover:text-foreground">{step.name}</span>
@@ -210,7 +210,7 @@ function BulletsTextVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
             ) : step.status === 'current' ? (
               <Link to={step.to || '#'} aria-current="step" className="flex items-start">
                 <span aria-hidden="true" className="relative flex size-5 shrink-0 items-center justify-center">
-                  <span className="absolute size-4 rounded-full bg-primary/20" />
+                  <span className="absolute size-4 rounded-full bg-primary-20" />
                   <span className="relative block size-2 rounded-full bg-primary" />
                 </span>
                 <span className="ml-3 text-sm/6 font-medium text-primary">{step.name}</span>
@@ -246,7 +246,7 @@ function CirclesTextVariant({ steps }: { steps: ProgressStep[] }): JSX.Element {
                 <Link to={step.to || '#'} className="group relative flex items-start">
                   <span className="flex h-9 items-center">
                     <span className="relative z-10 flex size-8 items-center justify-center rounded-full bg-primary transition-transform group-hover:scale-110">
-                      <CheckIcon aria-hidden="true" className="size-5 text-white" />
+                      <CheckIcon aria-hidden="true" className="size-5 text-on-fill" />
                     </span>
                   </span>
                   <span className="ml-4 flex min-w-0 flex-col">

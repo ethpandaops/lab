@@ -1,7 +1,7 @@
 /**
  * Data point in object format with additional metadata for tooltips
  */
-export interface EnrichedDataPoint {
+interface EnrichedDataPoint {
   /** The [x, y] coordinates */
   value: [number, number];
   /** Additional metadata for tooltip display */
@@ -143,7 +143,7 @@ export interface SeriesData {
 /**
  * X-axis configuration
  */
-export interface XAxisConfig {
+interface XAxisConfig {
   /**
    * Axis type
    * - 'category': Uses string labels (e.g., days of week)
@@ -189,7 +189,7 @@ export interface XAxisConfig {
 /**
  * Y-axis configuration
  */
-export interface YAxisConfig {
+interface YAxisConfig {
   /**
    * Axis name/label
    */
@@ -278,7 +278,7 @@ export interface MarkLineConfig {
  * Configuration for a vertical annotation area (markArea)
  * Renders a semi-transparent colored rectangle spanning the full y-axis
  */
-export interface MarkAreaConfig {
+interface MarkAreaConfig {
   /**
    * Start x-axis value
    */

@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import type { FctNodeLastSeen } from '@/api/types.gen';
-import type { NodeRange } from '../constants';
-import { summarizeByNode } from '../utils/history';
-import { isNodeOnline } from '../utils/node-stats';
+import type { NodeRange } from '@/pages/xatu/nodes/constants';
+import { summarizeByNode } from '@/pages/xatu/nodes/utils/history';
+import { isNodeOnline } from '@/pages/xatu/nodes/utils/node-stats';
 import { useLastSeenNodes } from './useLastSeenNodes';
 import { useNodeHistory, type HistoryRow, type NodeHistory } from './useNodeHistory';
 import { useStableNodes } from './useStableNodes';
 
 /** One node's typical timings over the selected range */
-export interface NodeObservation {
+interface NodeObservation {
   blockP50: number | null;
   attestationP50: number | null;
   /** Slots the node saw a block in */
@@ -101,19 +101,22 @@ export function buildNodeRows(
 
 /**
  * Every node that reported in the range, with its block and attestation timings over the range.
+ *
+ * @param nowSeconds - Current unix time, from `useNow`
  */
-export function useNodeRows(range: NodeRange): UseNodeRowsResult {
-  const lastSeen = useLastSeenNodes(range);
-  const block = useNodeHistory('block', range, {});
-  const attestation = useNodeHistory('attestation', range, {});
+export function useNodeRows(range: NodeRange, nowSeconds: number): UseNodeRowsResult {
+  const lastSeen = useLastSeenNodes(range, nowSeconds);
+  const block = useNodeHistory('block', range, {}, nowSeconds);
+  const attestation = useNodeHistory('attestation', range, {}, nowSeconds);
   const { stable, isLoading: stableLoading } = useStableNodes();
 
   const rows = useMemo(
     () =>
-      buildNodeRows(lastSeen.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], Date.now() / 1000).map(
-        row => ({ ...row, xatuNode: stable.get(row.nodeId) ?? row.nodeId })
-      ),
-    [lastSeen.nodes, block.data, attestation.data, stable]
+      buildNodeRows(lastSeen.nodes, block.data?.rows ?? [], attestation.data?.rows ?? [], nowSeconds).map(row => ({
+        ...row,
+        xatuNode: stable.get(row.nodeId) ?? row.nodeId,
+      })),
+    [lastSeen.nodes, block.data, attestation.data, stable, nowSeconds]
   );
 
   return {

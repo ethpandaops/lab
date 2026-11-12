@@ -1,3 +1,4 @@
+import { Description, Field, Label } from '@headlessui/react';
 import { Checkbox } from '@/components/Forms/Checkbox';
 import { ListContainer, ListItem } from '@/components/Layout/ListContainer';
 import type { CheckboxGroupProps } from './CheckboxGroup.types';
@@ -12,12 +13,10 @@ export function CheckboxGroup({
 }: CheckboxGroupProps): React.JSX.Element {
   // Render checkbox based on variant
   const renderCheckbox = (option: (typeof options)[0]): React.JSX.Element => {
-    const descriptionId = option.description ? `${option.id}-description` : undefined;
-
     switch (variant) {
       case 'list':
         return (
-          <ListItem key={option.id} className="flex gap-3">
+          <Field as={ListItem} key={option.id} className="flex gap-3">
             <div className="flex h-6 shrink-0 items-center">
               <Checkbox
                 id={option.id}
@@ -27,26 +26,19 @@ export function CheckboxGroup({
                 onChange={option.onChange}
                 disabled={option.disabled}
                 indeterminate={option.indeterminate}
-                aria-describedby={descriptionId}
                 rounded={rounded}
               />
             </div>
             <div className="text-sm/6">
-              <label htmlFor={option.id} className="font-medium text-foreground">
-                {option.label}
-              </label>
-              {option.description && (
-                <p id={descriptionId} className="text-muted">
-                  {option.description}
-                </p>
-              )}
+              <Label className="font-medium text-foreground">{option.label}</Label>
+              {option.description && <Description className="text-muted">{option.description}</Description>}
             </div>
-          </ListItem>
+          </Field>
         );
 
       case 'list-inline':
         return (
-          <ListItem key={option.id} className="flex gap-3">
+          <Field as={ListItem} key={option.id} className="flex gap-3">
             <div className="flex h-6 shrink-0 items-center">
               <Checkbox
                 id={option.id}
@@ -56,36 +48,26 @@ export function CheckboxGroup({
                 onChange={option.onChange}
                 disabled={option.disabled}
                 indeterminate={option.indeterminate}
-                aria-describedby={descriptionId}
                 rounded={rounded}
               />
             </div>
             <div className="text-sm/6">
-              <label htmlFor={option.id} className="font-medium text-foreground">
-                {option.label}
-              </label>{' '}
+              <Label className="font-medium text-foreground">{option.label}</Label>{' '}
               {option.description && (
-                <span id={descriptionId} className="text-muted">
-                  <span className="sr-only">{option.label} </span>
+                <Description as="span" className="text-muted">
                   {option.description}
-                </span>
+                </Description>
               )}
             </div>
-          </ListItem>
+          </Field>
         );
 
       case 'list-right':
         return (
-          <ListItem key={option.id} className="relative flex gap-3">
+          <Field as={ListItem} key={option.id} className="relative flex gap-3">
             <div className="min-w-0 flex-1 text-sm/6">
-              <label htmlFor={option.id} className="font-medium text-foreground">
-                {option.label}
-              </label>
-              {option.description && (
-                <p id={descriptionId} className="text-muted">
-                  {option.description}
-                </p>
-              )}
+              <Label className="font-medium text-foreground">{option.label}</Label>
+              {option.description && <Description className="text-muted">{option.description}</Description>}
             </div>
             <div className="flex h-6 shrink-0 items-center">
               <Checkbox
@@ -96,20 +78,17 @@ export function CheckboxGroup({
                 onChange={option.onChange}
                 disabled={option.disabled}
                 indeterminate={option.indeterminate}
-                aria-describedby={descriptionId}
                 rounded={rounded}
               />
             </div>
-          </ListItem>
+          </Field>
         );
 
       case 'simple':
         return (
-          <ListItem key={option.id} className="relative flex gap-3">
+          <Field as={ListItem} key={option.id} className="relative flex gap-3">
             <div className="min-w-0 flex-1 text-sm/6">
-              <label htmlFor={option.id} className="font-medium text-foreground select-none">
-                {option.label}
-              </label>
+              <Label className="font-medium text-foreground select-none">{option.label}</Label>
             </div>
             <div className="flex h-6 shrink-0 items-center">
               <Checkbox
@@ -123,7 +102,7 @@ export function CheckboxGroup({
                 rounded={rounded}
               />
             </div>
-          </ListItem>
+          </Field>
         );
 
       default:

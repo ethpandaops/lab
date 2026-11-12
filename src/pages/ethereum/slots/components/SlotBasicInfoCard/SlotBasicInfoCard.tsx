@@ -19,8 +19,8 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { useIsPageEnabled } from '@/hooks/useIsPageEnabled';
 import { useNetwork } from '@/hooks/useNetwork';
 import { GRAFFITI_FORMAT_LABELS, formatClientName } from '@/utils/graffiti';
-import { useSlotProposerClient, type ProposerClientField } from '../../hooks/useSlotProposerClient';
-import { noDataBefore } from '../../hooks/useSlotTableCoverage';
+import { useSlotProposerClient, type ProposerClientField } from '@/pages/ethereum/slots/hooks/useSlotProposerClient';
+import { noDataBefore } from '@/pages/ethereum/slots/hooks/useSlotTableCoverage';
 import type { SlotBasicInfoCardProps } from './SlotBasicInfoCard.types';
 import type { ForkVersion } from '@/utils/beacon';
 
@@ -237,14 +237,14 @@ export function SlotBasicInfoCard({
                   className="inline-block opacity-70 transition-opacity hover:opacity-100"
                   aria-label={link.label}
                 >
-                  <link.icon className="h-5 w-5" />
+                  <link.icon className="size-5" />
                 </a>
               ))}
             </div>
             {/* Mobile: Show dropdown menu */}
             <Menu as="div" className="relative sm:hidden">
               <MenuButton className="inline-flex items-center rounded-sm p-1 opacity-70 transition-opacity hover:opacity-100">
-                <EllipsisVerticalIcon className="h-5 w-5" aria-hidden="true" />
+                <EllipsisVerticalIcon className="size-5" aria-hidden="true" />
               </MenuButton>
               <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-sm border border-border bg-surface focus:outline-none">
                 {explorerLinks.map(link => (
@@ -255,7 +255,7 @@ export function SlotBasicInfoCard({
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 px-4 py-2 text-sm text-foreground hover:bg-background"
                     >
-                      <link.icon className="h-4 w-4" />
+                      <link.icon className="size-4" />
                       {link.label}
                     </a>
                   </MenuItem>

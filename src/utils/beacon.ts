@@ -24,7 +24,7 @@ export interface SlotPhase {
   duration: number;
   /** Tailwind classes to apply to this phase background (e.g., 'bg-primary', 'bg-success border-2') */
   className: string;
-  /** Tailwind classes to apply to the phase text (e.g., 'text-white', 'text-foreground') */
+  /** Tailwind classes to apply to the phase text (e.g., 'text-on-fill', 'text-foreground') */
   textClassName?: string;
   /** Optional description for accessibility */
   description?: string;
@@ -52,22 +52,22 @@ const PRE_GLOAS_PHASE_SPECS: SlotPhaseSpec[] = [
   {
     label: 'Block',
     endBps: 3333,
-    className: 'bg-surface border-b-4 border-b-data-cyan/50',
-    textClassName: 'text-cyan-700 dark:text-data-cyan font-bold',
+    className: 'bg-surface border-b-4 border-b-data-cyan-50',
+    textClassName: 'text-phase-cyan font-bold',
     description: 'Proposer broadcasts block',
   },
   {
     label: 'Attestations',
     endBps: 6667,
-    className: 'bg-surface border-b-4 border-b-data-green/50',
-    textClassName: 'text-green-700 dark:text-data-green font-bold',
+    className: 'bg-surface border-b-4 border-b-data-green-50',
+    textClassName: 'text-phase-green font-bold',
     description: 'Validators attest to block',
   },
   {
     label: 'Aggregations',
     endBps: 10000,
-    className: 'bg-surface border-b-4 border-b-data-amber/50',
-    textClassName: 'text-amber-700 dark:text-data-amber font-bold',
+    className: 'bg-surface border-b-4 border-b-data-amber-50',
+    textClassName: 'text-phase-amber font-bold',
     description: 'Attestations aggregated',
   },
 ];
@@ -83,29 +83,29 @@ const GLOAS_PHASE_SPECS: SlotPhaseSpec[] = [
   {
     label: 'Block',
     endBps: 2500,
-    className: 'bg-surface border-b-4 border-b-data-cyan/50',
-    textClassName: 'text-cyan-700 dark:text-data-cyan font-bold',
+    className: 'bg-surface border-b-4 border-b-data-cyan-50',
+    textClassName: 'text-phase-cyan font-bold',
     description: 'Proposer broadcasts block committing to a builder bid',
   },
   {
     label: 'Attestations',
     endBps: 5000,
-    className: 'bg-surface border-b-4 border-b-data-green/50',
-    textClassName: 'text-green-700 dark:text-data-green font-bold',
+    className: 'bg-surface border-b-4 border-b-data-green-50',
+    textClassName: 'text-phase-green font-bold',
     description: 'Validators attest to block',
   },
   {
     label: 'Payload',
     endBps: 7500,
-    className: 'bg-surface border-b-4 border-b-data-purple/50',
-    textClassName: 'text-purple-700 dark:text-data-purple font-bold',
+    className: 'bg-surface border-b-4 border-b-data-purple-50',
+    textClassName: 'text-phase-purple font-bold',
     description: 'Builder reveals the execution payload',
   },
   {
     label: 'PTC',
     endBps: 10000,
-    className: 'bg-surface border-b-4 border-b-data-amber/50',
-    textClassName: 'text-amber-700 dark:text-data-amber font-bold',
+    className: 'bg-surface border-b-4 border-b-data-amber-50',
+    textClassName: 'text-phase-amber font-bold',
     description: 'Payload Timeliness Committee attests whether the payload arrived',
   },
 ];
@@ -139,12 +139,6 @@ function phasesFromSpec(specs: SlotPhaseSpec[], slotDurationMs: number): SlotPha
 export const DEFAULT_BEACON_SLOT_PHASES: SlotPhase[] = phasesFromSpec(PRE_GLOAS_PHASE_SPECS, SECONDS_PER_SLOT * 1000);
 
 /**
- * Gloas (ePBS) slot phases (12000 milliseconds total): block, attestations,
- * payload reveal, PTC vote.
- */
-export const GLOAS_BEACON_SLOT_PHASES: SlotPhase[] = phasesFromSpec(GLOAS_PHASE_SPECS, SECONDS_PER_SLOT * 1000);
-
-/**
  * Get the slot phases for a fork. Gloas and later forks use the ePBS slot
  * structure; everything earlier keeps the classic three-phase layout.
  */
@@ -154,7 +148,7 @@ export function getSlotPhases(fork?: ForkVersion | null, slotDurationMs = SECOND
   return phasesFromSpec(specs, slotDurationMs);
 }
 
-export { CANONICAL_FORK_ORDER, isForkAtOrAfter } from './forkOrder';
+export { isForkAtOrAfter } from './forkOrder';
 
 /**
  * Convert slot number to Unix timestamp
@@ -220,22 +214,6 @@ export function epochToTimestamp(epoch: number, genesisTime: number): number {
 }
 
 /**
- * Convert timestamp to epoch number
- *
- * @param timestamp - Unix timestamp in seconds
- * @param genesisTime - Genesis time in Unix seconds
- * @returns Epoch number
- *
- * @example
- * ```tsx
- * timestampToEpoch(1606827863, 1606824023) // Returns 10
- * ```
- */
-export function timestampToEpoch(timestamp: number, genesisTime: number): number {
-  return Math.floor((timestamp - genesisTime) / (SLOTS_PER_EPOCH * SECONDS_PER_SLOT));
-}
-
-/**
  * Get the slot range for a given epoch
  *
  * @param epoch - Epoch number
@@ -250,27 +228,6 @@ export function getEpochSlotRange(epoch: number): { firstSlot: number; lastSlot:
   const firstSlot = epoch * SLOTS_PER_EPOCH;
   const lastSlot = firstSlot + SLOTS_PER_EPOCH - 1;
   return { firstSlot, lastSlot };
-}
-
-/**
- * Check if the current epoch is at or after a target fork epoch
- *
- * @param currentEpoch - Current epoch number
- * @param forkEpoch - Target fork epoch (undefined if not configured for network)
- * @returns true if current epoch >= fork epoch, false otherwise
- *
- * @example
- * ```tsx
- * isEpochAtOrAfter(1000, 500) // Returns true (1000 >= 500)
- * isEpochAtOrAfter(100, 500) // Returns false (100 < 500)
- * isEpochAtOrAfter(1000, undefined) // Returns false (fork not configured)
- * ```
- */
-export function isEpochAtOrAfter(currentEpoch: number, forkEpoch?: number): boolean {
-  if (forkEpoch === undefined) {
-    return false;
-  }
-  return currentEpoch >= forkEpoch;
 }
 
 /**
@@ -306,7 +263,7 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     version: 'phase0',
     name: 'Phase 0',
     emoji: '🚀',
-    color: 'bg-gray-100 text-gray-700 dark:bg-gray-400/10 dark:text-gray-400',
+    color: 'bg-tag-gray-bg text-tag-gray-chip',
     description:
       'Genesis fork - Launched the beacon chain proof-of-stake consensus layer at epoch 0 with validator staking',
   },
@@ -314,14 +271,14 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     version: 'altair',
     name: 'Altair',
     emoji: '🦅',
-    color: 'bg-sky-100 text-sky-700 dark:bg-sky-400/10 dark:text-sky-400',
+    color: 'bg-tag-sky-bg text-tag-sky',
     description: 'First upgrade - Introduced sync committees for light client support and increased penalties',
   },
   bellatrix: {
     version: 'bellatrix',
     name: 'Bellatrix',
     emoji: '🐼',
-    color: 'bg-slate-100 text-slate-700 dark:bg-slate-400/10 dark:text-slate-400',
+    color: 'bg-tag-slate-bg text-tag-slate',
     description: 'The Merge - Transitioned Ethereum from proof-of-work to proof-of-stake consensus',
     executionName: 'paris',
     combinedName: 'merge',
@@ -330,7 +287,7 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     version: 'capella',
     name: 'Capella',
     emoji: '🦉',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400',
+    color: 'bg-tag-blue-bg text-tag-blue',
     description: 'Shapella - Enabled validator withdrawals after 2+ years of staking (EIP-4895)',
     executionName: 'shanghai',
     combinedName: 'shapella',
@@ -339,7 +296,7 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     version: 'deneb',
     name: 'Deneb',
     emoji: '🐡',
-    color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400',
+    color: 'bg-tag-indigo-bg text-tag-indigo',
     description: 'Dencun - Introduced proto-danksharding with blob transactions, reducing L2 fees by ~90% (EIP-4844)',
     executionName: 'cancun',
     combinedName: 'dencun',
@@ -348,7 +305,7 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     version: 'electra',
     name: 'Electra',
     emoji: '🦒',
-    color: 'bg-violet-100 text-violet-700 dark:bg-violet-400/10 dark:text-violet-400',
+    color: 'bg-tag-violet-bg text-tag-violet',
     description:
       'Pectra - Increased max validator balance to 2048 ETH, enabling consolidation and compounding (EIP-7251)',
     executionName: 'prague',
@@ -358,7 +315,7 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     version: 'fulu',
     name: 'Fulu',
     emoji: '🦓',
-    color: 'bg-pink-100 text-pink-700 dark:bg-pink-400/10 dark:text-pink-400',
+    color: 'bg-tag-pink-bg text-tag-pink',
     description:
       'Fusaka - Implements PeerDAS for up to 8x blob throughput scaling (EIP-7594) and introduces blob parameter-only forks (EIP-7892)',
     executionName: 'osaka',
@@ -368,7 +325,7 @@ export const FORK_METADATA: Record<ForkVersion, ForkMetadata> = {
     version: 'gloas',
     name: 'Gloas',
     emoji: '🐋',
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400',
+    color: 'bg-tag-amber-bg text-tag-amber',
     description:
       'Glamsterdam - Enshrines proposer-builder separation, splitting the execution payload from the block with a Payload Timeliness Committee (EIP-7732)',
     executionName: 'amsterdam',

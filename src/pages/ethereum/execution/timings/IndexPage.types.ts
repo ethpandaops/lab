@@ -68,21 +68,6 @@ export const timingsSearchSchema = z.object({
 });
 
 /**
- * TypeScript type inferred from Zod schema
- */
-export type TimingsSearch = z.infer<typeof timingsSearchSchema>;
-
-/**
  * Default time range for the page
  */
 export const DEFAULT_TIME_RANGE: TimeRange = 'all';
-
-/**
- * Status values for engine_newPayload responses
- */
-export type NewPayloadStatus = 'VALID' | 'INVALID' | 'SYNCING' | 'ACCEPTED' | 'INVALID_BLOCK_HASH';
-
-/**
- * Status values for engine_getBlobs responses
- */
-export type GetBlobsStatus = 'SUCCESS' | 'PARTIAL' | 'EMPTY' | 'ERROR' | 'UNSUPPORTED';

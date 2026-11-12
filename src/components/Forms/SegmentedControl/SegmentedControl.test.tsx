@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@/test-utils';
 import { SegmentedControl } from './SegmentedControl';
 
 const options = [
@@ -29,7 +29,7 @@ describe('SegmentedControl', () => {
     const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
       this: HTMLElement
     ) {
-      const left = this.getAttribute('role') === 'group' ? 0 : lefts[this.textContent ?? ''];
+      const left = this.getAttribute('role') === 'group' ? 0 : (lefts[this.textContent ?? ''] ?? 0);
       return { left, right: this.getAttribute('role') === 'group' ? 100 : left + 40 } as DOMRect;
     });
     const scrollWidth = vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(124);

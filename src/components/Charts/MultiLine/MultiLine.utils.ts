@@ -41,9 +41,9 @@ export function createBandSeries(
   lowerValues: (number | null)[],
   upperValues: (number | null)[],
   config: BandConfig
-): SeriesData[] {
+): [SeriesData, SeriesData] {
   const widthValues = upperValues.map((u, i) => {
-    const lower = lowerValues[i];
+    const lower = lowerValues[i] ?? null;
     if (u === null || lower === null) return null;
     return Math.max(0, u - lower);
   });
@@ -342,15 +342,19 @@ export function dateCategoryTicks(labels: string[], maxTicks: number): Map<numbe
   const dates: Date[] = [];
   for (const label of labels) {
     const m = DATE_LABEL.exec(label);
-    const month = m ? MONTHS.indexOf(m[1]) : -1;
+    const month = m ? MONTHS.indexOf(m[1] ?? '') : -1;
     if (!m || month < 0) return null;
     dates.push(new Date(2000 + Number(m[3]), month, Number(m[2])));
   }
 
-  const spanDays = (dates[dates.length - 1].getTime() - dates[0].getTime()) / 86_400_000;
+  const first = dates[0];
+  const last = dates[dates.length - 1];
+  if (!first || !last) return null;
+  const spanDays = (last.getTime() - first.getTime()) / 86_400_000;
   const step =
     DATE_TICK_STEPS.find(s => spanDays / (s.days ?? (s.months ?? 1) * 30.4) <= Math.max(2, maxTicks)) ??
     DATE_TICK_STEPS[DATE_TICK_STEPS.length - 1];
+  if (!step) return null;
 
   /** Bucket a date falls in for the chosen step; a tick goes on the first label of each bucket */
   const bucket = (d: Date): number => {
@@ -363,7 +367,7 @@ export function dateCategoryTicks(labels: string[], maxTicks: number): Map<numbe
 
   const years = step.months !== undefined && step.months >= 12;
   const ticks = new Map<number, string>();
-  let previous = bucket(dates[0]);
+  let previous = bucket(first);
   let previousYear = -1;
   dates.forEach((d, i) => {
     const b = bucket(d);
@@ -383,15 +387,16 @@ export function dateCategoryTicks(labels: string[], maxTicks: number): Map<numbe
     if (i === 0 && !startsBucket) return;
     const showYear = d.getFullYear() !== previousYear;
     previousYear = d.getFullYear();
+    const month = MONTHS[d.getMonth()] ?? '';
     ticks.set(
       i,
       years
         ? String(d.getFullYear())
         : step.months
           ? showYear
-            ? `${MONTHS[d.getMonth()]} ${d.getFullYear()}`
-            : MONTHS[d.getMonth()]
-          : `${MONTHS[d.getMonth()]} ${d.getDate()}`
+            ? `${month} ${d.getFullYear()}`
+            : month
+          : `${month} ${d.getDate()}`
     );
   });
   return ticks;
@@ -463,7 +468,7 @@ export function timeAxisTicks(min: number, max: number, plotWidth: number): Time
   const label = (t: number, index: number, previous: number | undefined): string => {
     const d = new Date(t * 1000);
     const year = d.getUTCFullYear();
-    const month = MONTHS[d.getUTCMonth()];
+    const month = MONTHS[d.getUTCMonth()] ?? '';
     if (unit === 'year') return String(year);
     const newYear =
       spansYears && (index === 0 || previous === undefined || new Date(previous * 1000).getUTCFullYear() !== year);

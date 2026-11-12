@@ -9,10 +9,10 @@ import type {
   BalanceDailyDataPoint,
   SyncCommitteeDailyDataPoint,
   BlockProposalDataPoint,
-} from '../../hooks/useValidatorsData.types';
-import { DailyBreakdownTable } from '../DailyBreakdownTable';
-import { BeaconchainLink } from '../ValidatorIdentity/ValidatorIdentity';
-import type { ValidatorSelection } from '../ValidatorHeatmap';
+} from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
+import { DailyBreakdownTable } from '@/pages/ethereum/validators/components/DailyBreakdownTable';
+import { BeaconchainLink } from '@/pages/ethereum/validators/components/ValidatorIdentity/ValidatorIdentity';
+import type { ValidatorSelection } from '@/pages/ethereum/validators/components/ValidatorHeatmap';
 
 interface ValidatorTableProps {
   /** Array of validator metrics */
@@ -72,22 +72,22 @@ function formatEth(value: number | null): string {
  */
 function formatStatus(status: string, slashed: boolean): ReactNode {
   if (slashed) {
-    return <span className="rounded-xs bg-danger/10 px-2 py-0.5 text-xs font-medium text-danger">Slashed</span>;
+    return <span className="rounded-xs bg-danger-10 px-2 py-0.5 text-xs font-medium text-danger">Slashed</span>;
   }
 
   const statusColors: Record<string, string> = {
-    active_ongoing: 'bg-success/10 text-success',
-    active_exiting: 'bg-warning/10 text-warning',
-    active_slashed: 'bg-danger/10 text-danger',
-    exited_unslashed: 'bg-muted/10 text-muted',
-    exited_slashed: 'bg-danger/10 text-danger',
-    withdrawal_possible: 'bg-muted/10 text-muted',
-    withdrawal_done: 'bg-muted/10 text-muted',
-    pending_initialized: 'bg-muted/10 text-muted',
-    pending_queued: 'bg-muted/10 text-muted',
+    active_ongoing: 'bg-success-10 text-success',
+    active_exiting: 'bg-warning-10 text-warning',
+    active_slashed: 'bg-danger-10 text-danger',
+    exited_unslashed: 'bg-muted-10 text-muted',
+    exited_slashed: 'bg-danger-10 text-danger',
+    withdrawal_possible: 'bg-muted-10 text-muted',
+    withdrawal_done: 'bg-muted-10 text-muted',
+    pending_initialized: 'bg-muted-10 text-muted',
+    pending_queued: 'bg-muted-10 text-muted',
   };
 
-  const colorClass = statusColors[status] ?? 'bg-muted/10 text-muted';
+  const colorClass = statusColors[status] ?? 'bg-muted-10 text-muted';
   const displayStatus = status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
   return <span className={clsx('rounded-xs px-2 py-0.5 text-xs font-medium', colorClass)}>{displayStatus}</span>;
@@ -215,11 +215,11 @@ export function ValidatorTable({
 
   return (
     <Card className={className}>
-      <div className="-mx-(--card-inset) -my-(--card-inset-y) overflow-x-auto">
+      <div className="mx-card-bleed my-card-bleed overflow-x-auto">
         <table className="w-full text-sm whitespace-nowrap">
           <thead>
             <tr className="border-b border-border bg-surface text-xs text-muted">
-              <th className="w-px py-3 pr-2 pl-(--card-inset)" />
+              <th className="w-px py-3 pr-2 pl-card-inset" />
               <th className="px-2 py-3 text-left font-medium">Validator</th>
               <th className="w-px px-2 py-3 text-right font-medium">Inclusion</th>
               <th className="w-px px-2 py-3 text-center font-medium">Incl. Trend</th>
@@ -235,7 +235,7 @@ export function ValidatorTable({
               <th className="hidden w-px px-2 py-3 text-right font-medium lg:table-cell">Proposals</th>
               <th className="w-px px-2 py-3 text-right font-medium">Min Bal (ETH)</th>
               <th className="w-px px-2 py-3 text-center font-medium">Bal. Trend</th>
-              <th className="w-px py-3 pr-(--card-inset) pl-2 text-left font-medium">Status</th>
+              <th className="w-px py-3 pr-card-inset pl-2 text-left font-medium">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -379,15 +379,15 @@ function ValidatorRow({
       <tr
         ref={rowRef}
         className={clsx(
-          'cursor-pointer border-b border-border/50 transition-colors hover:bg-surface/80',
-          row.balance.slashed && 'bg-danger/5',
-          isExpanded && 'bg-surface/50',
-          isHighlighted && 'border-l-2 border-l-primary bg-primary/5'
+          'cursor-pointer border-b border-border-50 transition-colors hover:bg-surface-80',
+          row.balance.slashed && 'bg-danger-5',
+          isExpanded && 'bg-surface-50',
+          isHighlighted && 'border-l-2 border-l-primary bg-primary-5'
         )}
         onClick={onClick}
       >
         {/* Chevron */}
-        <td className="py-2 pr-2 pl-(--card-inset)">
+        <td className="py-2 pr-2 pl-card-inset">
           {isExpanded ? (
             <ChevronDownIcon className="size-4 text-primary" />
           ) : (
@@ -396,7 +396,7 @@ function ValidatorRow({
         </td>
 
         {/* Validator index + pubkey */}
-        <td className="px-2 py-2 font-mono">
+        <td className="p-2 font-mono">
           <span className="flex items-center gap-1.5">
             <span className="font-medium text-foreground">{row.validatorIndex}</span>
             {pubkey && (
@@ -412,10 +412,10 @@ function ValidatorRow({
         </td>
 
         {/* Inclusion rate */}
-        <td className="px-2 py-2 text-right">{formatPercent(row.attestation.inclusionRate)}</td>
+        <td className="p-2 text-right">{formatPercent(row.attestation.inclusionRate)}</td>
 
         {/* Inclusion sparkline */}
-        <td className="px-2 py-2 text-center">
+        <td className="p-2 text-center">
           {inclusionSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={inclusionSparkline} width={80} />
@@ -426,10 +426,10 @@ function ValidatorRow({
         </td>
 
         {/* Head */}
-        <td className="hidden px-2 py-2 text-right lg:table-cell">{formatPercent(row.attestation.headCorrectRate)}</td>
+        <td className="hidden p-2 text-right lg:table-cell">{formatPercent(row.attestation.headCorrectRate)}</td>
 
         {/* Head sparkline */}
-        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
+        <td className="hidden p-2 text-center 2xl:table-cell">
           {headSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={headSparkline} width={80} />
@@ -440,12 +440,10 @@ function ValidatorRow({
         </td>
 
         {/* Target */}
-        <td className="hidden px-2 py-2 text-right lg:table-cell">
-          {formatPercent(row.attestation.targetCorrectRate)}
-        </td>
+        <td className="hidden p-2 text-right lg:table-cell">{formatPercent(row.attestation.targetCorrectRate)}</td>
 
         {/* Target sparkline */}
-        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
+        <td className="hidden p-2 text-center 2xl:table-cell">
           {targetSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={targetSparkline} width={80} />
@@ -456,12 +454,10 @@ function ValidatorRow({
         </td>
 
         {/* Source */}
-        <td className="hidden px-2 py-2 text-right 2xl:table-cell">
-          {formatPercent(row.attestation.sourceCorrectRate)}
-        </td>
+        <td className="hidden p-2 text-right 2xl:table-cell">{formatPercent(row.attestation.sourceCorrectRate)}</td>
 
         {/* Source sparkline */}
-        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
+        <td className="hidden p-2 text-center 2xl:table-cell">
           {sourceSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={sourceSparkline} width={80} />
@@ -472,7 +468,7 @@ function ValidatorRow({
         </td>
 
         {/* Avg Delay */}
-        <td className="hidden px-2 py-2 text-right 2xl:table-cell">
+        <td className="hidden p-2 text-right 2xl:table-cell">
           {row.attestation.avgInclusionDistance !== null ? (
             <span className="tabular-nums">{row.attestation.avgInclusionDistance.toFixed(2)}</span>
           ) : (
@@ -481,7 +477,7 @@ function ValidatorRow({
         </td>
 
         {/* Delay sparkline */}
-        <td className="hidden px-2 py-2 text-center 2xl:table-cell">
+        <td className="hidden p-2 text-center 2xl:table-cell">
           {delaySparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={delaySparkline} width={80} />
@@ -492,10 +488,10 @@ function ValidatorRow({
         </td>
 
         {/* Sync % */}
-        <td className="px-2 py-2 text-right">{formatPercent(row.syncCommittee?.participationRate ?? null)}</td>
+        <td className="p-2 text-right">{formatPercent(row.syncCommittee?.participationRate ?? null)}</td>
 
         {/* Proposals */}
-        <td className="hidden px-2 py-2 text-right lg:table-cell">
+        <td className="hidden p-2 text-right lg:table-cell">
           {row.blockProposal ? (
             <span
               className={clsx(
@@ -515,12 +511,12 @@ function ValidatorRow({
         </td>
 
         {/* Min Balance */}
-        <td className="px-2 py-2 text-right">
+        <td className="p-2 text-right">
           <span className="tabular-nums">{formatEth(row.balance.minBalance)}</span>
         </td>
 
         {/* Balance sparkline */}
-        <td className="px-2 py-2 text-center">
+        <td className="p-2 text-center">
           {balanceSparkline.length > 1 ? (
             <div className="mx-auto w-fit">
               <Sparkline data={balanceSparkline} width={80} showArea />
@@ -531,13 +527,13 @@ function ValidatorRow({
         </td>
 
         {/* Status */}
-        <td className="py-2 pr-(--card-inset) pl-2">{formatStatus(row.balance.status, row.balance.slashed)}</td>
+        <td className="py-2 pr-card-inset pl-2">{formatStatus(row.balance.status, row.balance.slashed)}</td>
       </tr>
 
       {/* Expanded daily breakdown */}
       {isExpanded && (
         <tr className="bg-background">
-          <td colSpan={COLUMN_COUNT} className="px-(--card-inset) py-3">
+          <td colSpan={COLUMN_COUNT} className="px-card-inset py-3">
             <DailyBreakdownTable
               attestationData={attestationDaily}
               balanceData={balanceDaily}

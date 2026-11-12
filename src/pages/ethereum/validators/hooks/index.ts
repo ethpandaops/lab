@@ -1,11 +1,8 @@
 export { useValidatorsData } from './useValidatorsData';
 export type * from './useValidatorsData.types';
 export { useHourlyData } from './useHourlyData';
-export type { AttestationHourlyDataPoint, SyncCommitteeHourlyDataPoint, BalanceHourlyDataPoint } from './useHourlyData';
 export { useSlotData } from './useSlotData';
-export type { AttestationSlotDataPoint, SyncCommitteeSlotDataPoint, BalanceSlotDataPoint } from './useSlotData';
+export type { AttestationSlotDataPoint } from './useSlotData';
 export { useValidatorResolver } from './useValidatorResolver';
-export { useValidatorStatus, formatStatusLabel, getStatusIconConfig } from './useValidatorStatus';
-export type { StatusIconConfig } from './useValidatorStatus';
+export { useValidatorStatus } from './useValidatorStatus';
 export { useValidatorIdentity } from './useValidatorIdentity';
-export type { ValidatorIdentity } from './useValidatorIdentity';

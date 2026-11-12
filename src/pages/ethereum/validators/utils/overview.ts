@@ -32,7 +32,8 @@ export function formatCompact(value: number, digits = 1): string {
  */
 export function lowestSince(points: { day: string; value: number }[], latest: number): string | null {
   for (let i = points.length - 1; i >= 0; i--) {
-    if (points[i].value <= latest) return i < points.length - 1 ? points[i].day : null;
+    const point = points[i];
+    if (point && point.value <= latest) return i < points.length - 1 ? point.day : null;
   }
   // Lower than everything loaded: the data doesn't say since when
   return null;

@@ -1,6 +1,6 @@
 import { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { entityQuery } from '@/pages/ethereum/clients/utils/client-share';
-import type { BlockSource, SlotFilters, SlotSort, SlotStatus } from '../IndexPage.types';
+import type { BlockSource, SlotFilters, SlotSort, SlotStatus } from '@/pages/ethereum/slots/IndexPage.types';
 
 /**
  * Tables that hold per-slot facts. Filters run server-side on one of them (the driver); the rest are joined by

@@ -3,8 +3,8 @@ import { fctNodeLastSeenServiceList } from '@/api/sdk.gen';
 import type { FctNodeLastSeen } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import type { NodeRange } from '../constants';
-import { getBuckets } from '../utils/time-buckets';
+import type { NodeRange } from '@/pages/xatu/nodes/constants';
+import { getBuckets } from '@/pages/xatu/nodes/utils/time-buckets';
 
 /** Rows from libp2p gossip name tysm sentries "prysm"; read them as tysm like the rollups and every other page */
 function tysmClient(node: FctNodeLastSeen): FctNodeLastSeen {
@@ -22,12 +22,13 @@ export interface UseLastSeenNodesResult {
  *
  * The range starts at its first rollup bucket, so it covers the same Xatu nodes as the rollups.
  *
+ * @param nowSeconds - Current unix time, from `useNow`
  * @param nodeId - Read one Xatu node only
  */
-export function useLastSeenNodes(range: NodeRange, nodeId?: string): UseLastSeenNodesResult {
+export function useLastSeenNodes(range: NodeRange, nowSeconds: number, nodeId?: string): UseLastSeenNodesResult {
   const { currentNetwork } = useNetwork();
   // All history has no lower bound; otherwise the start moves once a bucket, keeping the key stable in between
-  const start = range === 'all' ? undefined : getBuckets(range, Date.now() / 1000)[0];
+  const start = range === 'all' ? undefined : getBuckets(range, nowSeconds)[0];
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['xatu-nodes', 'last-seen', currentNetwork?.name, range, nodeId, start],

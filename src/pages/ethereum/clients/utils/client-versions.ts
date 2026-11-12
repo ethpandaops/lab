@@ -8,13 +8,13 @@ import { CONSENSUS_CLIENTS_SET, EXECUTION_CLIENTS_SET, normalizeClientName } fro
 import { compareVersions } from '@/utils/version';
 import { completeBucketEnd } from '@/utils/time';
 import { findReleaseByVersion, normaliseVersion, type ClientRelease } from '@/utils/graffiti';
-import { RESOLVED_STATUSES, type ReleaseStatus } from '../api/client-models';
+import { RESOLVED_STATUSES } from '@/pages/ethereum/clients/api/client-models';
 
 export { releaseName, releaseUrl, type ClientRelease } from '@/utils/graffiti';
 import type { ClientLayer } from './client-share';
 
 /** The `version` route param that resolves to a client's newest full release */
-export const LATEST_VERSION = 'latest';
+const LATEST_VERSION = 'latest';
 
 /**
  * Layer of a known client, or null for names the app does not know.
@@ -127,12 +127,6 @@ export function displayVersion(raw: string | undefined, releases: DimClientRelea
   return matchReleaseVersion(raw, releases)?.version ?? shortVersion(raw);
 }
 
-/** Why a block's version did not resolve, as release_status names it */
-export type UnresolvedReason = Exclude<
-  ReleaseStatus,
-  'commit_match' | 'commit_untagged' | 'commit_mismatch' | 'version_match'
->;
-
 /** Blocks sharing a time bucket, entity and version of the page's client */
 export interface VersionCount {
   /** Start of the bucket (unix seconds): the block's slot time for per-block rows */
@@ -168,7 +162,7 @@ export const UNRESOLVED_LABELS: Record<string, string> = {
 };
 
 /** Whether a row's version builds on its release rather than being the tagged release itself */
-export function isUntagged(row: Pick<VersionCount, 'status'>): boolean {
+function isUntagged(row: Pick<VersionCount, 'status'>): boolean {
   return row.status === 'commit_untagged';
 }
 
@@ -400,14 +394,14 @@ export function versionColors(versions: VersionSummary[], palette: readonly stri
     .slice(0, limit)
     .map(summary => summary.version)
     .sort((a, b) => compareVersions(b, a));
-  return new Map(top.map((version, index) => [version, palette[index % palette.length]]));
+  return new Map(top.map((version, index) => [version, palette[index % palette.length] ?? OTHER_VERSION_COLOR]));
 }
 
 /** How finely versions are drawn: each release, or each minor line */
 export type VersionLevel = 'patch' | 'minor';
 
 /** The release line a version belongs to at `level`, e.g. v8.2.1 is v8.2.x at minor; unparseable versions stay as is */
-export function versionLine(version: string, level: VersionLevel): string {
+function versionLine(version: string, level: VersionLevel): string {
   if (level === 'patch') return version;
   const match = /^(v?)(\d+)\.(\d+)/.exec(version);
   if (!match) return version;
@@ -422,7 +416,7 @@ function topCoverage(counts: Map<string, number>, limit: number): number {
 }
 
 /** The `limit` versions with the most blocks over the last `recentDays` days, so current releases are drawn */
-export function recentTopVersions(days: VersionDay[], limit: number, recentDays = 7): string[] {
+function recentTopVersions(days: VersionDay[], limit: number, recentDays = 7): string[] {
   const counts = new Map<string, number>();
   for (const day of days.slice(-recentDays)) {
     for (const [version, count] of day.counts) counts.set(version, (counts.get(version) ?? 0) + count);
@@ -558,11 +552,12 @@ export function shareStat(
   window: string
 ): { value: string; delta?: { value: string; type: 'neutral' } } {
   const counted = points.map(point => point[key]).filter((share): share is number => share !== null);
-  if (counted.length === 0) return { value: '-' };
-  const latest = counted[counted.length - 1];
+  const first = counted[0];
+  const latest = counted.at(-1);
+  if (first === undefined || latest === undefined) return { value: '-' };
   const value = `${latest.toFixed(1)}%`;
   if (counted.length < 2) return { value };
-  const change = Math.round((latest - counted[0]) * 10) / 10;
+  const change = Math.round((latest - first) * 10) / 10;
   return {
     value,
     delta: { value: `${change > 0 ? '+' : ''}${change.toFixed(1)} pts over ${window}`, type: 'neutral' },
@@ -580,7 +575,7 @@ export function buildLine(raw: string): string {
 /**
  * Numeric version a build line reports: "1.17.11-unstable" → "1.17.11", "26.10-develop" → "26.10".
  */
-export function buildBase(raw: string): string {
+function buildBase(raw: string): string {
   return /^v?(\d+(?:\.\d+){0,2})/i.exec(raw.trim())?.[1] ?? raw;
 }
 

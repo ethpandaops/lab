@@ -7,9 +7,13 @@ import { Badge } from '@/components/Elements/Badge';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
-import { useAttestationDuties, type AttestationDuty, type AttestationOutcome } from '../../hooks/useAttestationDuties';
-import { useCursorPagination } from '../../hooks/useCursorPagination';
-import { TableCard, TableSearch, ValidatorFilter } from '../TableCard';
+import {
+  useAttestationDuties,
+  type AttestationDuty,
+  type AttestationOutcome,
+} from '@/pages/ethereum/validators/hooks/useAttestationDuties';
+import { useCursorPagination } from '@/pages/ethereum/validators/hooks/useCursorPagination';
+import { TableCard, TableSearch, ValidatorFilter } from '@/pages/ethereum/validators/components/TableCard';
 import { formatGwei, shortRoot } from './format';
 
 const OUTCOME_OPTIONS: { value: AttestationOutcome; label: string }[] = [

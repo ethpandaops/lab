@@ -17,7 +17,7 @@ import type {
   FctValidatorRewardTotalDaily,
   FctValidatorEffectiveBalanceByCredentialTypeDaily,
 } from '@/api/types.gen';
-import { CREDENTIAL_TYPES, type CredentialType, type OverviewWindow } from '../utils/overview';
+import { CREDENTIAL_TYPES, type CredentialType, type OverviewWindow } from '@/pages/ethereum/validators/utils/overview';
 import { completeBucketEnd, completeUtcDays, currentUtcDate, currentUtcWeek, toUtcDate } from '@/utils/time';
 
 const GWEI = 1e9;

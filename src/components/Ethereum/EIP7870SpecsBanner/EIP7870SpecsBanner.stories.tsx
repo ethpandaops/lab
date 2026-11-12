@@ -11,7 +11,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[700px] rounded-sm bg-background p-6">
+      <div className="min-w-175 rounded-sm bg-background p-6">
         <Story />
       </div>
     ),
@@ -38,7 +38,7 @@ export const Collapsed: Story = {
 
 export const WithCustomClass: Story = {
   args: {
-    className: 'border-primary/30',
+    className: 'border-primary-30',
   },
   parameters: {
     docs: {

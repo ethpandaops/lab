@@ -1,18 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act } from '@/test-utils';
+import { NOW_MS } from '@/test-utils/time';
 import { useBeaconClock } from './useBeaconClock';
 import * as useNetworkModule from '@/hooks/useNetwork';
 import * as useIntervalModule from '@/hooks/useInterval';
 import { SECONDS_PER_SLOT, SLOTS_PER_EPOCH } from '@/utils/beacon';
-import type { Network } from '@/contexts/NetworkContext/NetworkContext.types';
+import type { Network } from '@/hooks/useConfig';
 
 // Mock the dependencies
 vi.mock('@/hooks/useNetwork');
 vi.mock('@/hooks/useInterval');
 
 describe('useBeaconClock', () => {
-  // Helper to create a mock network with genesis_time
-  const createMockNetwork = (genesis_time: number): Partial<Network> => ({
+  // Helper to create a mock network with genesis_time; undefined stands for a network config missing it
+  const createMockNetwork = (genesis_time: number | undefined): Partial<Network> => ({
     name: 'mainnet',
     display_name: 'Mainnet',
     genesis_time,
@@ -117,7 +118,7 @@ describe('useBeaconClock', () => {
   describe('edge cases and error handling', () => {
     it('should handle invalid genesis_time (undefined)', () => {
       vi.mocked(useNetworkModule.useNetwork).mockReturnValue({
-        currentNetwork: { genesis_time: undefined } as Network,
+        currentNetwork: createMockNetwork(undefined) as Network,
         setCurrentNetwork: vi.fn(),
         networks: [],
         isLoading: false,
@@ -360,8 +361,7 @@ describe('useBeaconClock', () => {
 
     it('should default to Date.now when no getCurrentTime is provided', () => {
       const genesis_time = 1606824000;
-      const now = Date.now();
-      const dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(now);
+      const dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(NOW_MS);
 
       vi.mocked(useNetworkModule.useNetwork).mockReturnValue({
         currentNetwork: createMockNetwork(genesis_time) as Network,
@@ -375,8 +375,6 @@ describe('useBeaconClock', () => {
       renderHook(() => useBeaconClock());
 
       expect(dateNowSpy).toHaveBeenCalled();
-
-      dateNowSpy.mockRestore();
     });
   });
 

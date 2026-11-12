@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, screen } from 'storybook/test';
 import { PopoutCard } from './PopoutCard';
 import { BarChart } from '@/components/Charts/Bar';
 import { LineChart } from '@/components/Charts/Line';
@@ -11,7 +12,7 @@ const meta: Meta<typeof PopoutCard> = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -35,6 +36,10 @@ export const Default: Story = {
         height={300}
       />
     ),
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: 'Export options' }));
+    await expect(await screen.findByRole('menuitem', { name: 'Copy to clipboard' })).toBeInTheDocument();
   },
 };
 
@@ -88,7 +93,7 @@ export const WithLineChart: Story = {
     title: 'Daily Active Users',
     subtitle: 'Past 2 weeks',
     children: ({ inModal }) => (
-      <div className={inModal ? 'h-[600px]' : 'h-96'}>
+      <div className={inModal ? 'h-150' : 'h-96'}>
         <LineChart
           data={[1200, 1350, 1180, 1420, 1560, 1490, 1620, 1580, 1740, 1690, 1820, 1880, 1950, 2100]}
           labels={Array.from({ length: 14 }, (_, i) => `Day ${i + 1}`)}
@@ -125,7 +130,7 @@ export const WithTable: Story = {
               <td className="py-3 text-muted">2025-10-24</td>
               <td className="py-3 text-foreground">$125.00</td>
               <td className="py-3">
-                <span className="rounded-sm bg-success/10 px-2 py-1 text-xs font-medium text-success">Completed</span>
+                <span className="rounded-sm bg-success-10 px-2 py-1 text-xs font-medium text-success">Completed</span>
               </td>
             </tr>
             <tr>
@@ -133,7 +138,7 @@ export const WithTable: Story = {
               <td className="py-3 text-muted">2025-10-24</td>
               <td className="py-3 text-foreground">$89.50</td>
               <td className="py-3">
-                <span className="rounded-sm bg-warning/10 px-2 py-1 text-xs font-medium text-warning">Pending</span>
+                <span className="rounded-sm bg-warning-10 px-2 py-1 text-xs font-medium text-warning">Pending</span>
               </td>
             </tr>
             <tr>
@@ -141,7 +146,7 @@ export const WithTable: Story = {
               <td className="py-3 text-muted">2025-10-23</td>
               <td className="py-3 text-foreground">$210.00</td>
               <td className="py-3">
-                <span className="rounded-sm bg-success/10 px-2 py-1 text-xs font-medium text-success">Completed</span>
+                <span className="rounded-sm bg-success-10 px-2 py-1 text-xs font-medium text-success">Completed</span>
               </td>
             </tr>
             <tr>
@@ -149,7 +154,7 @@ export const WithTable: Story = {
               <td className="py-3 text-muted">2025-10-23</td>
               <td className="py-3 text-foreground">$45.00</td>
               <td className="py-3">
-                <span className="rounded-sm bg-danger/10 px-2 py-1 text-xs font-medium text-danger">Failed</span>
+                <span className="rounded-sm bg-danger-10 px-2 py-1 text-xs font-medium text-danger">Failed</span>
               </td>
             </tr>
             <tr>
@@ -157,7 +162,7 @@ export const WithTable: Story = {
               <td className="py-3 text-muted">2025-10-22</td>
               <td className="py-3 text-foreground">$156.25</td>
               <td className="py-3">
-                <span className="rounded-sm bg-success/10 px-2 py-1 text-xs font-medium text-success">Completed</span>
+                <span className="rounded-sm bg-success-10 px-2 py-1 text-xs font-medium text-success">Completed</span>
               </td>
             </tr>
           </tbody>
@@ -176,7 +181,7 @@ export const WithImage: Story = {
     subtitle: 'Global node distribution',
     children: (
       <div className="flex items-center justify-center">
-        <div className="flex size-64 items-center justify-center rounded-sm bg-muted/20">
+        <div className="flex size-64 items-center justify-center rounded-sm bg-muted-20">
           <p className="text-sm text-muted">Image placeholder</p>
         </div>
       </div>
@@ -479,7 +484,7 @@ export const DescriptionAboveContent: Story = {
 export const PositionComparison: Story = {
   decorators: [
     Story => (
-      <div className="min-w-[1200px] rounded-sm bg-surface p-6">
+      <div className="min-w-300 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),

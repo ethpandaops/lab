@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef } from 'react';
+import { type JSX, useMemo } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { BarChart as EChartsBar } from 'echarts/charts';
@@ -17,7 +17,7 @@ import {
   getChartValueAxisName,
   getChartValueSplitLine,
   clientAxisLabel,
-} from '../chartChrome';
+} from '@/components/Charts/chartChrome';
 import { isKnownClient } from '@/utils/ethereum';
 
 // Get data visualization colors once at module level
@@ -53,33 +53,31 @@ echarts.use([EChartsBar, GridComponent, TooltipComponent, TitleComponent, Canvas
  * />
  * ```
  */
-export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function BarChart(
-  {
-    data = [],
-    labels = [],
-    title,
-    titleFontSize = 14,
-    titleFontFamily,
-    titleFontWeight = 600,
-    titleLeft = 'center',
-    titleTop = 8,
-    orientation = 'vertical',
-    height: _height = 400,
-    color,
-    max,
-    splitNumber = 5,
-    barWidth = '60%',
-    showLabel = true,
-    labelPosition,
-    labelFormatter = '{c}',
-    axisName,
-    animationDuration = 300,
-    tooltipFormatter,
-    categoryLabelInterval = 'auto',
-    valueAxisLabelFormatter,
-  },
-  ref
-): JSX.Element {
+export function BarChart({
+  data = [],
+  labels = [],
+  title,
+  titleFontSize = 14,
+  titleFontFamily,
+  titleFontWeight = 600,
+  titleLeft = 'center',
+  titleTop = 8,
+  orientation = 'vertical',
+  height: _height = 400,
+  color,
+  max,
+  splitNumber = 5,
+  barWidth = '60%',
+  showLabel = true,
+  labelPosition,
+  labelFormatter = '{c}',
+  axisName,
+  animationDuration = 300,
+  tooltipFormatter,
+  categoryLabelInterval = 'auto',
+  valueAxisLabelFormatter,
+  ref,
+}: BarChartProps): JSX.Element {
   const themeColors = useThemeColors();
 
   const option = useMemo(() => {
@@ -224,16 +222,17 @@ export const BarChart = forwardRef<ReactEChartsCore, BarChartProps>(function Bar
   ]);
 
   return (
-    <div className={_height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={_height === '100%' ? 'size-full' : 'w-full'}>
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         ref={ref}
         echarts={echarts}
         option={option}
-        style={{ height: _height, width: '100%', minHeight: _height }}
+        className="w-full"
+        style={{ height: _height, minHeight: _height }}
         notMerge={false}
         lazyUpdate={true}
       />
     </div>
   );
-});
+}

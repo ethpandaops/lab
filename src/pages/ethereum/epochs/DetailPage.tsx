@@ -178,7 +178,7 @@ export function DetailPage(): React.JSX.Element {
             date: new Date(data.stats.epochStartDateTime * 1000).toISOString().split('T')[0],
             slot: undefined,
           }}
-          className="flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent/50 hover:bg-accent/20"
+          className="flex items-center gap-1.5 rounded-sm border border-accent-30 bg-accent-10 px-3 py-2 text-sm font-medium text-accent transition-all hover:border-accent-50 hover:bg-accent-20"
         >
           <EyeIcon className="size-4" />
           <span>View Custody</span>

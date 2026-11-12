@@ -10,7 +10,7 @@ import type { InfoBoxProps } from './InfoBox.types';
  * text is available without sitting above the data on every visit.
  */
 export function InfoBox({ children, summary, icon, hideIcon = false, className }: InfoBoxProps): JSX.Element {
-  const body = <div className="min-w-0 flex-1 space-y-2 text-sm/6 text-foreground/80">{children}</div>;
+  const body = <div className="min-w-0 flex-1 space-y-2 text-sm/6 text-foreground-80">{children}</div>;
 
   if (summary) {
     return (
@@ -25,7 +25,7 @@ export function InfoBox({ children, summary, icon, hideIcon = false, className }
   }
 
   return (
-    <div className={clsx('flex gap-3 rounded-sm bg-muted/10 px-4 py-3', className)}>
+    <div className={clsx('flex gap-3 rounded-sm bg-muted-10 px-4 py-3', className)}>
       {!hideIcon && icon && <div className="size-5 shrink-0 text-muted">{icon}</div>}
       {body}
     </div>

@@ -1,8 +1,8 @@
-import { type JSX, useState, useEffect } from 'react';
+import { type JSX, useState } from 'react';
 import type { Column } from '@tanstack/react-table';
 import { Input } from '@/components/Forms/Input';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
-import type { DataTableColumnMeta } from '../DataTable.types';
+import type { DataTableColumnMeta } from '@/components/DataTable/DataTable.types';
 
 interface ColumnFilterProps<TData> {
   column: Column<TData>;
@@ -15,11 +15,13 @@ export function ColumnFilter<TData>({ column }: ColumnFilterProps<TData>): JSX.E
   const [textValue, setTextValue] = useState<string>((filterValue as string) || '');
 
   // Sync text value with filter value
-  useEffect(() => {
+  const [prevFilterValue, setPrevFilterValue] = useState(filterValue);
+  if (filterValue !== prevFilterValue) {
+    setPrevFilterValue(filterValue);
     if (meta?.filterType === 'text') {
       setTextValue((filterValue as string) || '');
     }
-  }, [filterValue, meta?.filterType]);
+  }
 
   // No filter type specified
   if (!meta?.filterType) {
@@ -44,7 +46,7 @@ export function ColumnFilter<TData>({ column }: ColumnFilterProps<TData>): JSX.E
           value={textValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTextChange(e.target.value)}
           placeholder={meta.filterPlaceholder || 'Filter...'}
-          className="min-w-[120px]"
+          className="min-w-30"
         />
       </Input>
     );
@@ -107,7 +109,7 @@ export function ColumnFilter<TData>({ column }: ColumnFilterProps<TData>): JSX.E
           value={textValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTextChange(e.target.value)}
           placeholder={meta.filterPlaceholder || 'Min...'}
-          className="min-w-[100px]"
+          className="min-w-25"
         />
       </Input>
     );
@@ -122,7 +124,7 @@ export function ColumnFilter<TData>({ column }: ColumnFilterProps<TData>): JSX.E
           value={textValue}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTextChange(e.target.value)}
           placeholder={meta.filterPlaceholder || 'Date...'}
-          className="min-w-[140px]"
+          className="min-w-35"
         />
       </Input>
     );

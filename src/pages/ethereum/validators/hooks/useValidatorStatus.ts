@@ -71,7 +71,7 @@ export function getStatusIconConfig(status: string | null): StatusIconConfig {
     case 'withdrawal_done':
       return { icon: BanknotesIcon, colorClass: 'text-muted', label: 'Withdrawal Done' };
     case 'not_yet_deposited':
-      return { icon: MinusCircleIcon, colorClass: 'text-muted/40', label: 'Not Yet Deposited' };
+      return { icon: MinusCircleIcon, colorClass: 'text-muted-40', label: 'Not Yet Deposited' };
     default:
       return { icon: QuestionMarkCircleIcon, colorClass: 'text-warning', label: 'Unknown' };
   }
@@ -136,7 +136,7 @@ export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatu
 
       // Before first event: infer "not yet deposited" if earliest status is pending
       if (result === null) {
-        const firstStatus = arr[0].status ?? '';
+        const firstStatus = arr[0]?.status ?? '';
         if (firstStatus.startsWith('pending')) {
           return 'not_yet_deposited';
         }
@@ -146,10 +146,14 @@ export function useValidatorStatus(resolvedIndices: number[]): UseValidatorStatu
     };
   }, [transitionsByValidator]);
 
-  const latestStatus = useMemo(
-    () => new Map([...transitionsByValidator].map(([index, arr]) => [index, arr[arr.length - 1]])),
-    [transitionsByValidator]
-  );
+  const latestStatus = useMemo(() => {
+    const latest = new Map<number, DimValidatorStatus>();
+    for (const [index, arr] of transitionsByValidator) {
+      const last = arr.at(-1);
+      if (last) latest.set(index, last);
+    }
+    return latest;
+  }, [transitionsByValidator]);
 
   // Validators with no status transitions at all
   const unknownValidators = useMemo(() => {

@@ -1,5 +1,3 @@
-import type { SeriesData } from '@/components/Charts/MultiLine';
-
 /** Available time period options for chart display */
 export type TimePeriod = '24h' | '72h' | '7d' | '30d' | '90d' | '180d' | '1y' | '2y' | 'all';
 
@@ -15,12 +13,6 @@ export const TIME_RANGE_CONFIG = {
   '2y': { days: 730, dataType: 'daily' as const, pageSize: 10000 },
   all: { days: null, dataType: 'daily' as const, pageSize: 10000 },
 } as const;
-
-/** Chart configuration with labels and series data */
-export interface ChartConfig {
-  labels: string[];
-  series: SeriesData[];
-}
 
 /** Time period selector options for UI rendering */
 export const TIME_PERIOD_OPTIONS = [

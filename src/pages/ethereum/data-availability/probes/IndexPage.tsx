@@ -279,7 +279,8 @@ export function IndexPage(): JSX.Element {
   // Handle sorting change
   const handleSortingChange = useCallback(
     (sorting: SortingState): void => {
-      if (sorting.length === 0) {
+      const [sort] = sorting;
+      if (!sort) {
         // Reset to default sort
         navigate({
           resetScroll: false,
@@ -291,7 +292,7 @@ export function IndexPage(): JSX.Element {
           }),
         });
       } else {
-        const { id, desc } = sorting[0];
+        const { id, desc } = sort;
         navigate({
           resetScroll: false,
           search: prev => ({

@@ -42,7 +42,7 @@ export const Default: Story = {
           title="Dialog Title"
           description="This is a basic dialog with a title and description."
         >
-          <p className="text-sm text-foreground dark:text-gray-300">
+          <p className="text-sm text-foreground-soft">
             This is the main content of the dialog. You can put any content here.
           </p>
         </Dialog>
@@ -82,7 +82,7 @@ export const WithFooter: Story = {
             </>
           }
         >
-          <p className="text-sm text-foreground dark:text-gray-300">
+          <p className="text-sm text-foreground-soft">
             This action will make changes to your account. Please review before confirming.
           </p>
         </Dialog>
@@ -156,7 +156,7 @@ export const SmallSize: Story = {
             </Button>
           }
         >
-          <p className="text-sm text-foreground dark:text-gray-300">This is a small dialog.</p>
+          <p className="text-sm text-foreground-soft">This is a small dialog.</p>
         </Dialog>
       </>
     );
@@ -190,7 +190,7 @@ export const LargeSize: Story = {
           }
         >
           <div className="space-y-4">
-            <p className="text-sm text-foreground dark:text-muted">
+            <p className="text-sm text-foreground-soft">
               This is a larger dialog that can contain more content. You can add forms, lists, or any other complex
               content here.
             </p>
@@ -226,7 +226,7 @@ export const NoCloseButton: Story = {
             </Button>
           }
         >
-          <p className="text-sm text-foreground dark:text-gray-300">
+          <p className="text-sm text-foreground-soft">
             This dialog has no close button in the header, but can still be closed by pressing Escape or clicking the
             footer button.
           </p>
@@ -255,8 +255,8 @@ export const ContentOnly: Story = {
           }
         >
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-foreground dark:text-white">Custom Content</h3>
-            <p className="text-sm text-foreground dark:text-muted">
+            <h3 className="text-lg font-semibold text-foreground">Custom Content</h3>
+            <p className="text-sm text-foreground-soft">
               This dialog has no title or description props, allowing for fully custom content layout.
             </p>
           </div>
@@ -330,8 +330,8 @@ export const WithForm: Story = {
 
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <label className="text-sm font-medium text-foreground dark:text-foreground">Email notifications</label>
-                <p className="text-sm text-muted dark:text-muted">Send activity notifications to this member</p>
+                <label className="text-sm font-medium text-foreground">Email notifications</label>
+                <p className="text-sm text-muted">Send activity notifications to this member</p>
               </div>
               <Toggle checked={notifications} onChange={setNotifications} />
             </div>

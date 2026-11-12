@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-export type DividerAlignment = 'center' | 'left';
-export type DividerVariant = 'label' | 'icon' | 'title' | 'button' | 'toolbar';
+type DividerAlignment = 'center' | 'left';
+type DividerVariant = 'label' | 'icon' | 'title' | 'button' | 'toolbar';
 
 export interface DividerProps {
   /**

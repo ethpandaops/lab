@@ -1,7 +1,10 @@
 import { client as apiClient } from '@/api/client.gen';
 import { useTableBounds } from '@/hooks/useBounds';
-import type { FctAttestationVoteCorrectnessByClientDaily, FctBlockProposalByClientDaily } from '../api/client-models';
-import type { ClientLayer } from '../utils/client-share';
+import type {
+  FctAttestationVoteCorrectnessByClientDaily,
+  FctBlockProposalByClientDaily,
+} from '@/pages/ethereum/clients/api/client-models';
+import type { ClientLayer } from '@/pages/ethereum/clients/utils/client-share';
 import { useDailyByClient } from './useDailyByClient';
 
 /**

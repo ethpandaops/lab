@@ -11,8 +11,8 @@ import {
   ENTITY_TABLES,
   fctValidatorStakeByEntityGroupDailyList,
   type FctValidatorStakeByEntityGroupDaily,
-} from '../api/entity-models';
-import { groupId, isEntityGroup } from '../utils/groups';
+} from '@/pages/ethereum/entities/api/entity-models';
+import { groupId, isEntityGroup } from '@/pages/ethereum/entities/utils/groups';
 
 const GWEI = 1e9;
 

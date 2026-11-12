@@ -11,33 +11,33 @@ const variantStyles: Record<CardVariant, { container: string; header: string; ma
   },
   muted: {
     container: 'bg-surface outline -outline-offset-1 outline-border',
-    header: 'bg-surface dark:bg-background',
+    header: 'bg-panel',
     main: '',
-    footer: 'bg-surface dark:bg-background',
+    footer: 'bg-panel',
   },
   primary: {
     container: 'bg-surface outline -outline-offset-1 outline-border',
-    header: 'bg-primary/5 dark:bg-primary/10',
+    header: 'bg-primary-wash',
     main: '',
     footer: '',
   },
   accent: {
     container: 'bg-surface outline -outline-offset-1 outline-border',
-    header: 'bg-accent/5 dark:bg-accent/10',
+    header: 'bg-accent-wash',
     main: '',
-    footer: 'bg-accent/5 dark:bg-accent/10',
+    footer: 'bg-accent-wash',
   },
   elevated: {
     container: 'bg-surface outline -outline-offset-1 outline-border',
-    header: 'bg-background dark:bg-background',
+    header: 'bg-background',
     main: '',
     footer: '',
   },
   surface: {
     container: 'bg-surface outline -outline-offset-1 outline-border',
-    header: 'bg-surface dark:bg-background',
-    main: 'bg-background dark:bg-background/50',
-    footer: 'bg-surface dark:bg-background',
+    header: 'bg-panel',
+    main: 'bg-well',
+    footer: 'bg-panel',
   },
 };
 
@@ -80,11 +80,11 @@ export function Card({
   return (
     <div
       className={clsx(
-        'relative divide-y divide-border dark:divide-border',
+        'relative divide-y divide-border',
         !allowContentOverflow && 'overflow-hidden',
         rounded && 'rounded-sm',
         styles.container,
-        isInteractive && 'cursor-pointer transition-colors duration-200 hover:outline-primary/40',
+        isInteractive && 'cursor-pointer transition-colors duration-200 hover:outline-primary-40',
         className
       )}
       onClick={isInteractive ? onClick : undefined}
@@ -99,10 +99,7 @@ export function Card({
       {headerContent && <div className={clsx('relative z-10 px-4 py-3 sm:px-5', styles.header)}>{headerContent}</div>}
       <div
         data-slot="card-body"
-        className={clsx(
-          'relative z-10 flex-1 p-4 [--card-inset-y:--spacing(4)] [--card-inset:--spacing(4)] empty:hidden sm:p-5 sm:[--card-inset-y:--spacing(5)] sm:[--card-inset:--spacing(5)]',
-          styles.main
-        )}
+        className={clsx('relative z-10 flex-1 p-4 card-inset empty:hidden sm:p-5', styles.main)}
       >
         {children}
       </div>

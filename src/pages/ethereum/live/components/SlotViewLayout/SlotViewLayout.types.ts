@@ -1,5 +1,5 @@
-import type { MapPointWithTiming } from '../../hooks/useMapData/useMapData';
-import type { ContinentalPropagationSeries } from '../BlobDataAvailability/BlobDataAvailability.types';
+import type { MapPointWithTiming } from '@/pages/ethereum/live/hooks/useMapData/useMapData';
+import type { ContinentalPropagationSeries } from '@/pages/ethereum/live/components/BlobDataAvailability/BlobDataAvailability.types';
 
 export interface SlotViewLayoutProps {
   mode: 'live' | 'static';

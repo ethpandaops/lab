@@ -19,9 +19,9 @@ import type {
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { normalizeClientName } from '@/utils/ethereum';
-import { PAGE_SIZE, REFERENCE_NODE_CLASS } from '../constants';
+import { PAGE_SIZE, REFERENCE_NODE_CLASS } from '@/pages/ethereum/clients/constants';
 import { completeUtcDays, currentUtcDate } from '@/utils/time';
-import { opcodeRowsFromDaily } from '../utils/client-versions';
+import { opcodeRowsFromDaily } from '@/pages/ethereum/clients/utils/client-versions';
 
 export interface UseReferenceEngineResult {
   /** Daily engine_newPayload per version of the client on the reference nodes, oldest first */

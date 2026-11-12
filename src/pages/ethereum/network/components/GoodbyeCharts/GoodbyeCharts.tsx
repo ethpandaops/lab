@@ -8,16 +8,16 @@ import { Table } from '@/components/Lists/Table';
 import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
 import { CONSENSUS_CLIENTS_SET } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import { SeriesCard } from '../SeriesCard';
-import { dayStart, formatShare } from '../../utils/network-census';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import { dayStart, formatShare } from '@/pages/ethereum/network/utils/network-census';
 import {
   clientGoodbyes,
   goodbyeReason,
   reasonsIn,
   TOO_MANY_PEERS,
   type GoodbyeReason,
-} from '../../utils/network-goodbyes';
-import { dayShares, seriesDays } from '../../utils/network-series';
+} from '@/pages/ethereum/network/utils/network-goodbyes';
+import { dayShares, seriesDays } from '@/pages/ethereum/network/utils/network-series';
 
 export interface GoodbyeChartsProps {
   /** Goodbyes per reason code, every day of the range */
@@ -46,7 +46,9 @@ function reasonBars(rows: FctPeerGoodbyeDaily[], days: string[], reasons: Goodby
  */
 export function GoodbyeCharts({ reasons, clients }: GoodbyeChartsProps): JSX.Element {
   const days = seriesDays(reasons, peers);
-  if (days.length === 0) {
+  const firstDay = days[0];
+  const lastDay = days.at(-1);
+  if (firstDay === undefined || lastDay === undefined) {
     return (
       <Card rounded>
         <p className="text-sm text-muted">No goodbyes were counted in this range.</p>
@@ -58,7 +60,7 @@ export function GoodbyeCharts({ reasons, clients }: GoodbyeChartsProps): JSX.Ele
   const restDays = seriesDays(rest, peers);
   const byClient = clientGoodbyes(clients);
   const clientReasons = reasonsIn(clients);
-  const span = `${formatDataDate(dayStart(days[0]))} to ${formatDataDate(dayStart(days[days.length - 1]))}`;
+  const span = `${formatDataDate(dayStart(firstDay))} to ${formatDataDate(dayStart(lastDay))}`;
 
   return (
     <div className="flex flex-col gap-3">

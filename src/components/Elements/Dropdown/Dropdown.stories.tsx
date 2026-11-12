@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, screen } from 'storybook/test';
 import {
   ArchiveBoxIcon,
   ArrowRightCircleIcon,
@@ -11,14 +12,14 @@ import {
   UserPlusIcon,
 } from '@heroicons/react/20/solid';
 import { Dropdown, DropdownItem, DropdownHeader, DropdownSection } from './Dropdown';
-import { Button } from '../Button';
+import { Button } from '@/components/Elements/Button';
 
 const meta: Meta<typeof Dropdown> = {
   title: 'Components/Elements/Dropdown',
   component: Dropdown,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -50,6 +51,12 @@ export const Simple: Story = {
         <DropdownItem>Sign out</DropdownItem>
       </DropdownSection>
     ),
+  },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole('button', { name: 'Options' });
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(await screen.findByRole('menuitem', { name: 'Sign out' })).toBeInTheDocument();
   },
 };
 
@@ -129,7 +136,7 @@ export const WithMinimalMenuIcon: Story = {
     trigger: (
       <button
         type="button"
-        className="flex items-center rounded-full text-gray-400 hover:text-gray-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:text-gray-400 dark:hover:text-gray-300 dark:focus-visible:outline-primary"
+        className="flex items-center rounded-full text-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
       >
         <span className="sr-only">Open options</span>
         <EllipsisVerticalIcon aria-hidden="true" className="size-5" />

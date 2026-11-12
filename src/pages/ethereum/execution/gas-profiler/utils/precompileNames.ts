@@ -1,4 +1,4 @@
-import type { ContractOwnerMap } from '../hooks/useContractOwners';
+import type { ContractOwnerMap } from '@/pages/ethereum/execution/gas-profiler/hooks/useContractOwners';
 
 /**
  * Map of EVM precompiled contract addresses to their human-readable names.
@@ -41,12 +41,4 @@ export function getPrecompileOwnerMap(): ContractOwnerMap {
 export function isPrecompileAddress(address: string | null | undefined): boolean {
   if (!address) return false;
   return address.toLowerCase() in PRECOMPILE_NAMES;
-}
-
-/**
- * Get the human-readable name for a precompile address, or null if not a precompile.
- */
-export function getPrecompileName(address: string | null | undefined): string | null {
-  if (!address) return null;
-  return PRECOMPILE_NAMES[address.toLowerCase()] ?? null;
 }

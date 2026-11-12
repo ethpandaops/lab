@@ -6,7 +6,7 @@ const meta = {
   component: Sparkline,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-xs bg-surface p-6">
+      <div className="min-w-150 rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),
@@ -73,6 +73,9 @@ export const WithGaps: Story = {
  * Sparkline rendered inside a table cell to demonstrate real usage
  */
 export const InTableRow: Story = {
+  args: {
+    data: [98.5, 99.1, 97.8, 99.3, 98.9, 99.5, 99.2],
+  },
   render: () => (
     <table className="w-full text-sm text-foreground">
       <thead>
@@ -85,7 +88,7 @@ export const InTableRow: Story = {
         </tr>
       </thead>
       <tbody>
-        <tr className="border-b border-border/50">
+        <tr className="border-b border-border-50">
           <td className="px-3 py-2 font-mono">12345</td>
           <td className="px-3 py-2 text-right text-success">99.12%</td>
           <td className="px-3 py-2">
@@ -93,18 +96,18 @@ export const InTableRow: Story = {
           </td>
           <td className="px-3 py-2 text-right">32.0145</td>
           <td className="px-3 py-2">
-            <Sparkline data={[32.01, 32.02, 32.0, 31.98, 32.03, 32.05, 32.04]} showArea color="#22c55e" />
+            <Sparkline data={[32.01, 32.02, 32.0, 31.98, 32.03, 32.05, 32.04]} showArea color="var(--color-success)" />
           </td>
         </tr>
-        <tr className="border-b border-border/50">
+        <tr className="border-b border-border-50">
           <td className="px-3 py-2 font-mono">67890</td>
           <td className="px-3 py-2 text-right text-warning">94.50%</td>
           <td className="px-3 py-2">
-            <Sparkline data={[96, 95, 93, 92, 94, 95, 94]} color="#f59e0b" />
+            <Sparkline data={[96, 95, 93, 92, 94, 95, 94]} color="var(--color-warning)" />
           </td>
           <td className="px-3 py-2 text-right">31.9820</td>
           <td className="px-3 py-2">
-            <Sparkline data={[32.0, 31.99, 31.98, 31.97, 31.98, 31.98, 31.98]} showArea color="#f59e0b" />
+            <Sparkline data={[32.0, 31.99, 31.98, 31.97, 31.98, 31.98, 31.98]} showArea color="var(--color-warning)" />
           </td>
         </tr>
       </tbody>

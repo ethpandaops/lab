@@ -26,8 +26,8 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '../constants';
-import { bucketFilter, getBuckets, rowBucket, type BucketColumns } from '../utils/time-buckets';
+import { NODE_RANGE_CONFIG, type Granularity, type NodeRange } from '@/pages/xatu/nodes/constants';
+import { bucketFilter, getBuckets, rowBucket, type BucketColumns } from '@/pages/xatu/nodes/utils/time-buckets';
 
 /** Rollup family: block, head and attestation arrival, data column completion, engine API calls */
 export type HistoryMetric = 'block' | 'head' | 'attestation' | 'dataColumn' | 'newPayload' | 'getBlobs';
@@ -202,12 +202,14 @@ export interface UseNodeHistoryResult {
  * Rollups for a range: hourly up to a week, daily up to 90 days, weekly for all history (daily for families without
  * weekly rollups).
  *
+ * @param nowSeconds - Current unix time, from `useNow`
  * @param enabled - Skip the query, e.g. engine metrics for nodes that don't report engine calls
  */
 export function useNodeHistory(
   metric: HistoryMetric,
   range: NodeRange,
   filter: HistoryFilter,
+  nowSeconds: number,
   enabled = true
 ): UseNodeHistoryResult {
   const { currentNetwork } = useNetwork();
@@ -215,7 +217,7 @@ export function useNodeHistory(
   const rangeGranularity = NODE_RANGE_CONFIG[range].granularity;
   const granularity = rangeGranularity === 'weekly' && !source.weekly ? 'daily' : rangeGranularity;
   // Bucket starts move once a bucket, which keeps the query key stable in between
-  const buckets = getBuckets(range, Date.now() / 1000, undefined, granularity);
+  const buckets = getBuckets(range, nowSeconds, undefined, granularity);
 
   const { data, isLoading, error } = useQuery({
     queryKey: [

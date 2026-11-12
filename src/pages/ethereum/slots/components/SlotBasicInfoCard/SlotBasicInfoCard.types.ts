@@ -1,4 +1,4 @@
-import type { SlotDetailData } from '../../hooks/useSlotDetailData';
+import type { SlotDetailData } from '@/pages/ethereum/slots/hooks/useSlotDetailData';
 
 export interface SlotBasicInfoCardProps {
   slot: number;

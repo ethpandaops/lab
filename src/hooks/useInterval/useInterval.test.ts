@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook } from '@/test-utils';
 import { useInterval } from './useInterval';
 
 describe('useInterval', () => {
@@ -343,14 +343,15 @@ describe('useInterval', () => {
       expect(callback).toHaveReturnedWith('return value');
     });
 
-    // Note: Zero delay intervals cause issues with Vitest fake timers
-    // This is an edge case that's not recommended in practice anyway
-    it.skip('should work with zero delay', () => {
+    // 0 is a delay, not a pause: only null pauses. Fake timers fire a 0 ms interval
+    // forever without advancing time, so this one runs on real timers.
+    it('should work with zero delay', async () => {
+      vi.useRealTimers();
       const callback = vi.fn();
-      renderHook(() => useInterval(callback, 0));
+      const { unmount } = renderHook(() => useInterval(callback, 0));
 
-      vi.advanceTimersByTime(0);
-      expect(callback).toHaveBeenCalled();
+      await vi.waitFor(() => expect(callback).toHaveBeenCalled());
+      unmount();
     });
 
     it('should handle callback with side effects', () => {

@@ -114,7 +114,7 @@ export function PeerPage(): JSX.Element {
       <div className="flex flex-col gap-6">
         {query.isLoading ? (
           <PlaceSkeleton />
-        ) : !latest ? (
+        ) : !latest || !first ? (
           <Card rounded>
             <h3 className="text-base/7 font-semibold text-foreground">No peer with this ID was counted</h3>
           </Card>

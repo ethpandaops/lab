@@ -99,6 +99,27 @@ function buildContextDescription(cellContext: CellContext): string {
 }
 
 /**
+ * A probe row's key: int_custody_probe_order_by_slot's sort key, as one probe batch has a row for each slot it tested
+ * and each result it got
+ */
+function probeKey(probe: IntCustodyProbeOrderBySlot): string {
+  return `${probe.slot}-${probe.peer_id_unique_key}-${probe.result}-${probe.error}-${probe.probe_date_time}`;
+}
+
+/** Placeholder for a probe row while the probes load */
+function ProbeRowSkeleton(): JSX.Element {
+  return (
+    <div className="flex items-center gap-2 px-2 py-1.5">
+      <div className="size-7 animate-pulse rounded-full bg-muted-50" />
+      <div className="flex flex-1 flex-col gap-1">
+        <div className="h-3 w-24 animate-pulse rounded-xs bg-muted-50" />
+        <div className="h-2 w-16 animate-pulse rounded-xs bg-muted-50" />
+      </div>
+    </div>
+  );
+}
+
+/**
  * Quick filter button component - styled as standard buttons with color variants
  */
 function FilterButton({
@@ -121,17 +142,17 @@ function FilterButton({
   // missing = red (peer responded but didn't have the data - serious)
   const defaultStyles = {
     all: 'bg-surface text-foreground hover:bg-background',
-    success: 'bg-surface text-success hover:bg-success/10',
-    failure: 'bg-surface text-warning hover:bg-warning/10',
-    missing: 'bg-surface text-danger hover:bg-danger/10',
+    success: 'bg-surface text-success hover:bg-success-10',
+    failure: 'bg-surface text-warning hover:bg-warning-10',
+    missing: 'bg-surface text-danger hover:bg-danger-10',
   };
 
   // Active state styles per variant
   const activeStyles = {
-    all: 'bg-primary/10 text-primary inset-ring-primary/50',
-    success: 'bg-success/20 text-success inset-ring-success/50',
-    failure: 'bg-warning/20 text-warning inset-ring-warning/50',
-    missing: 'bg-danger/20 text-danger inset-ring-danger/50',
+    all: 'bg-primary-10 text-primary inset-ring-primary-50',
+    success: 'bg-success-20 text-success inset-ring-success-50',
+    failure: 'bg-warning-20 text-warning inset-ring-warning-50',
+    missing: 'bg-danger-20 text-danger inset-ring-danger-50',
   };
 
   return (
@@ -294,7 +315,7 @@ export function CellProbeDialog({
             <Link
               to="/ethereum/data-availability/probes"
               search={probesLinkParams}
-              className="inline-flex items-center gap-1.5 rounded-xs border border-accent/50 bg-accent/10 px-2 py-1 text-xs font-medium text-accent transition-colors hover:bg-accent/20"
+              className="inline-flex items-center gap-1.5 rounded-xs border border-accent-50 bg-accent-10 px-2 py-1 text-xs font-medium text-accent transition-colors hover:bg-accent-20"
             >
               <MagnifyingGlassIcon className="size-3.5" />
               View All Probes
@@ -320,15 +341,11 @@ export function CellProbeDialog({
             <div className="pr-3">
               {isLoading ? (
                 <div className="space-y-2 p-2">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="flex items-center gap-2 px-2 py-1.5">
-                      <div className="size-7 animate-pulse rounded-full bg-muted/50" />
-                      <div className="flex flex-1 flex-col gap-1">
-                        <div className="h-3 w-24 animate-pulse rounded-xs bg-muted/50" />
-                        <div className="h-2 w-16 animate-pulse rounded-xs bg-muted/50" />
-                      </div>
-                    </div>
-                  ))}
+                  <ProbeRowSkeleton />
+                  <ProbeRowSkeleton />
+                  <ProbeRowSkeleton />
+                  <ProbeRowSkeleton />
+                  <ProbeRowSkeleton />
                 </div>
               ) : probes.length === 0 ? (
                 <div className="py-8 text-center text-sm text-muted">
@@ -336,9 +353,9 @@ export function CellProbeDialog({
                 </div>
               ) : (
                 <div className="space-y-0.5">
-                  {probes.map((probe, index) => (
+                  {probes.map(probe => (
                     <ProbeEventRow
-                      key={`${probe.probe_date_time}-${probe.peer_id_unique_key}-${index}`}
+                      key={probeKey(probe)}
                       probe={probe}
                       onClick={() => handleProbeClick(probe)}
                       showViewIcon

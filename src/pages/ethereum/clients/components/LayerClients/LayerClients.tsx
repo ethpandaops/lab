@@ -10,11 +10,11 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import type { DimClientRelease } from '@/api/types.gen';
 import { getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
-import { OTHER_VERSION_COLOR, type LatestAdoption } from '../../utils/client-versions';
-import { ANGLE_COLORS } from '../../utils/angle-colors';
-import { PEER_SOURCE, peerShareChart, unifiedClientRows } from '../../utils/census';
-import type { ClientLayer, ClientSummary } from '../../utils/client-share';
-import { ShareBar } from '../ShareBar';
+import { OTHER_VERSION_COLOR, type LatestAdoption } from '@/pages/ethereum/clients/utils/client-versions';
+import { ANGLE_COLORS } from '@/pages/ethereum/clients/utils/angle-colors';
+import { PEER_SOURCE, peerShareChart, unifiedClientRows } from '@/pages/ethereum/clients/utils/census';
+import type { ClientLayer, ClientSummary } from '@/pages/ethereum/clients/utils/client-share';
+import { ShareBar } from '@/pages/ethereum/clients/components/ShareBar';
 
 export interface LayerClientsProps {
   layer: ClientLayer;
@@ -181,8 +181,8 @@ export function LayerClients({
         footer={footer}
         allowContentOverflow
       >
-        <div className="-mx-(--card-inset) overflow-x-auto px-(--card-inset)">
-          <table className="w-full border-collapse sm:min-w-[44rem]">
+        <div className="mx-card-bleed overflow-x-auto px-card-inset">
+          <table className="w-full border-collapse sm:min-w-176">
             <thead className="border-b border-border">
               <tr>
                 <HeaderCell title="Client" className="sm:w-44" />
@@ -190,14 +190,14 @@ export function LayerClients({
                   title="Proposed blocks"
                   note="Stake-weighted"
                   color={ANGLE_COLORS.blocks}
-                  className="w-[26%]"
+                  className="w-26/100"
                 />
                 {showPeers && (
                   <HeaderCell
                     title="P2P peers (latest day)"
                     note="Peer-weighted"
                     color={ANGLE_COLORS.peers}
-                    className="w-[26%]"
+                    className="w-26/100"
                   />
                 )}
                 {showXatu && (
@@ -217,13 +217,13 @@ export function LayerClients({
                 <th aria-hidden className={clsx('w-5', WIDE_ONLY)} />
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/60">
+            <tbody className="divide-y divide-border-60">
               {rows.map(row => {
                 const latest = latestReleases.get(row.client)?.version;
                 const adoption = latestAdoption.get(row.client);
                 return (
                   <Fragment key={row.client}>
-                    <tr className="group relative transition-colors hover:bg-primary/5 max-sm:border-b-0">
+                    <tr className="group relative transition-colors hover:bg-primary-5 max-sm:border-b-0">
                       <td className="py-2 pr-3">
                         <Link
                           to="/ethereum/clients/$client"
@@ -271,7 +271,7 @@ export function LayerClients({
                     <tr className="sm:hidden">
                       <td colSpan={3} className="p-0">
                         {/* Narrow screens stack the columns that do not fit in a row under the client */}
-                        <dl className="grid grid-cols-[auto_auto_auto_auto] justify-start gap-x-3 pb-2 pl-7 text-xs/5 whitespace-nowrap text-muted">
+                        <dl className="grid grid-cols-auto-4 justify-start gap-x-3 pb-2 pl-7 text-xs/5 whitespace-nowrap text-muted">
                           {showXatu && xatuNodes && (
                             <>
                               <dt>Xatu nodes (24h)</dt>

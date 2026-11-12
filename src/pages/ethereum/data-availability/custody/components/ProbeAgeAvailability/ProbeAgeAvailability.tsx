@@ -6,7 +6,11 @@ import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { Table } from '@/components/Lists/Table';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { SLOT_AGE_BUCKETS, SLOT_AGE_LABELS, type ProbeAgeSummary } from '../../utils/probe-age';
+import {
+  SLOT_AGE_BUCKETS,
+  SLOT_AGE_LABELS,
+  type ProbeAgeSummary,
+} from '@/pages/ethereum/data-availability/custody/utils/probe-age';
 
 export interface ProbeAgeAvailabilityProps {
   data: ProbeAgeSummary | undefined;
@@ -66,7 +70,7 @@ export function ProbeAgeAvailability({ data, isLoading, subtitle }: ProbeAgeAvai
             legendPosition="top"
             enableDataZoom
           />
-          <div className="-mx-(--card-inset) overflow-x-auto px-(--card-inset)">
+          <div className="mx-card-bleed overflow-x-auto px-card-inset">
             <Table
               variant="nested"
               data={data.byClient}

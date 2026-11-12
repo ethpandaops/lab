@@ -1,7 +1,7 @@
 /**
  * Data point for block size timeseries
  */
-export interface BlockSizeDataPoint {
+interface BlockSizeDataPoint {
   /** X-axis value (slot, epoch, timestamp, etc.) */
   x: number;
   /** Consensus layer block size in bytes (uncompressed) */
@@ -22,7 +22,7 @@ export interface BlockSizeDataPoint {
 /**
  * X-axis configuration for BlockSizeChart
  */
-export interface BlockSizeXAxisConfig {
+interface BlockSizeXAxisConfig {
   /** Axis label (e.g., "Slot", "Epoch", "Block Number") */
   name: string;
   /** Optional minimum value */

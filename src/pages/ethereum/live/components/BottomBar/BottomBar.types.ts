@@ -1,4 +1,4 @@
-import type { ContinentalPropagationSeries } from '../BlobDataAvailability/BlobDataAvailability.types';
+import type { ContinentalPropagationSeries } from '@/pages/ethereum/live/components/BlobDataAvailability/BlobDataAvailability.types';
 import type { ForkInfo } from '@/utils/forks';
 
 export interface BottomBarProps {

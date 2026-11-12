@@ -7,9 +7,9 @@ import { Card } from '@/components/Layout/Card';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
 import { getRelativeTime } from '@/utils';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
-import type { NodeRow } from '../../hooks/useNodeRows';
-import { formatNodeLocation } from '../../utils/node-stats';
-import { NodeStatus } from '../NodeStatus';
+import type { NodeRow } from '@/pages/xatu/nodes/hooks/useNodeRows';
+import { formatNodeLocation } from '@/pages/xatu/nodes/utils/node-stats';
+import { NodeStatus } from '@/pages/xatu/nodes/components/NodeStatus';
 import { NodeClientVersion } from '@/pages/ethereum/clients/components/NodeClientVersion';
 
 export interface NodesTableProps {

@@ -270,10 +270,7 @@ export function useStateExpiryData(): UseStateExpiryDataResult {
     contractExpiry24mQuery.data,
   ]);
 
-  const latestData = useMemo(() => {
-    if (!processedData || processedData.length === 0) return null;
-    return processedData[processedData.length - 1];
-  }, [processedData]);
+  const latestData = useMemo(() => processedData?.at(-1) ?? null, [processedData]);
 
   const isLoading =
     currentStateQuery.isLoading ||

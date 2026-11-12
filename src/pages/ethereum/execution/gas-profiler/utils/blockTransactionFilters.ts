@@ -1,5 +1,5 @@
-import type { TransactionSummary } from '../hooks/useBlockTransactions';
-import type { TransactionOpcodeProfile } from '../hooks/useBlockTransactionOpcodes';
+import type { TransactionSummary } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactions';
+import type { TransactionOpcodeProfile } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactionOpcodes';
 
 /**
  * Numeric columns the block transaction table can sort by.
@@ -73,7 +73,7 @@ export interface BlockTxFilterContext {
 }
 
 /** Whether a transaction is a plain value transfer (no EVM execution beyond intrinsic gas) */
-export function isSimpleTransfer(tx: TransactionSummary): boolean {
+function isSimpleTransfer(tx: TransactionSummary): boolean {
   return tx.intrinsicGas !== null && tx.totalGasUsed === tx.intrinsicGas;
 }
 
@@ -95,11 +95,6 @@ export function parseOpcodeList(value: string | undefined): string[] {
     .split(',')
     .map(op => op.trim().toUpperCase())
     .filter(Boolean);
-}
-
-/** Whether any filter is set */
-export function hasActiveBlockTxFilters(filters: BlockTxFilters): boolean {
-  return BLOCK_TX_FILTER_KEYS.some(key => filters[key] !== undefined && filters[key] !== '');
 }
 
 /** Whether the filters need per-transaction opcode data */
@@ -155,7 +150,7 @@ export function filterBlockTransactions(
 }
 
 /** Value a transaction sorts by for a column; undefined sorts last in either direction */
-export function getBlockTxSortValue(
+function getBlockTxSortValue(
   tx: TransactionSummary,
   field: BlockTxSortField,
   receiptBytes?: Map<string, number>
@@ -203,7 +198,7 @@ export function sortBlockTransactions(
 }
 
 /** Compact number for chips: 1.5M, 250K, 42 */
-export function formatCompactNumber(value: number): string {
+function formatCompactNumber(value: number): string {
   if (value >= 1_000_000) return `${+(value / 1_000_000).toFixed(1)}M`;
   if (value >= 1_000) return `${+(value / 1_000).toFixed(1)}K`;
   return String(value);

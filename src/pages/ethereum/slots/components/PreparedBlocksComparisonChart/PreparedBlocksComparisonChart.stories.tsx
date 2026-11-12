@@ -11,7 +11,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -128,7 +128,7 @@ export const TwoClients: Story = {
  */
 export const SingleBlock: Story = {
   args: {
-    preparedBlocks: [mockPreparedBlocks[0]],
+    preparedBlocks: mockPreparedBlocks.slice(0, 1),
   },
 };
 

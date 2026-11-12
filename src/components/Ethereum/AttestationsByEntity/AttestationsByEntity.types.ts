@@ -1,4 +1,4 @@
-export interface EntityCountItem {
+interface EntityCountItem {
   /**
    * Entity name (e.g., staking provider name)
    */

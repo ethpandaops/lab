@@ -12,7 +12,7 @@ import { getExecutionClientColor } from '@/utils';
 import { completeBucketEnd } from '@/utils/time';
 
 /** Seconds per slot on mainnet-like networks */
-export const SLOT_SECONDS = 12;
+const SLOT_SECONDS = 12;
 
 /** Blocks below this gas are dominated by fixed overhead and skew per-gas throughput */
 const MIN_GAS_FOR_THROUGHPUT = 5_000_000;
@@ -90,7 +90,7 @@ export interface ClientPerformance {
  * Counts and sums per client of the fct_engine_new_payload_*_window tables, which hold them over a range; short
  * ranges build the same rows from their blocks (rollupBlocks).
  */
-export type GasBucketRow = Pick<
+type GasBucketRow = Pick<
   FctEngineNewPayloadGasBucketWindow,
   | 'client'
   | 'gas_bucket_mgas'
@@ -165,7 +165,9 @@ export function quantile(sorted: number[], q: number): number {
   const pos = (sorted.length - 1) * q;
   const lo = Math.floor(pos);
   const hi = Math.ceil(pos);
-  return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+  const loValue = sorted[lo] ?? 0;
+  const hiValue = sorted[hi] ?? loValue;
+  return loValue + (hiValue - loValue) * (pos - lo);
 }
 
 /**
@@ -207,7 +209,7 @@ export function histogramQuantile(buckets: ThroughputBucketRow[], q: number): nu
     }
     below += count;
   }
-  return THROUGHPUT_BUCKET_BASE ** ((sorted[sorted.length - 1].bucket_index ?? 0) + 1);
+  return THROUGHPUT_BUCKET_BASE ** ((sorted.at(-1)?.bucket_index ?? 0) + 1);
 }
 
 function resourceShares(row: IntBlockResourceGas): Map<ResourceKey, number> {
@@ -476,9 +478,9 @@ export function slowestBlocks(
         gasUsed: block?.gas_used ?? 0,
         txCount: block?.tx_count ?? 0,
         blobCount: block?.blob_count ?? 0,
-        slowestClient: sorted[0].client,
-        slowestMs: sorted[0].ms,
-        fastestMs: sorted[sorted.length - 1].ms,
+        slowestClient: sorted[0]?.client ?? '',
+        slowestMs: sorted[0]?.ms ?? 0,
+        fastestMs: sorted.at(-1)?.ms ?? 0,
         perClient: sorted,
         topResource: top,
       };

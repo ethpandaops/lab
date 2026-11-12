@@ -4,8 +4,11 @@ import { intTransactionCallFrameOpcodeResourceGasServiceList } from '@/api/sdk.g
 import type { IntTransactionCallFrameOpcodeResourceGas } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { aggregateOpcodeResourceGas, toOpcodeResourceRows } from '../utils/resourceGas';
-import type { ResourceGasEntry, OpcodeResourceRow } from '../utils/resourceGas';
+import {
+  aggregateOpcodeResourceGas,
+  toOpcodeResourceRows,
+} from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
+import type { ResourceGasEntry, OpcodeResourceRow } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
 
 export interface UseCallFrameResourceGasOptions {
   /** Transaction hash (optional — omit to fetch all transactions in the block) */

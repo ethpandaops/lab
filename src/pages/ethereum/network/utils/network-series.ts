@@ -3,7 +3,7 @@ import type { FctPeerConcentrationElDaily, FctPeerCountByCountryDaily } from '@/
 import { CONSENSUS_CLIENTS, getClientColor } from '@/utils/ethereum';
 import { formatClientName } from '@/utils/graffiti';
 import { OTHER_VERSION_COLOR } from '@/pages/ethereum/clients/utils/client-versions';
-import type { PlaceCensusRow } from '../hooks/usePlaceCensus';
+import type { PlaceCensusRow } from '@/pages/ethereum/network/hooks/usePlaceCensus';
 import { layerCounts, sumBy } from './network-census';
 
 type DayRow = { day_start_date?: string };
@@ -44,13 +44,18 @@ export function dayShares<T extends DayRow>(
   });
 }
 
-/** An area that stacks with the other layers of `stack` into one band per day */
-export function stackLayer(name: string, data: Array<number | null>, color: string, stack: string): SeriesData {
+/** An area that stacks with the other layers of `stack` into one band per day; the chart picks the colour when none is given */
+export function stackLayer(
+  name: string,
+  data: Array<number | null>,
+  color: string | undefined,
+  stack: string
+): SeriesData {
   return { name, data, color, stack, showArea: true, areaOpacity: 0.85, lineWidth: 0, showSymbol: false };
 }
 
-/** A plain line */
-export function line(name: string, data: Array<number | null>, color: string): SeriesData {
+/** A plain line; the chart picks the colour when none is given */
+export function line(name: string, data: Array<number | null>, color: string | undefined): SeriesData {
   return { name, data, color, showSymbol: false };
 }
 

@@ -6,7 +6,7 @@ import type { ListSectionProps } from './ListSection.types';
 
 /**
  * ListSection component for creating sections and subsections within lists.
- * Renders a section header with children - does not create nested containers.
+ * Renders a list item holding the section header and a nested list of its children.
  * Use within a ListContainer and wrap children in ListItems.
  */
 export function ListSection({
@@ -25,7 +25,7 @@ export function ListSection({
   const headerElement = nested ? (
     <div
       className={clsx(
-        'text-xs font-semibold tracking-wider text-muted/70 uppercase',
+        'text-xs font-semibold tracking-wider text-muted-70 uppercase',
         collapsible && 'cursor-pointer select-none',
         headerClassName
       )}
@@ -36,11 +36,15 @@ export function ListSection({
     <Header size="xs" title={title} className={clsx(collapsible && 'cursor-pointer select-none', headerClassName)} />
   );
 
-  const content = <div className={clsx('mt-1.5', nested && 'ml-2.5', contentClassName)}>{children}</div>;
+  const content = (
+    <ul role="list" className={clsx('mt-1.5', nested && 'ml-2.5', contentClassName)}>
+      {children}
+    </ul>
+  );
 
   if (collapsible) {
     return (
-      <div className={className}>
+      <li className={className}>
         <button
           type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -50,14 +54,14 @@ export function ListSection({
           <ChevronDownIcon className={clsx('size-4 text-muted transition-transform', isCollapsed && '-rotate-90')} />
         </button>
         {!isCollapsed && content}
-      </div>
+      </li>
     );
   }
 
   return (
-    <div className={className}>
+    <li className={className}>
       {headerElement}
       {content}
-    </div>
+    </li>
   );
 }

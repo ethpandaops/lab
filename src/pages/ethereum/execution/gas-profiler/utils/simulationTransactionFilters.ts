@@ -1,4 +1,4 @@
-import type { TxSummary } from '../SimulatePage.types';
+import type { TxSummary } from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
 
 export const SIM_TX_SORT_FIELDS = ['impact', 'delta', 'index', 'originalGas', 'simulatedGas', 'reverts'] as const;
 export type SimTxSortField = (typeof SIM_TX_SORT_FIELDS)[number];
@@ -23,11 +23,11 @@ export interface SimTxFilters {
   impactMin?: number;
 }
 
-export function hasStatusChange(tx: TxSummary): boolean {
+function hasStatusChange(tx: TxSummary): boolean {
   return tx.originalStatus !== tx.simulatedStatus;
 }
 
-export function hasCallErrors(tx: TxSummary): boolean {
+function hasCallErrors(tx: TxSummary): boolean {
   return (tx.originalErrors?.length ?? 0) > 0 || (tx.simulatedErrors?.length ?? 0) > 0 || !!tx.error;
 }
 

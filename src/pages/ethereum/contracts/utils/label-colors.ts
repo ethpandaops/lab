@@ -61,8 +61,9 @@ export function getLabelColor(label: string): BadgeColor {
   const normalized = label.toLowerCase().trim().replace(/_/g, '-');
 
   // Check for exact semantic color mapping
-  if (normalized in SEMANTIC_COLORS) {
-    return SEMANTIC_COLORS[normalized];
+  const exact = SEMANTIC_COLORS[normalized];
+  if (exact) {
+    return exact;
   }
 
   // Check for partial matches (e.g., "fungible_tokens" contains "token")

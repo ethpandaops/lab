@@ -2,7 +2,6 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { StackedBar } from './StackedBar';
-import type { StackedBarSegment } from './StackedBar.types';
 
 const meta = {
   title: 'Components/Charts/StackedBar',
@@ -12,7 +11,7 @@ const meta = {
   },
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-xs bg-surface p-6">
+      <div className="min-w-150 rounded-xs bg-surface p-6">
         <Story />
       </div>
     ),
@@ -152,14 +151,16 @@ export const Interactive: Story = {
  * Selection demo with state
  */
 export const SelectionDemo: Story = {
-  render: () => {
-    const [selected, setSelected] = useState<string | undefined>(undefined);
-    const segments: StackedBarSegment[] = [
+  args: {
+    segments: [
       { name: 'Engineering', value: 500000, color: '#3b82f6' },
       { name: 'Marketing', value: 200000, color: '#10b981' },
       { name: 'Operations', value: 150000, color: '#f59e0b' },
       { name: 'Other', value: 50000, color: '#6b7280' },
-    ];
+    ],
+  },
+  render: ({ segments }) => {
+    const [selected, setSelected] = useState<string | undefined>(undefined);
 
     return (
       <div>

@@ -1,4 +1,4 @@
-import { type JSX, useMemo, forwardRef, useCallback, useState } from 'react';
+import { type JSX, useMemo, useCallback, useState } from 'react';
 import ReactEChartsCore from 'echarts-for-react/lib/core';
 import * as echarts from 'echarts/core';
 import { BarChart as EChartsBar } from 'echarts/charts';
@@ -9,7 +9,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils/dataVizColors';
 import type { StackedBarProps } from './StackedBar.types';
 import { ECHARTS_THEME } from '@/utils/echarts-theme';
-import { getChartTooltipChrome } from '../chartChrome';
+import { getChartTooltipChrome } from '@/components/Charts/chartChrome';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { isKnownClient } from '@/utils/ethereum';
 
@@ -62,34 +62,32 @@ function defaultValueFormatter(value: number): string {
  * />
  * ```
  */
-export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function StackedBar(
-  {
-    segments,
-    total: providedTotal,
-    title,
-    subtitle,
-    footerLeft,
-    footerRight,
-    footerLeftClassName,
-    footerRightClassName,
-    showLabels = true,
-    showPercentages = true,
-    animated = true,
-    height = 120,
-    labelFontSize = 11,
-    animationDuration = 300,
-    valueFormatter = defaultValueFormatter,
-    showLegend = false,
-    onSegmentClick,
-    onSegmentHover,
-    selectedSegmentName,
-    minWidthPercent = 0.5,
-    minLabelWidthPercent = 8,
-    renderTooltip,
-    emptyMessage = 'No data available',
-  },
-  ref
-): JSX.Element {
+export function StackedBar({
+  segments,
+  total: providedTotal,
+  title,
+  subtitle,
+  footerLeft,
+  footerRight,
+  footerLeftClassName,
+  footerRightClassName,
+  showLabels = true,
+  showPercentages = true,
+  animated = true,
+  height = 120,
+  labelFontSize = 11,
+  animationDuration = 300,
+  valueFormatter = defaultValueFormatter,
+  showLegend = false,
+  onSegmentClick,
+  onSegmentHover,
+  selectedSegmentName,
+  minWidthPercent = 0.5,
+  minLabelWidthPercent = 8,
+  renderTooltip,
+  emptyMessage = 'No data available',
+  ref,
+}: StackedBarProps): JSX.Element {
   const themeColors = useThemeColors();
   const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
 
@@ -112,7 +110,8 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
   const segmentColors = useMemo(() => {
     const colors: Record<string, string> = {};
     segments.forEach((seg, index) => {
-      colors[seg.name] = seg.color || CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length];
+      const color = seg.color || CHART_CATEGORICAL_COLORS[index % CHART_CATEGORICAL_COLORS.length];
+      if (color) colors[seg.name] = color;
     });
     return colors;
   }, [segments]);
@@ -309,7 +308,8 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
           ref={ref}
           echarts={echarts}
           option={option}
-          style={{ height: chartHeight, width: '100%' }}
+          className="w-full"
+          style={{ height: chartHeight }}
           notMerge={false}
           lazyUpdate={true}
           onEvents={handleChartEvents}
@@ -357,7 +357,7 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
                   className={clsx('size-3 rounded-xs', isSelected && 'ring-2 ring-primary ring-offset-1')}
                   style={{ backgroundColor: color }}
                 />
-                {isKnownClient(seg.name) && <ClientLogo client={seg.name} size={14} noLink />}
+                {isKnownClient(seg.name) && <ClientLogo client={seg.name} size={14} noLink decorative />}
                 <span className="text-foreground">{seg.name}</span>
               </button>
             );
@@ -366,4 +366,4 @@ export const StackedBar = forwardRef<ReactEChartsCore, StackedBarProps>(function
       )}
     </div>
   );
-});
+}

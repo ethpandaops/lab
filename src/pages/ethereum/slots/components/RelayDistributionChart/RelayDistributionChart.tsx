@@ -57,6 +57,7 @@ export function RelayDistributionChart({ relayData, winningRelay }: RelayDistrib
   const tooltipFormatter = useMemo(
     () => (params: unknown) => {
       const param = (params as { name: string; value: number; data: { value: number }; dataIndex: number }[])[0];
+      if (!param) return '';
       const isWinner = processedData[param.dataIndex]?.isWinner;
       const winnerText = isWinner ? '<br/><strong>(Winner)</strong>' : '';
       // Handle both direct value and data.value formats

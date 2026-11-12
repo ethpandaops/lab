@@ -9,9 +9,7 @@ import { ClientLabel } from '@/components/Ethereum/ClientLabel';
 import { getClientColor } from '@/utils/ethereum';
 import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
 import { formatDailyDate } from '@/pages/ethereum/execution/overview/overview.utils';
-import { ratio, type ClientMetric } from '../../utils/client-metrics';
-
-export type { ClientMetric };
+import { ratio, type ClientMetrics } from '@/pages/ethereum/clients/utils/client-metrics';
 
 export interface ClientMetricCompareProps<T extends { day_start_date?: string; client?: string }> {
   /** Client the page is about, drawn on top and highlighted in the table */
@@ -19,7 +17,7 @@ export interface ClientMetricCompareProps<T extends { day_start_date?: string; c
   title: string;
   subtitle?: string;
   rows: T[];
-  metrics: Array<ClientMetric<T>>;
+  metrics: ClientMetrics<T>;
   /** Count shown beside each client in the table, e.g. blocks or validators */
   countLabel: string;
   count: (row: T) => number;
@@ -69,9 +67,12 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
       if (row.day_start_date) days.add(row.day_start_date);
     }
     const allDays = [...days].sort();
+    const first = allDays[0];
+    const last = allDays.at(-1);
     const weekly =
-      allDays.length > 1 &&
-      (Date.parse(allDays[allDays.length - 1]) - Date.parse(allDays[0])) / 86_400_000 > WEEKLY_AFTER_DAYS;
+      first !== undefined &&
+      last !== undefined &&
+      (Date.parse(last) - Date.parse(first)) / 86_400_000 > WEEKLY_AFTER_DAYS;
     const bucket = (day: string): string => (weekly ? weekStart(day) : day);
     const sortedDays = [...new Set(allDays.map(bucket))];
     const clients = [...byClient.entries()]
@@ -136,7 +137,7 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
         <p className="text-sm text-muted">No data in this window.</p>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-fill-2-1">
             <MultiLineChart
               series={series}
               xAxis={{ type: 'category', labels, name: weekly ? 'Week' : 'Date' }}
@@ -155,7 +156,7 @@ export function ClientMetricCompare<T extends { day_start_date?: string; client?
               </thead>
               <tbody>
                 {table.map(entry => (
-                  <tr key={entry.client} className={clsx(entry.client === client && 'bg-primary/10')}>
+                  <tr key={entry.client} className={clsx(entry.client === client && 'bg-primary-10')}>
                     <td className="py-0.5 pl-1">
                       {entry.client === client ? (
                         <ClientLabel client={entry.client} noLink />

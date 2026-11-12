@@ -2,9 +2,9 @@ import { type JSX, memo, useState } from 'react';
 import { TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import clsx from 'clsx';
 import { Tab } from '@/components/Navigation/Tab';
-import { BlobDataAvailability } from '../BlobDataAvailability';
-import { DataColumnDataAvailability } from '../DataColumnDataAvailability';
-import { AttestationArrivals } from '../AttestationArrivals';
+import { BlobDataAvailability } from '@/pages/ethereum/live/components/BlobDataAvailability';
+import { DataColumnDataAvailability } from '@/pages/ethereum/live/components/DataColumnDataAvailability';
+import { AttestationArrivals } from '@/pages/ethereum/live/components/AttestationArrivals';
 import type { BottomBarProps } from './BottomBar.types';
 
 function BottomBarComponent({
@@ -94,7 +94,7 @@ function BottomBarComponent({
       {/* Mobile Layout - Tabbed */}
       <div className="flex h-full flex-col bg-background md:border-t md:border-border lg:hidden">
         <TabGroup selectedIndex={selectedTab} onChange={setSelectedTab} className="flex min-h-0 flex-1 flex-col">
-          <TabList className="flex shrink-0 border-y border-border bg-surface/50">
+          <TabList className="flex shrink-0 border-y border-border bg-surface-50">
             {showBlobAvailability && <Tab className="flex-1">Propagation</Tab>}
             {showDataColumnAvailability && <Tab className="flex-1">Data Columns</Tab>}
             <Tab className="flex-1">Attestations</Tab>

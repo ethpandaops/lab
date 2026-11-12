@@ -11,7 +11,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -92,6 +92,9 @@ export const WithoutIcon: Story = {
 };
 
 export const AllForks: Story = {
+  args: {
+    fork: 'phase0',
+  },
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -108,6 +111,9 @@ export const AllForks: Story = {
 };
 
 export const AllSizes: Story = {
+  args: {
+    fork: 'deneb',
+  },
   render: () => (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">

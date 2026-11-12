@@ -5,6 +5,12 @@ on:
     branches:
       - master
 
+# One deploy at a time: a newer push waits for the running deploy instead of
+# cancelling it partway through.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 permissions:
   contents: read
   pages: write
@@ -13,21 +19,25 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: '24'
-
-      - name: Deploy Storybook to GitHub Pages
-        uses: bitovi/github-actions-storybook-to-github-pages@b75ece8f984a32b2adb322065d7a8a2cc8db2d52 # v1.0.3
+          persist-credentials: false
+      - name: Set up pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          install_command: pnpm install
-          build_command: pnpm build-storybook:gh-pages
+          node-version-file: package.json
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Storybook
+        run: pnpm build-storybook:gh-pages
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
           path: storybook-static
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

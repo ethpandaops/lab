@@ -10,7 +10,7 @@ const SLOTS_PER_EPOCH = 32;
  * Fulu activation information for filtering custody probe queries.
  * PeerDAS/Data Column Availability only exists after Fulu fork activation.
  */
-export interface FuluActivation {
+interface FuluActivation {
   /** Fulu fork activation epoch */
   epoch: number;
   /** First slot in the Fulu fork (epoch * 32) */

@@ -11,10 +11,12 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { formatSlot } from '@/utils';
 import { ValidatorHeatmap } from './ValidatorHeatmap';
 import type { HeatmapMetric } from './ValidatorHeatmap';
-import type { AttestationDailyDataPoint } from '../../hooks/useValidatorsData.types';
+import type { AttestationDailyDataPoint } from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
+import { seededRandom } from '@/test-utils/random';
 
 /** Generate mock daily attestation data */
 function generateMockDailyData(validatorIndices: number[], from: number, to: number): AttestationDailyDataPoint[] {
+  const random = seededRandom(30);
   const points: AttestationDailyDataPoint[] = [];
   const startDate = new Date(from * 1000);
   startDate.setUTCHours(0, 0, 0, 0);
@@ -28,11 +30,11 @@ function generateMockDailyData(validatorIndices: number[], from: number, to: num
       points.push({
         timestamp,
         validatorIndex,
-        inclusionRate: 95 + Math.random() * 5,
-        headCorrectRate: 90 + Math.random() * 10,
-        targetCorrectRate: 95 + Math.random() * 5,
-        sourceCorrectRate: 98 + Math.random() * 2,
-        avgInclusionDistance: 1 + Math.random() * 0.5,
+        inclusionRate: 95 + random() * 5,
+        headCorrectRate: 90 + random() * 10,
+        targetCorrectRate: 95 + random() * 5,
+        sourceCorrectRate: 98 + random() * 2,
+        avgInclusionDistance: 1 + random() * 0.5,
       });
     }
     current.setUTCDate(current.getUTCDate() + 1);
@@ -69,16 +71,17 @@ function generateMockHourlyGrid(validatorIndices: number[]): {
   data: [number, number, number][];
   yLabels: string[];
 } {
+  const random = seededRandom(31);
   const yLabels = validatorIndices.map(v => formatSlot(v));
   const data: [number, number, number][] = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let v = 0; v < validatorIndices.length; v++) {
-      data.push([hour, v, 90 + Math.random() * 10]);
+      data.push([hour, v, 90 + random() * 10]);
     }
   }
   // Sprinkle a few NO_DATA cells
   for (let v = 0; v < validatorIndices.length; v++) {
-    const missingHour = Math.floor(Math.random() * 24);
+    const missingHour = Math.floor(random() * 24);
     const idx = data.findIndex(([h, vi]) => h === missingHour && vi === v);
     if (idx !== -1) data[idx] = [missingHour, v, NO_DATA];
   }
@@ -129,21 +132,21 @@ function SkeletonPreview({ rows, height, showChrome, loading }: SkeletonPreviewP
 
   const skeleton = (
     <div className="relative" style={{ height }}>
-      <div className="absolute flex flex-col justify-evenly" style={{ top: 16, bottom: 50, left: 8, width: 48 }}>
+      <div className="absolute top-4 bottom-12.5 left-2 flex w-12 flex-col justify-evenly">
         {Array.from({ length: rows }, (_, i) => (
           <LoadingContainer key={i} className="h-3 w-full rounded-xs" shimmer={false} />
         ))}
       </div>
-      <div className="absolute flex flex-col justify-evenly gap-1" style={{ top: 16, right: 90, bottom: 50, left: 60 }}>
+      <div className="absolute top-4 right-22.5 bottom-12.5 left-15 flex flex-col justify-evenly gap-1">
         {Array.from({ length: rows }, (_, i) => (
           <LoadingContainer key={i} className="h-5 w-full rounded-xs" />
         ))}
       </div>
-      <div className="absolute" style={{ left: 60, right: 90, bottom: 24 }}>
+      <div className="absolute right-22.5 bottom-6 left-15">
         <LoadingContainer className="h-2 w-full rounded-xs" shimmer={false} />
       </div>
-      <div className="absolute" style={{ right: 24, top: '25%', bottom: '25%', width: 16 }}>
-        <LoadingContainer className="h-full w-full rounded-xs" shimmer={false} />
+      <div className="absolute inset-y-1/4 right-6 w-4">
+        <LoadingContainer className="size-full rounded-xs" shimmer={false} />
       </div>
     </div>
   );
@@ -179,7 +182,7 @@ function SkeletonPreview({ rows, height, showChrome, loading }: SkeletonPreviewP
         <div className="mb-4 flex items-center gap-3">
           <button
             type="button"
-            className="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            className="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary-80"
           >
             <ArrowLeftIcon className="size-4" />
             Back to daily view
@@ -221,7 +224,7 @@ const meta = {
   component: SkeletonPreview,
   decorators: [
     (Story: React.ComponentType) => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -230,6 +233,12 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  args: {
+    rows: 6,
+    height: 340,
+    showChrome: true,
+    loading: true,
+  },
   argTypes: {
     rows: { control: { type: 'range', min: 1, max: 12, step: 1 } },
     height: { control: { type: 'range', min: 200, max: 800, step: 20 } },

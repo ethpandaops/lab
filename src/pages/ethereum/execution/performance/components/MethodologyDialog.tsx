@@ -57,7 +57,7 @@ export function MethodologyDialog({
 
   return (
     <Dialog open={open} onClose={onClose} title="Methodology" size="lg">
-      <div ref={bodyRef} className="max-h-[70vh] space-y-6 overflow-y-auto pr-1 text-sm/6 text-muted">
+      <div ref={bodyRef} className="max-h-vh-70 space-y-6 overflow-y-auto pr-1 text-sm/6 text-muted">
         <p>
           Durations are engine_newPayload calls timed by the consensus client, so they include validating the block and
           computing its state root, not only running the EVM. Reference Xatu nodes run every execution client on the

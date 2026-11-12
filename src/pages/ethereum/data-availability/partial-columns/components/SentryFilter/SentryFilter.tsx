@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
-import { formatClientName } from '../../utils/partial-columns';
+import { formatClientName } from '@/pages/ethereum/data-availability/partial-columns/utils/partial-columns';
 
 export interface SentryFilterProps {
   /** Sentry consensus clients with data in the window */
@@ -26,8 +26,8 @@ export function SentryFilter({ clients, value, onChange }: SentryFilterProps): J
           className={clsx(
             'inline-flex items-center gap-1.5 rounded-sm border px-3 py-1.5 text-xs font-medium transition-colors',
             value === client
-              ? 'border-primary bg-primary/10 text-primary'
-              : 'border-border bg-surface text-muted hover:border-primary/40'
+              ? 'border-primary bg-primary-10 text-primary'
+              : 'border-border bg-surface text-muted hover:border-primary-40'
           )}
         >
           <ClientLogo client={client} size={14} noLink />

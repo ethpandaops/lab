@@ -5,15 +5,8 @@ import type { ForkInfo } from '@/utils/forks';
 import { epochToTimestamp } from '@/utils/beacon';
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/20/solid';
 import { useNetwork } from '@/hooks/useNetwork';
-import { useState, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
-import {
-  ForkCountdown,
-  ForkCountdownSkeleton,
-  ForkQuickLinks,
-  secondsToCountdown,
-  type CountdownTime,
-} from '../ForkShared';
+import { ForkCountdown, ForkCountdownSkeleton, ForkQuickLinks } from '@/pages/ethereum/forks/components/ForkShared';
 
 interface ForksHeaderProps {
   activeFork: ForkInfo | null;
@@ -30,7 +23,7 @@ function ExternalLinks({ combinedName }: { combinedName?: string }): React.JSX.E
     <div className="flex items-center gap-2">
       <a href="https://ethereum.org/en/roadmap/" target="_blank" rel="noopener noreferrer" className={linkClass}>
         Roadmap
-        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+        <ArrowTopRightOnSquareIcon className="size-3" />
       </a>
       <span className="text-border">•</span>
       <a
@@ -40,7 +33,7 @@ function ExternalLinks({ combinedName }: { combinedName?: string }): React.JSX.E
         className={linkClass}
       >
         Forkcast
-        <ArrowTopRightOnSquareIcon className="h-3 w-3" />
+        <ArrowTopRightOnSquareIcon className="size-3" />
       </a>
     </div>
   );
@@ -48,35 +41,6 @@ function ExternalLinks({ combinedName }: { combinedName?: string }): React.JSX.E
 
 export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps): React.JSX.Element {
   const { currentNetwork } = useNetwork();
-
-  const calculateSecondsUntilFork = (): number => {
-    if (!nextFork || !currentNetwork?.genesis_time) return 0;
-
-    const forkSlot = nextFork.epoch * 32;
-    const forkTimestamp = currentNetwork.genesis_time + forkSlot * 12;
-    const nowInSeconds = Math.floor(Date.now() / 1000);
-    const secondsUntilFork = forkTimestamp - nowInSeconds;
-
-    return Math.max(0, secondsUntilFork);
-  };
-
-  const [countdown, setCountdown] = useState<CountdownTime>(() => secondsToCountdown(calculateSecondsUntilFork()));
-
-  useEffect(() => {
-    if (!nextFork || !currentNetwork?.genesis_time) return;
-
-    const updateCountdown = (): void => {
-      setCountdown(secondsToCountdown(calculateSecondsUntilFork()));
-    };
-
-    // Update immediately when data is available
-    updateCountdown();
-
-    const interval = setInterval(updateCountdown, 1000);
-
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nextFork, currentNetwork]);
 
   if (!nextFork && activeFork) {
     // Calculate time since activation for the current fork
@@ -185,7 +149,11 @@ export function ForksHeader({ activeFork, nextFork, allForks }: ForksHeaderProps
       </div>
 
       {/* Countdown display */}
-      {!currentNetwork?.genesis_time ? <ForkCountdownSkeleton /> : <ForkCountdown countdown={countdown} />}
+      {!currentNetwork?.genesis_time ? (
+        <ForkCountdownSkeleton />
+      ) : (
+        <ForkCountdown timestamp={epochToTimestamp(nextFork.epoch, currentNetwork.genesis_time)} />
+      )}
 
       {/* Action buttons */}
       <ForkQuickLinks epoch={nextFork.epoch}>

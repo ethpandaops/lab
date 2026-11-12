@@ -29,7 +29,7 @@ export function ClusterSpecsModal({ open, onClose, clusterName }: ClusterSpecsMo
         <span className="flex items-center gap-2">
           <ServerIcon className={clsx('size-5', clusterColor)} />
           <span>{cluster.name} cluster</span>
-          <span className="rounded-xs bg-accent/10 px-1.5 py-0.5 text-xs font-medium text-accent">EIP-7870</span>
+          <span className="rounded-xs bg-accent-10 px-1.5 py-0.5 text-xs font-medium text-accent">EIP-7870</span>
         </span>
       }
       size="md"

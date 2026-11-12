@@ -78,10 +78,11 @@ export function ScrollAnchor({
    */
   useEffect(() => {
     const hash = window.location.hash.slice(1); // Remove '#' prefix
-    if (hash === id) {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => scrollToAnchor(id, scrollOffset), 100);
-    }
+    if (hash !== id) return;
+
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => scrollToAnchor(id, scrollOffset), 100);
+    return () => clearTimeout(timeoutId);
   }, [id, scrollOffset]);
 
   return (
@@ -98,7 +99,6 @@ export function ScrollAnchor({
             handleClick();
           }
         }}
-        aria-label={`Link to ${id} section`}
       >
         {children}
       </div>
@@ -110,7 +110,7 @@ export function ScrollAnchor({
           className={clsx(
             'shrink-0 self-start rounded-sm p-1',
             'opacity-0 transition-all group-hover:opacity-100',
-            'hover:bg-muted/20 focus:outline-hidden focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-primary',
+            'hover:bg-muted-20 focus:outline-hidden focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-primary',
             'text-muted hover:text-foreground'
           )}
           aria-label="Copy link to clipboard"

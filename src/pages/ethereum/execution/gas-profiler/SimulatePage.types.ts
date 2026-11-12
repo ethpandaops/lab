@@ -1,8 +1,6 @@
 import { z } from 'zod';
-import { getDataVizColors } from '@/utils/dataVizColors';
+import type { GasSchedule as ForkGasSchedule } from '@/lab-api';
 import { SIM_TX_SORT_FIELDS } from './utils/simulationTransactionFilters';
-
-const { DATA_COLORS } = getDataVizColors();
 
 /**
  * Zod schema for simulate page search parameters
@@ -83,258 +81,10 @@ export interface GasSchedule {
 }
 
 /**
- * Gas parameter with value and description from API
- */
-export interface GasParameterInfo {
-  value: number;
-  description: string;
-}
-
-/**
  * Gas schedule defaults with descriptions from API
  * Contains both the numeric values and human-readable descriptions for tooltips
  */
-export interface GasScheduleDefaults {
-  /** Map of parameter names to their values and descriptions */
-  parameters: Record<string, GasParameterInfo>;
-}
-
-/**
- * Gas parameter metadata for UI rendering
- * Note: Default values come from the API (fork-aware), not from this metadata
- */
-export interface GasParameterMeta {
-  key: keyof GasSchedule;
-  label: string;
-  min: number;
-  max: number;
-  step: number;
-  description?: string;
-}
-
-/**
- * Grouped gas parameters for organized UI
- * Category names and colors align with OPCODE_CATEGORIES and CATEGORY_COLORS
- * from utils/opcodeUtils.ts for visual consistency across the gas profiler.
- */
-export interface GasParameterGroup {
-  /** Category name - matches opcode category names for consistency */
-  name: string;
-  /** Category color hex value - matches CATEGORY_COLORS from opcodeUtils */
-  color: string;
-  /** Gas parameters in this category */
-  parameters: GasParameterMeta[];
-}
-
-/**
- * All gas parameter groups for the editor UI
- * Groups are ordered by typical gas impact (highest first)
- * Colors match CATEGORY_COLORS from utils/opcodeUtils.ts
- */
-export const GAS_PARAMETER_GROUPS: GasParameterGroup[] = [
-  {
-    name: 'Storage',
-    color: DATA_COLORS.red, // matches CATEGORY_COLORS.Storage
-    parameters: [
-      // Pre-Berlin: single SLOAD cost
-      { key: 'SLOAD', label: 'SLOAD', min: 0, max: 2000, step: 50 },
-      // Post-Berlin (EIP-2929): cold/warm access costs
-      { key: 'SLOAD_COLD', label: 'SLOAD Cold', min: 0, max: 10000, step: 100 },
-      { key: 'SLOAD_WARM', label: 'SLOAD Warm', min: 0, max: 1000, step: 10 },
-      { key: 'SSTORE_SET', label: 'SSTORE Set', min: 0, max: 50000, step: 1000 },
-      { key: 'SSTORE_RESET', label: 'SSTORE Reset', min: 0, max: 10000, step: 100 },
-    ],
-  },
-  {
-    name: 'Transient Storage',
-    color: DATA_COLORS.orange, // matches CATEGORY_COLORS['Transient Storage']
-    parameters: [
-      { key: 'TLOAD', label: 'TLOAD', min: 0, max: 1000, step: 10 },
-      { key: 'TSTORE', label: 'TSTORE', min: 0, max: 1000, step: 10 },
-    ],
-  },
-  {
-    name: 'Contract',
-    color: DATA_COLORS.sky, // matches CATEGORY_COLORS.Contract
-    parameters: [
-      // Pre-Berlin: single CALL_BASE cost
-      { key: 'CALL_BASE', label: 'CALL Base', min: 0, max: 2000, step: 50 },
-      // Post-Berlin (EIP-2929): cold/warm access costs
-      { key: 'CALL_COLD', label: 'CALL Cold', min: 0, max: 10000, step: 100 },
-      { key: 'CALL_WARM', label: 'CALL Warm', min: 0, max: 1000, step: 10 },
-      { key: 'CALL_VALUE_XFER', label: 'Value Transfer', min: 0, max: 20000, step: 500 },
-      { key: 'CALL_NEW_ACCOUNT', label: 'New Account', min: 0, max: 50000, step: 1000 },
-      { key: 'CREATE', label: 'CREATE', min: 0, max: 100000, step: 1000 },
-      { key: 'CREATE2', label: 'CREATE2', min: 0, max: 100000, step: 1000 },
-      { key: 'SELFDESTRUCT', label: 'SELFDESTRUCT', min: 0, max: 10000, step: 100 },
-    ],
-  },
-  {
-    name: 'Ethereum State',
-    color: DATA_COLORS.blue, // matches CATEGORY_COLORS['Ethereum State']
-    parameters: [
-      { key: 'BALANCE', label: 'BALANCE', min: 0, max: 2000, step: 50 },
-      { key: 'EXTCODESIZE', label: 'EXTCODESIZE', min: 0, max: 2000, step: 50 },
-      { key: 'EXTCODECOPY', label: 'EXTCODECOPY', min: 0, max: 2000, step: 50 },
-      { key: 'EXTCODEHASH', label: 'EXTCODEHASH', min: 0, max: 2000, step: 50 },
-      { key: 'CALLDATALOAD', label: 'CALLDATALOAD', min: 0, max: 20, step: 1 },
-      // Cancun blob opcodes
-      { key: 'BLOBHASH', label: 'BLOBHASH', min: 0, max: 20, step: 1 },
-      { key: 'BLOBBASEFEE', label: 'BLOBBASEFEE', min: 0, max: 20, step: 1 },
-    ],
-  },
-  {
-    name: 'Log',
-    color: DATA_COLORS.yellow, // matches CATEGORY_COLORS.Log
-    parameters: [
-      { key: 'LOG', label: 'LOG Base', min: 0, max: 2000, step: 25 },
-      { key: 'LOG_TOPIC', label: 'LOG Topic', min: 0, max: 2000, step: 25 },
-      { key: 'LOG_DATA', label: 'LOG Data', min: 0, max: 50, step: 1 },
-    ],
-  },
-  {
-    name: 'Math',
-    color: DATA_COLORS.amber, // matches CATEGORY_COLORS.Math
-    parameters: [
-      // Simple (gas = 3)
-      { key: 'ADD', label: 'ADD', min: 0, max: 20, step: 1 },
-      { key: 'SUB', label: 'SUB', min: 0, max: 20, step: 1 },
-      // Medium (gas = 5)
-      { key: 'MUL', label: 'MUL', min: 0, max: 30, step: 1 },
-      { key: 'DIV', label: 'DIV', min: 0, max: 30, step: 1 },
-      { key: 'SDIV', label: 'SDIV', min: 0, max: 30, step: 1 },
-      { key: 'MOD', label: 'MOD', min: 0, max: 30, step: 1 },
-      { key: 'SMOD', label: 'SMOD', min: 0, max: 30, step: 1 },
-      { key: 'SIGNEXTEND', label: 'SIGNEXTEND', min: 0, max: 30, step: 1 },
-      // Higher (gas = 8)
-      { key: 'ADDMOD', label: 'ADDMOD', min: 0, max: 50, step: 1 },
-      { key: 'MULMOD', label: 'MULMOD', min: 0, max: 50, step: 1 },
-      // Exponentiation
-      { key: 'EXP', label: 'EXP Base', min: 0, max: 100, step: 5 },
-      { key: 'EXP_BYTE', label: 'EXP Byte', min: 0, max: 200, step: 10 },
-    ],
-  },
-  {
-    name: 'Comparisons',
-    color: DATA_COLORS.violet, // matches CATEGORY_COLORS.Comparisons
-    parameters: [
-      { key: 'LT', label: 'LT', min: 0, max: 20, step: 1 },
-      { key: 'GT', label: 'GT', min: 0, max: 20, step: 1 },
-      { key: 'SLT', label: 'SLT', min: 0, max: 20, step: 1 },
-      { key: 'SGT', label: 'SGT', min: 0, max: 20, step: 1 },
-      { key: 'EQ', label: 'EQ', min: 0, max: 20, step: 1 },
-      { key: 'ISZERO', label: 'ISZERO', min: 0, max: 20, step: 1 },
-    ],
-  },
-  {
-    name: 'Logic',
-    color: DATA_COLORS.cyan, // matches CATEGORY_COLORS.Logic
-    parameters: [
-      { key: 'AND', label: 'AND', min: 0, max: 20, step: 1 },
-      { key: 'OR', label: 'OR', min: 0, max: 20, step: 1 },
-      { key: 'XOR', label: 'XOR', min: 0, max: 20, step: 1 },
-      { key: 'NOT', label: 'NOT', min: 0, max: 20, step: 1 },
-    ],
-  },
-  {
-    name: 'Bit Ops',
-    color: DATA_COLORS.teal, // matches CATEGORY_COLORS['Bit Ops']
-    parameters: [
-      { key: 'BYTE', label: 'BYTE', min: 0, max: 20, step: 1 },
-      // Constantinople+ (EIP-145)
-      { key: 'SHL', label: 'SHL', min: 0, max: 20, step: 1 },
-      { key: 'SHR', label: 'SHR', min: 0, max: 20, step: 1 },
-      { key: 'SAR', label: 'SAR', min: 0, max: 20, step: 1 },
-    ],
-  },
-  {
-    name: 'Jump',
-    color: DATA_COLORS.pink, // matches CATEGORY_COLORS.Jump
-    parameters: [
-      { key: 'JUMP', label: 'JUMP', min: 0, max: 50, step: 1 },
-      { key: 'JUMPI', label: 'JUMPI', min: 0, max: 50, step: 1 },
-    ],
-  },
-  {
-    name: 'Pop',
-    color: DATA_COLORS.purple, // matches CATEGORY_COLORS.Pop
-    parameters: [
-      { key: 'POP', label: 'POP', min: 0, max: 20, step: 1 },
-      // Shanghai+ (EIP-3855)
-      { key: 'PUSH0', label: 'PUSH0', min: 0, max: 20, step: 1 },
-    ],
-  },
-  {
-    name: 'Memory',
-    color: DATA_COLORS.green, // matches CATEGORY_COLORS.Memory
-    parameters: [
-      { key: 'MEMORY', label: 'MEMORY', min: 0, max: 20, step: 1 },
-      { key: 'COPY', label: 'COPY', min: 0, max: 20, step: 1 },
-      // Cancun (EIP-5656)
-      { key: 'MCOPY', label: 'MCOPY', min: 0, max: 20, step: 1 },
-      { key: 'MCOPY_WORD', label: 'MCOPY Word', min: 0, max: 20, step: 1 },
-    ],
-  },
-  {
-    name: 'Misc',
-    color: DATA_COLORS.slate, // matches CATEGORY_COLORS.Misc
-    parameters: [
-      { key: 'KECCAK256', label: 'KECCAK256 Base', min: 0, max: 200, step: 5 },
-      { key: 'KECCAK256_WORD', label: 'KECCAK256 Word', min: 0, max: 50, step: 1 },
-    ],
-  },
-  {
-    name: 'Precompiles (Fixed)',
-    color: DATA_COLORS.emerald,
-    parameters: [
-      { key: 'PC_ECREC', label: 'ECRECOVER', min: 0, max: 20000, step: 100 },
-      { key: 'PC_BN254_ADD', label: 'BN254 Add', min: 0, max: 2000, step: 10 },
-      { key: 'PC_BN254_MUL', label: 'BN254 Mul', min: 0, max: 30000, step: 500 },
-      { key: 'PC_BLS12_G1ADD', label: 'BLS12 G1Add', min: 0, max: 5000, step: 25 },
-      { key: 'PC_BLS12_G2ADD', label: 'BLS12 G2Add', min: 0, max: 5000, step: 25 },
-      { key: 'PC_BLS12_MAP_FP_TO_G1', label: 'BLS12 MapFpToG1', min: 0, max: 30000, step: 500 },
-      { key: 'PC_BLS12_MAP_FP2_TO_G2', label: 'BLS12 MapFp2ToG2', min: 0, max: 100000, step: 1000 },
-      { key: 'PC_KZG_POINT_EVALUATION', label: 'KZG Point Eval', min: 0, max: 250000, step: 5000 },
-      { key: 'PC_P256VERIFY', label: 'P256 Verify', min: 0, max: 20000, step: 100 },
-    ],
-  },
-  {
-    name: 'Precompiles (Variable)',
-    color: DATA_COLORS.emerald,
-    parameters: [
-      { key: 'PC_SHA256_BASE', label: 'SHA256 Base', min: 0, max: 500, step: 5 },
-      { key: 'PC_SHA256_PER_WORD', label: 'SHA256 /Word', min: 0, max: 100, step: 1 },
-      { key: 'PC_RIPEMD160_BASE', label: 'RIPEMD160 Base', min: 0, max: 3000, step: 50 },
-      { key: 'PC_RIPEMD160_PER_WORD', label: 'RIPEMD160 /Word', min: 0, max: 500, step: 10 },
-      { key: 'PC_ID_BASE', label: 'Identity Base', min: 0, max: 100, step: 1 },
-      { key: 'PC_ID_PER_WORD', label: 'Identity /Word', min: 0, max: 50, step: 1 },
-      { key: 'PC_MODEXP_MIN_GAS', label: 'MODEXP Min Gas', min: 0, max: 2000, step: 10 },
-      { key: 'PC_BN254_PAIRING_BASE', label: 'BN254 Pairing Base', min: 0, max: 200000, step: 5000 },
-      { key: 'PC_BN254_PAIRING_PER_PAIR', label: 'BN254 Pairing /Pair', min: 0, max: 200000, step: 1000 },
-      { key: 'PC_BLAKE2F_BASE', label: 'BLAKE2F Base', min: 0, max: 1000, step: 10 },
-      { key: 'PC_BLAKE2F_PER_ROUND', label: 'BLAKE2F /Round', min: 0, max: 20, step: 1 },
-      { key: 'PC_BLS12_PAIRING_CHECK_BASE', label: 'BLS12 Pairing Base', min: 0, max: 200000, step: 5000 },
-      { key: 'PC_BLS12_PAIRING_CHECK_PER_PAIR', label: 'BLS12 Pairing /Pair', min: 0, max: 200000, step: 1000 },
-      { key: 'PC_BLS12_G1MSM_MUL_GAS', label: 'BLS12 G1MSM /Point', min: 0, max: 50000, step: 1000 },
-      { key: 'PC_BLS12_G2MSM_MUL_GAS', label: 'BLS12 G2MSM /Point', min: 0, max: 100000, step: 1000 },
-    ],
-  },
-  {
-    name: 'Intrinsic Gas',
-    color: DATA_COLORS.fuchsia,
-    parameters: [
-      { key: 'TX_BASE', label: 'TX Base', min: 0, max: 100000, step: 1000 },
-      { key: 'TX_CREATE_BASE', label: 'TX Create', min: 0, max: 200000, step: 1000 },
-      { key: 'TX_DATA_ZERO', label: 'Calldata Zero', min: 0, max: 50, step: 1 },
-      { key: 'TX_DATA_NONZERO', label: 'Calldata Non-Zero', min: 0, max: 200, step: 1 },
-      { key: 'TX_ACCESS_LIST_ADDR', label: 'Access List Addr', min: 0, max: 10000, step: 100 },
-      { key: 'TX_ACCESS_LIST_KEY', label: 'Access List Key', min: 0, max: 10000, step: 100 },
-      { key: 'TX_INIT_CODE_WORD', label: 'Init Code Word', min: 0, max: 20, step: 1 },
-      { key: 'TX_FLOOR_PER_TOKEN', label: 'Floor Per Token', min: 0, max: 50, step: 1 },
-      { key: 'TX_AUTH_COST', label: 'Auth Cost', min: 0, max: 100000, step: 1000 },
-    ],
-  },
-];
+export type GasScheduleDefaults = ForkGasSchedule;
 
 /**
  * Glamsterdam (EIP-8007) gas schedule preset.
@@ -378,7 +128,7 @@ export const GLAMSTERDAM_PRESET: Record<string, number> = {
 /**
  * Summary of gas usage (original or simulated)
  */
-export interface BlockGasSummary {
+interface BlockGasSummary {
   gasUsed: number;
   gasLimit: number;
   wouldExceedLimit: boolean;
@@ -441,46 +191,8 @@ export interface OpcodeSummary {
  */
 export interface BlockSimulationResult {
   blockNumber: number;
-  baseFork: string;
-  customSchedule: GasSchedule;
   original: BlockGasSummary;
   simulated: BlockGasSummary;
   transactions: TxSummary[];
   opcodeBreakdown: Record<string, OpcodeSummary>;
-}
-
-/**
- * Transaction gas detail
- */
-export interface TxGasDetail {
-  gasUsed: number;
-  intrinsicGas: number;
-  executionGas: number;
-  refundGas: number;
-}
-
-/**
- * Trace entry for transaction simulation
- */
-export interface TraceEntry {
-  pc: number;
-  op: string;
-  depth: number;
-  originalGas: number;
-  simulatedGas: number;
-}
-
-/**
- * Transaction simulation result (with optional trace)
- */
-export interface TransactionSimulationResult {
-  transactionHash: string;
-  blockNumber: number;
-  baseFork: string;
-  customSchedule: GasSchedule;
-  status: 'success' | 'failed';
-  original: TxGasDetail;
-  simulated: TxGasDetail;
-  opcodeBreakdown: Record<string, OpcodeSummary>;
-  trace?: TraceEntry[];
 }

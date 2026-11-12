@@ -1,4 +1,4 @@
-import { ExplorerLinks } from '../ExplorerLinks';
+import { ExplorerLinks } from '@/pages/ethereum/execution/gas-profiler/components/ExplorerLinks';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { type JSX, useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -22,15 +22,15 @@ import { Tab } from '@/components/Navigation/Tab';
 import { ScrollableTabs } from '@/components/Navigation/ScrollableTabs';
 import { useNetwork } from '@/hooks/useNetwork';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
-import { getEtherscanBaseUrl, isMainnet } from '../../utils/explorerLinks';
+import { getOpcodeCategory, CATEGORY_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/opcodeUtils';
+import { getEtherscanBaseUrl, isMainnet } from '@/pages/ethereum/execution/gas-profiler/utils/explorerLinks';
 import type {
   BlockSimulationResult,
   TxSummary,
   OpcodeSummary,
   CallError,
   GasProfilerSimulateSearch,
-} from '../../SimulatePage.types';
+} from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
 import {
   DEFAULT_SIM_TX_PAGE_SIZE,
   DEFAULT_SIM_TX_SORT,
@@ -39,10 +39,16 @@ import {
   type SimTxSortField,
   filterSimulationTransactions,
   sortSimulationTransactions,
-} from '../../utils/simulationTransactionFilters';
-import { formatRangeChip } from '../../utils/blockTransactionFilters';
-import { type ActiveFilterChip, FilterBar, FilterField, type FilterPreset, RangeFields } from '../FilterBar';
-import { ListPagination } from '../ListPagination';
+} from '@/pages/ethereum/execution/gas-profiler/utils/simulationTransactionFilters';
+import { formatRangeChip } from '@/pages/ethereum/execution/gas-profiler/utils/blockTransactionFilters';
+import {
+  type ActiveFilterChip,
+  FilterBar,
+  FilterField,
+  type FilterPreset,
+  RangeFields,
+} from '@/pages/ethereum/execution/gas-profiler/components/FilterBar';
+import { ListPagination } from '@/pages/ethereum/execution/gas-profiler/components/ListPagination';
 import { Input } from '@/components/Forms/Input';
 import { SelectMenu } from '@/components/Forms/SelectMenu';
 import { getDataVizColors } from '@/utils/dataVizColors';
@@ -137,7 +143,7 @@ function Tooltip({ title, description, children, className, style, width = 'w-56
     <div
       role="tooltip"
       className={clsx(
-        'pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3',
+        'pointer-events-none fixed z-9999 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3',
         width
       )}
       style={{ top: position.top, left: position.left }}
@@ -180,18 +186,27 @@ function ErrorCard({
   const isSimulated = variant === 'simulated';
   const hasErrors = sorted.length > 0;
 
+  // Call errors carry no id, so each is keyed by what it shows, with repeats of the same error numbered
+  const repeats = new Map<string, number>();
+  const rows = sorted.map(err => {
+    const shown = `${err.depth}|${err.type}|${err.address}|${err.error}`;
+    const repeat = repeats.get(shown) ?? 0;
+    repeats.set(shown, repeat + 1);
+    return { err, key: `${shown}|${repeat}` };
+  });
+
   return (
     <div
       className={clsx(
         'overflow-hidden rounded-xs border',
-        isSimulated && hasErrors ? 'border-danger/20 bg-danger/[0.03]' : 'border-border/50 bg-surface/20'
+        isSimulated && hasErrors ? 'border-danger-20 bg-danger-3' : 'border-border-50 bg-surface-20'
       )}
     >
       {/* Header */}
       <div
         className={clsx(
           'flex items-center gap-2 border-b px-3 py-2',
-          isSimulated && hasErrors ? 'border-danger/15 bg-danger/5' : 'border-border/30'
+          isSimulated && hasErrors ? 'border-danger-15 bg-danger-5' : 'border-border-30'
         )}
       >
         <div
@@ -207,23 +222,23 @@ function ErrorCard({
       <div className="px-3 py-2.5">
         {hasErrors ? (
           <div className="space-y-0.5 overflow-x-auto">
-            {sorted.map((err, idx) => (
+            {rows.map(({ err, key }) => (
               <div
-                key={idx}
+                key={key}
                 className="flex items-center gap-1.5 py-0.5 whitespace-nowrap"
                 style={{ paddingLeft: `${err.depth * 16}px` }}
               >
-                {err.depth > 0 && <span className="text-2xs text-muted/40">{'\u2514'}</span>}
+                {err.depth > 0 && <span className="text-2xs text-muted-40">{'\u2514'}</span>}
                 <span
                   className={clsx(
                     'shrink-0 rounded-xs px-1 py-px font-mono text-2xs font-semibold',
-                    isSimulated ? 'bg-danger/10 text-danger' : 'bg-warning/10 text-warning'
+                    isSimulated ? 'bg-danger-10 text-danger' : 'bg-warning-10 text-warning'
                   )}
                 >
                   {err.type}
                 </span>
-                <span className="font-mono text-2xs text-foreground/70">{err.address}</span>
-                <span className="font-mono text-2xs text-danger/70">({err.error})</span>
+                <span className="font-mono text-2xs text-foreground-70">{err.address}</span>
+                <span className="font-mono text-2xs text-danger-70">({err.error})</span>
               </div>
             ))}
           </div>
@@ -255,7 +270,7 @@ function GasComparisonSection({
   const isIncrease = result.simulated.gasUsed > result.original.gasUsed;
   const absDelta = Math.abs(result.simulated.gasUsed - result.original.gasUsed);
 
-  const simBarColor = overallDelta > 5 ? 'bg-danger/30' : overallDelta < -5 ? 'bg-success/25' : 'bg-primary/25';
+  const simBarColor = overallDelta > 5 ? 'bg-danger-30' : overallDelta < -5 ? 'bg-success-25' : 'bg-primary-25';
 
   return (
     <div className="space-y-2">
@@ -276,9 +291,9 @@ function GasComparisonSection({
         <div className="w-28 shrink-0 text-right font-mono text-sm font-bold text-muted tabular-nums">
           {formatGas(result.original.gasUsed)}
         </div>
-        <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-border/20">
+        <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-border-20">
           <div
-            className="absolute inset-y-0 left-0 rounded-full bg-foreground/15 transition-all duration-500"
+            className="absolute inset-y-0 left-0 rounded-full bg-foreground-15 transition-all duration-500"
             style={{ width: `${origPct}%` }}
           />
         </div>
@@ -308,19 +323,19 @@ function GasComparisonSection({
         >
           {formatGas(result.simulated.gasUsed)}
         </div>
-        <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-border/20">
+        <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-border-20">
           <div
             className={clsx('absolute inset-y-0 left-0 rounded-full transition-all duration-500', simBarColor)}
             style={{ width: `${simPct}%` }}
           />
           {/* Original position marker on simulated bar */}
-          <div className="absolute inset-y-0 z-10 w-px bg-foreground/40" style={{ left: `${origPct}%` }} />
+          <div className="absolute inset-y-0 z-10 w-px bg-foreground-40" style={{ left: `${origPct}%` }} />
         </div>
         <div className="w-8 shrink-0 text-right font-mono text-xs text-muted tabular-nums">{Math.round(simPct)}%</div>
       </Tooltip>
 
       {/* Footer: delta + limit status */}
-      <div className="flex items-center justify-between border-t border-border/30 pt-2">
+      <div className="flex items-center justify-between border-t border-border-30 pt-2">
         <div className="flex items-center gap-2">
           <span className={clsx('font-mono text-sm font-bold tabular-nums', getDeltaColor(overallDelta))}>
             {formatDelta(overallDelta)}
@@ -448,7 +463,7 @@ function OpcodeRow({ op, maxGas }: { op: OpcodeRowData; maxGas: number }): JSX.E
       }
       width="w-auto"
       description={
-        <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 whitespace-nowrap">
+        <div className="grid grid-cols-auto-1fr gap-x-3 gap-y-1 whitespace-nowrap">
           <span className="text-muted">Original</span>
           <span className="text-right font-mono tabular-nums">{formatGas(op.originalGas)}</span>
           <span className="text-muted">Simulated</span>
@@ -467,9 +482,10 @@ function OpcodeRow({ op, maxGas }: { op: OpcodeRowData; maxGas: number }): JSX.E
           )}
         </div>
       }
-      style={{ display: 'block' }}
+      // The ! outranks the tooltip's own inline-flex
+      className="block!"
     >
-      <div className="group rounded-xs py-1.5 pl-2 transition-colors hover:bg-surface/40">
+      <div className="group rounded-xs py-1.5 pl-2 transition-colors hover:bg-surface-40">
         {/* Main row — mirrors category header pattern */}
         <div className="flex items-center gap-2">
           <div className="size-2 shrink-0 rounded-full" style={{ backgroundColor: op.categoryColor }} />
@@ -495,13 +511,13 @@ function OpcodeRow({ op, maxGas }: { op: OpcodeRowData; maxGas: number }): JSX.E
         </div>
         {/* Mini before/after bars */}
         <div className="mt-1 ml-4 space-y-px">
-          <div className="relative h-1 overflow-hidden rounded-full bg-border/15">
+          <div className="relative h-1 overflow-hidden rounded-full bg-border-15">
             <div
-              className="absolute inset-y-0 left-0 rounded-full bg-foreground/12 transition-all duration-500"
+              className="absolute inset-y-0 left-0 rounded-full bg-foreground-12 transition-all duration-500"
               style={{ width: `${Math.max(origWidth, origWidth > 0 ? 0.5 : 0)}%` }}
             />
           </div>
-          <div className="relative h-1 overflow-hidden rounded-full bg-border/15">
+          <div className="relative h-1 overflow-hidden rounded-full bg-border-15">
             <div
               className="absolute inset-y-0 left-0 rounded-full transition-all duration-500"
               style={{
@@ -571,7 +587,7 @@ function OpcodeBreakdownSection({
   return (
     <div>
       {/* Category groups */}
-      <div className="divide-y divide-border/30">
+      <div className="divide-y divide-border-30">
         {categoryData.map(cat => {
           const isExpanded = expandedCategories.has(cat.name);
           return (
@@ -580,7 +596,7 @@ function OpcodeBreakdownSection({
               <button
                 type="button"
                 onClick={() => toggleCategory(cat.name)}
-                className="flex w-full items-center gap-2 py-2.5 text-left transition-colors hover:bg-surface/30"
+                className="flex w-full items-center gap-2 py-2.5 text-left transition-colors hover:bg-surface-30"
               >
                 <ChevronRightIcon
                   className={clsx('size-3 text-muted transition-transform duration-200', isExpanded && 'rotate-90')}
@@ -603,7 +619,7 @@ function OpcodeBreakdownSection({
 
               {/* Opcode rows */}
               {isExpanded && (
-                <div className="mb-1 ml-1.5 rounded-xs border-l-2 border-border/40 bg-surface/30 py-1 pl-3">
+                <div className="mb-1 ml-1.5 rounded-xs border-l-2 border-border-40 bg-surface-30 py-1 pl-3">
                   {cat.opcodes.map(op => (
                     <OpcodeRow key={op.opcode} op={op} maxGas={maxGas} />
                   ))}
@@ -660,7 +676,7 @@ function TransactionImpactView({
   const { currentNetwork } = useNetwork();
   const search = useSearch({ from: SIMULATE_ROUTE }) as GasProfilerSimulateSearch;
   const navigate = useNavigate({ from: SIMULATE_ROUTE });
-  const [expandedTxs, setExpandedTxs] = useState<Set<string>>(new Set());
+  const [expandedTxs, setExpandedTxs] = useState<Set<string>>(() => new Set());
 
   const toggleExpand = useCallback((hash: string) => {
     setExpandedTxs(prev => {
@@ -885,7 +901,7 @@ function TransactionImpactView({
       />
 
       {/* Transaction cards */}
-      <div className="divide-y divide-border/20">
+      <div className="divide-y divide-border-20">
         {pageRows.map(tx => {
           const statusChanged = tx.originalStatus !== tx.simulatedStatus;
           const hasErrors = (tx.originalErrors?.length ?? 0) > 0 || (tx.simulatedErrors?.length ?? 0) > 0;
@@ -900,7 +916,7 @@ function TransactionImpactView({
               <button
                 type="button"
                 onClick={() => toggleExpand(tx.hash)}
-                className="flex w-full items-center gap-2 rounded-xs px-1 py-2 text-left transition-colors hover:bg-surface/40"
+                className="flex w-full items-center gap-2 rounded-xs px-1 py-2 text-left transition-colors hover:bg-surface-40"
               >
                 <ChevronRightIcon
                   className={clsx(
@@ -942,7 +958,7 @@ function TransactionImpactView({
 
               {/* Expanded detail section */}
               {isExpanded && (
-                <div className="mt-1 mb-2 ml-5 rounded-xs border-l-2 border-border/40 bg-surface/20 p-3">
+                <div className="mt-1 mb-2 ml-5 rounded-xs border-l-2 border-border-40 bg-surface-20 p-3">
                   {/* Detail grid */}
                   <dl className="grid grid-cols-2 gap-x-8 gap-y-4 md:grid-cols-4">
                     <div>
@@ -976,7 +992,7 @@ function TransactionImpactView({
                           }
                         >
                           {tx.diverged ? (
-                            <span className="cursor-help text-warning underline decoration-warning/30 decoration-dotted underline-offset-2">
+                            <span className="cursor-help text-warning underline decoration-warning-30 decoration-dotted underline-offset-2">
                               Yes
                             </span>
                           ) : (
@@ -1047,12 +1063,12 @@ function TransactionImpactView({
                   )}
 
                   {/* Action links */}
-                  <div className="mt-3 flex items-center gap-3 border-t border-border/20 pt-3">
+                  <div className="mt-3 flex items-center gap-3 border-t border-border-20 pt-3">
                     <Link
                       to="/ethereum/execution/gas-profiler/tx/$txHash"
                       params={{ txHash: tx.hash }}
                       search={{ block: blockNumber }}
-                      className="rounded-sm bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                      className="rounded-sm bg-primary-10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary-20"
                     >
                       View tx details &rarr;
                     </Link>

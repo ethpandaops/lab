@@ -168,7 +168,7 @@ export function SlotDetailSkeleton({ slot, epoch }: SlotDetailSkeletonProps): JS
               </div>
             </div>
             <div className="flex items-center justify-center lg:items-start">
-              <LoadingContainer className="size-[180px] rounded-sm" />
+              <LoadingContainer className="size-45 rounded-sm" />
             </div>
           </div>
         </div>

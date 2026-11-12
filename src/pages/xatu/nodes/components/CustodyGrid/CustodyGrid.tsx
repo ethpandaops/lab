@@ -1,9 +1,9 @@
 import { type JSX, useState } from 'react';
 import clsx from 'clsx';
 import { Card } from '@/components/Layout/Card';
-import { DATA_COLUMN_COUNT } from '../../constants';
-import type { NodeDataColumns } from '../../hooks/useNodeDataColumns';
-import { formatMs } from '../../utils/node-stats';
+import { DATA_COLUMN_COUNT } from '@/pages/xatu/nodes/constants';
+import type { NodeDataColumns } from '@/pages/xatu/nodes/hooks/useNodeDataColumns';
+import { formatMs } from '@/pages/xatu/nodes/utils/node-stats';
 
 export interface CustodyGridProps {
   columns: NodeDataColumns;
@@ -52,7 +52,7 @@ export function CustodyGrid({ columns }: CustodyGridProps): JSX.Element {
               onMouseEnter={() => setHovered(index)}
               className={clsx(
                 'aspect-square rounded-xs transition-opacity',
-                column ? 'bg-primary/70' : 'bg-border/60',
+                column ? 'bg-primary-70' : 'bg-border-60',
                 hovered !== null && hovered !== index && 'opacity-60'
               )}
             />

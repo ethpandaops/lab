@@ -1,1 +1,1 @@
-export { PayloadsView, type PayloadsViewProps } from './PayloadsView';
+export { PayloadsView } from './PayloadsView';

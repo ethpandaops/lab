@@ -23,13 +23,13 @@ import {
 import { getForkForSlot, isForkAtOrAfter } from '@/utils/beacon';
 import { derivePayloadStatus } from '@/utils/epbs';
 import { EIP7870_REFERENCE_TAG } from '@/constants';
-import { slotToTimestamp } from '../../utils';
-import { useBlockDetailsData } from '../useBlockDetailsData';
-import { useMapData } from '../useMapData';
-import { useSidebarData } from '../useSidebarData';
-import { useBlobAvailabilityData } from '../useBlobAvailabilityData';
-import { useDataColumnAvailabilityData } from '../useDataColumnAvailabilityData';
-import { useAttestationData } from '../useAttestationData';
+import { slotToTimestamp } from '@/pages/ethereum/live/utils';
+import { useBlockDetailsData } from '@/pages/ethereum/live/hooks/useBlockDetailsData';
+import { useMapData } from '@/pages/ethereum/live/hooks/useMapData';
+import { useSidebarData } from '@/pages/ethereum/live/hooks/useSidebarData';
+import { useBlobAvailabilityData } from '@/pages/ethereum/live/hooks/useBlobAvailabilityData';
+import { useDataColumnAvailabilityData } from '@/pages/ethereum/live/hooks/useDataColumnAvailabilityData';
+import { useAttestationData } from '@/pages/ethereum/live/hooks/useAttestationData';
 import type { FctBlockFirstSeenByNode } from '@/api/types.gen';
 import type { SlotViewData } from './useSlotViewData.types';
 
@@ -446,12 +446,13 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
           propagationNodeCount: 0,
         };
       }
-      const at = (q: number): number => diffs[Math.min(diffs.length - 1, Math.floor(q * (diffs.length - 1)))];
+      const at = (q: number): number | null =>
+        diffs[Math.min(diffs.length - 1, Math.floor(q * (diffs.length - 1)))] ?? null;
       return {
-        propagationMinMs: diffs[0],
+        propagationMinMs: diffs[0] ?? null,
         propagationP50Ms: at(0.5),
         propagationP90Ms: at(0.9),
-        propagationMaxMs: diffs[diffs.length - 1],
+        propagationMaxMs: diffs.at(-1) ?? null,
         propagationNodeCount: diffs.length,
       };
     }, [blockFirstSeenQuery.data]);
@@ -563,7 +564,7 @@ export function useSlotViewData(currentSlot: number): SlotViewData {
 
     return {
       payloadFirstSeenMs: seenDiffs[0] ?? null,
-      payloadP50Ms: seenDiffs.length > 0 ? seenDiffs[Math.floor(0.5 * (seenDiffs.length - 1))] : null,
+      payloadP50Ms: seenDiffs[Math.floor(0.5 * (seenDiffs.length - 1))] ?? null,
       payloadNodeCount: seenDiffs.length,
       builderIndex: seenRows[0]?.builder_index ?? null,
       ptcPresentVotes: presentVotes,

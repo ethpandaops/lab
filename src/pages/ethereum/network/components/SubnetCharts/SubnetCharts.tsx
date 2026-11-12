@@ -4,9 +4,9 @@ import type {
   FctPeerSubnetCoverageDaily,
   FctPeerSubnetDaily,
 } from '@/api/types.gen';
-import { DayBarsCard } from '../DayBarsCard';
-import { SeriesCard } from '../SeriesCard';
-import { clientShareLines, line, seriesDays } from '../../utils/network-series';
+import { DayBarsCard } from '@/pages/ethereum/network/components/DayBarsCard';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import { clientShareLines, line, seriesDays } from '@/pages/ethereum/network/utils/network-series';
 
 type AttnetRow = FctPeerAttnetCountByClClientDaily;
 

@@ -5,7 +5,7 @@ import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { Slot } from '@/components/Ethereum/Slot';
 import { formatSlot } from '@/utils';
 import type { BlockDetailsModalProps } from './BlockDetailsModal.types';
-import type { ParsedBlock } from '../../hooks';
+import type { ParsedBlock } from '@/pages/ethereum/execution/locally-built-blocks/hooks';
 
 /**
  * Formats a wei value to ETH with proper formatting
@@ -92,15 +92,14 @@ export function BlockDetailsModal({
           nodeMap.get(nodeName)!.push(block);
         });
 
-        const nodes = Array.from(nodeMap.entries()).map(([nodeName, nodeBlocks]) => ({
-          nodeName,
-          blocks: nodeBlocks,
-          representativeBlock: nodeBlocks[0],
-        }));
+        const nodes = Array.from(nodeMap.entries()).flatMap(([nodeName, nodeBlocks]) => {
+          const [representativeBlock] = nodeBlocks;
+          return representativeBlock ? [{ nodeName, blocks: nodeBlocks, representativeBlock }] : [];
+        });
 
         return {
           slot: slotNumber,
-          slotStartDateTime: blocks[0].slot_start_date_time || 0,
+          slotStartDateTime: blocks[0]?.slot_start_date_time || 0,
           nodes,
           totalBlocks: blocks.length,
         };
@@ -150,11 +149,10 @@ export function BlockDetailsModal({
       deduplicatedNodeMap.set(nodeName, uniqueBlocks);
     });
 
-    nodeGroups = Array.from(deduplicatedNodeMap.entries()).map(([nodeName, nodeBlocks]) => ({
-      nodeName,
-      blocks: nodeBlocks,
-      representativeBlock: nodeBlocks[0],
-    }));
+    nodeGroups = Array.from(deduplicatedNodeMap.entries()).flatMap(([nodeName, nodeBlocks]) => {
+      const [representativeBlock] = nodeBlocks;
+      return representativeBlock ? [{ nodeName, blocks: nodeBlocks, representativeBlock }] : [];
+    });
   }
 
   const nodeCount = isPairingContext ? slotGroups.reduce((sum, s) => sum + s.nodes.length, 0) : nodeGroups.length;
@@ -223,7 +221,7 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
         Slot <Slot slot={slot} />
       </span>
       <div className="flex items-center gap-3 text-xs text-muted">
-        <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
+        <span className="rounded-sm bg-primary-20 px-1.5 py-0.5 font-medium text-primary">
           {nodes.length} Xatu node{nodes.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -234,7 +232,7 @@ function SlotCard({ slotGroup }: { slotGroup: SlotGroup }): JSX.Element {
     <Disclosure title={title}>
       <div className="space-y-3">
         {nodes.map((nodeGroup, index) => (
-          <div key={nodeGroup.nodeName} className="rounded-sm border border-border bg-background/30 p-3">
+          <div key={nodeGroup.nodeName} className="rounded-sm border border-border bg-background-30 p-3">
             <div className="mb-2 flex items-center gap-2 text-xs">
               <span className="text-muted">#{index + 1}</span>
               <span className="flex-1 truncate text-sm text-foreground">{nodeGroup.nodeName}</span>
@@ -268,7 +266,7 @@ function NodeCard({ nodeGroup, index }: { nodeGroup: NodeGroup; index: number })
       <span className="flex-1 truncate text-sm">{nodeName}</span>
       <div className="flex items-center gap-3 text-xs text-muted">
         {blocks.length > 1 && (
-          <span className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-medium text-primary">
+          <span className="rounded-sm bg-primary-20 px-1.5 py-0.5 font-medium text-primary">
             {blocks.length} blocks
           </span>
         )}

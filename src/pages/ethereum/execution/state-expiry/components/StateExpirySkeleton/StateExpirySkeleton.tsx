@@ -12,7 +12,7 @@ export function StateExpirySkeleton(): JSX.Element {
       {/* Summary Cards - 3 cards */}
       <div className="grid gap-2 md:grid-cols-3 md:gap-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <Card key={i} className="border-l-2 border-l-muted/50 p-2 md:p-3">
+          <Card key={i} className="border-l-2 border-l-muted-50 p-2 md:p-3">
             <LoadingContainer className="h-3 w-24" />
             <LoadingContainer className="mt-1.5 h-6 w-20" />
             <LoadingContainer className="mt-1 h-4 w-16" />
@@ -28,7 +28,7 @@ export function StateExpirySkeleton(): JSX.Element {
               <LoadingContainer className="h-5 w-32" />
               <LoadingContainer className="mt-1.5 h-3 w-40" />
             </div>
-            <LoadingContainer className="h-[280px] w-full" />
+            <LoadingContainer className="h-70 w-full" />
           </Card>
         ))}
       </div>

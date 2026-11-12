@@ -20,7 +20,7 @@ import {
   legendItemSize,
   clientAxisLabel,
   formatClientAxisLabel,
-} from '../chartChrome';
+} from '@/components/Charts/chartChrome';
 import { isKnownClient } from '@/utils/ethereum';
 
 // Get data visualization colors once at module level
@@ -195,7 +195,7 @@ export function BoxPlot({
         trigger: 'item' as const,
         ...getChartTooltipChrome(themeColors),
         formatter: (params: { seriesName: string; name: string; value: number[] }) => {
-          const [min, q1, median, q3, max] = params.value;
+          const [min = 0, q1 = 0, median = 0, q3 = 0, max = 0] = params.value;
           return `
             <div style="font-weight: 600; margin-bottom: 4px;">${params.seriesName}</div>
             <div style="display: flex; flex-direction: column; gap: 2px;">
@@ -255,12 +255,13 @@ export function BoxPlot({
   ]);
 
   return (
-    <div className={height === '100%' ? 'h-full w-full' : 'w-full'}>
+    <div className={height === '100%' ? 'size-full' : 'w-full'}>
       <ReactEChartsCore
         theme={ECHARTS_THEME}
         echarts={echarts}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
       />

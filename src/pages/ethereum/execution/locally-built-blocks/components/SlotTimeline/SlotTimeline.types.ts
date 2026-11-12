@@ -1,4 +1,4 @@
-import type { SlotBlocksGroup, BlockCountMap } from '../../hooks';
+import type { SlotBlocksGroup, BlockCountMap } from '@/pages/ethereum/execution/locally-built-blocks/hooks';
 
 export interface SlotTimelineProps {
   slotGroups: SlotBlocksGroup[];

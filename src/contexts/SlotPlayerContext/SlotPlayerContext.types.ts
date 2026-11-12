@@ -236,7 +236,7 @@ export interface SlotPlayerActions {
  * }), [handleSlotChange]);
  * ```
  */
-export interface SlotPlayerCallbacks {
+interface SlotPlayerCallbacks {
   /** Called when currentSlot changes (receives actual beacon chain slot number) */
   onSlotChange?: (slot: number) => void;
   /** Called when play state changes (isPlaying and reason for pause) */

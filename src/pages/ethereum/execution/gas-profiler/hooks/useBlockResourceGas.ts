@@ -3,8 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { intBlockResourceGasServiceListOptions } from '@/api/@tanstack/react-query.gen';
 import type { IntBlockResourceGas } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
-import { toResourceEntries, getResourceRefund, getTotalResourceGas } from '../utils/resourceGas';
-import type { ResourceGasEntry } from '../utils/resourceGas';
+import {
+  toResourceEntries,
+  getResourceRefund,
+  getTotalResourceGas,
+} from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
+import type { ResourceGasEntry } from '@/pages/ethereum/execution/gas-profiler/utils/resourceGas';
 
 export interface UseBlockResourceGasOptions {
   blockNumber: number | null;
@@ -43,11 +47,7 @@ export function useBlockResourceGas({ blockNumber }: UseBlockResourceGasOptions)
     staleTime: 5 * 60 * 1000,
   });
 
-  const record = useMemo<IntBlockResourceGas | null>(() => {
-    const items = data?.int_block_resource_gas;
-    if (!items?.length) return null;
-    return items[0];
-  }, [data]);
+  const record = useMemo<IntBlockResourceGas | null>(() => data?.int_block_resource_gas?.[0] ?? null, [data]);
 
   const entries = useMemo(() => toResourceEntries(record), [record]);
   const refund = useMemo(() => getResourceRefund(record), [record]);

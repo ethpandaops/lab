@@ -1,4 +1,4 @@
-import type { ProposalStatus } from '../utils/proposal-status';
+import type { ProposalStatus } from '@/pages/ethereum/validators/utils/proposal-status';
 import type {
   FctAttestationVoteCorrectnessByValidatorDaily,
   FctBlockProposerByValidator,
@@ -93,7 +93,7 @@ export interface ValidatorMetrics {
 /**
  * Daily data point for time series charts
  */
-export interface DailyDataPoint {
+interface DailyDataPoint {
   timestamp: number;
   validatorIndex: number;
 }

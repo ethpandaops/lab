@@ -1,4 +1,4 @@
-export interface CheckboxOption {
+interface CheckboxOption {
   /**
    * Unique identifier for the checkbox
    */
@@ -37,7 +37,7 @@ export interface CheckboxOption {
   onChange?: (checked: boolean) => void;
 }
 
-export type CheckboxGroupVariant = 'list' | 'list-inline' | 'list-right' | 'simple';
+type CheckboxGroupVariant = 'list' | 'list-inline' | 'list-right' | 'simple';
 
 export interface CheckboxGroupProps {
   /**

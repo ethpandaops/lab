@@ -7,7 +7,7 @@ interface ConfigGateProps {
 
 // ConfigGate: Gates the entire app until config is successfully loaded
 export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
-  const { data: config, isLoading, error } = useConfig();
+  const { data: config, isLoading } = useConfig();
 
   useEffect(() => {
     // Once React has mounted, hide the initial HTML loading screen
@@ -33,8 +33,6 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
 
   // Show error state if initial config fetch failed
   if (!config) {
-    console.error('Config error:', error);
-
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background">
         {/* Content */}
@@ -43,10 +41,9 @@ export function ConfigGate({ children }: ConfigGateProps): JSX.Element {
           <h1 className="mt-6 text-xl/8 font-semibold tracking-tight text-danger sm:mt-8 sm:text-2xl/8">
             Failed to Load Configuration
           </h1>
-          {error && <p className="mt-2 max-w-md text-center text-sm text-muted">{error.message}</p>}
           <button
             onClick={() => window.location.reload()}
-            className="mt-6 inline-flex h-8 items-center rounded-sm bg-danger px-4 text-sm font-semibold text-white transition-colors hover:bg-danger/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:mt-8 dark:text-background"
+            className="mt-6 inline-flex h-8 items-center rounded-sm bg-danger px-4 text-sm font-semibold text-on-solid transition-colors hover:bg-danger-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:mt-8"
           >
             Reload Page
           </button>

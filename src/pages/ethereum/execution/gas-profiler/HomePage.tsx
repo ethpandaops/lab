@@ -90,11 +90,9 @@ export function HomePage(): JSX.Element {
   const { data: bounds, isLoading: boundsLoading, error } = useGasProfilerBounds();
 
   // Initialize pinnedMax from bounds on first load
-  useEffect(() => {
-    if (bounds && pinnedMax === null) {
-      setPinnedMax(bounds.max);
-    }
-  }, [bounds, pinnedMax]);
+  if (bounds && pinnedMax === null) {
+    setPinnedMax(bounds.max);
+  }
 
   // Fetch recent blocks for visualization — pinned to anchorBlock
   const {
@@ -381,9 +379,9 @@ export function HomePage(): JSX.Element {
         <div
           className={clsx(
             'flex items-stretch bg-surface',
-            'outline-1 -outline-offset-1 transition-[outline-color]',
+            'outline-1 -outline-offset-1 transition-colors',
             searchError
-              ? 'outline-danger/50 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-danger'
+              ? 'outline-danger-50 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-danger'
               : 'outline-border focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-primary'
           )}
         >
@@ -401,14 +399,14 @@ export function HomePage(): JSX.Element {
           <button
             type="button"
             onClick={handleSearch}
-            className="bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary/90 sm:px-5"
+            className="bg-primary px-4 text-sm font-semibold text-on-fill transition-colors hover:bg-primary-90 sm:px-5"
           >
             Search
           </button>
           <button
             type="button"
             onClick={handleSimulate}
-            className="flex items-center gap-2 border-l border-border px-3 text-sm font-medium text-muted transition-colors hover:bg-primary/5 hover:text-foreground sm:px-4"
+            className="flex items-center gap-2 border-l border-border px-3 text-sm font-medium text-muted transition-colors hover:bg-primary-5 hover:text-foreground sm:px-4"
           >
             <BeakerIcon className="hidden size-4 sm:block" />
             Simulate
@@ -482,7 +480,7 @@ export function HomePage(): JSX.Element {
         <PopoutCard title="Gas by Category" anchorId="gas-by-category" modalSize="full">
           {({ inModal }) =>
             isOpcodeGasLoading ? (
-              <LoadingContainer className="h-[420px] rounded-sm" />
+              <LoadingContainer className="h-105 rounded-sm" />
             ) : gasByCategoryData.labels.length > 0 ? (
               <BarChart
                 data={gasByCategoryData.data}
@@ -504,7 +502,7 @@ export function HomePage(): JSX.Element {
                 }}
               />
             ) : (
-              <div className="flex h-[420px] items-center justify-center text-muted">No category data available</div>
+              <div className="flex h-105 items-center justify-center text-muted">No category data available</div>
             )
           }
         </PopoutCard>
@@ -513,11 +511,11 @@ export function HomePage(): JSX.Element {
       {/* Opcode Analysis - Charts by Gas and Count */}
       <div className="mb-6">
         {isOpcodeGasLoading ? (
-          <LoadingContainer className="h-[320px] rounded-sm" />
+          <LoadingContainer className="h-80 rounded-sm" />
         ) : opcodeStats.length > 0 ? (
           <OpcodeAnalysis opcodeStats={opcodeStats} maxOpcodes={10} />
         ) : (
-          <div className="flex h-[320px] items-center justify-center rounded-sm border border-border text-muted">
+          <div className="flex h-80 items-center justify-center rounded-sm border border-border text-muted">
             No opcode data available
           </div>
         )}

@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import type { FctPeerCountBySourceDaily, FctPeerReachabilityByClClientDaily } from '@/api/types.gen';
-import { SeriesCard } from '../SeriesCard';
-import { clientShareLines, dayShares, line, seriesDays } from '../../utils/network-series';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import { clientShareLines, dayShares, line, seriesDays } from '@/pages/ethereum/network/utils/network-series';
 
 export interface ReachabilityChartsProps {
   /** Network-wide consensus peer rows, one a day */

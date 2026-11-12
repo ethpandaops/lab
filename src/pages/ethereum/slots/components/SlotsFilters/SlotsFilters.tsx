@@ -17,7 +17,7 @@ import { useEntityOptions } from '@/pages/ethereum/clients/hooks/useEntityOption
 import { entityLabel } from '@/pages/ethereum/clients/utils/client-share';
 import { CONSENSUS_CLIENTS, EXECUTION_CLIENTS, truncateAddress } from '@/utils/ethereum';
 import { UNKNOWN_CLIENT, formatClientName } from '@/utils/graffiti';
-import { KNOWN_RELAYS, type SlotFilters } from '../../IndexPage.types';
+import { KNOWN_RELAYS, type SlotFilters } from '@/pages/ethereum/slots/IndexPage.types';
 
 export interface SlotsFiltersProps {
   filters: SlotFilters;

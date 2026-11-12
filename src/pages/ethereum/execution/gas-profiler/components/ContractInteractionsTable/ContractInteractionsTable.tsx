@@ -1,9 +1,9 @@
 import { Button } from '@/components/Elements/Button';
-import React, { type JSX, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { type JSX, useState, useCallback, useMemo } from 'react';
 import { ChevronRightIcon, ChevronDownIcon, CogIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import type { ContractInteractionsTableProps, ContractInteractionItem } from './ContractInteractionsTable.types';
-import { ContractStorageButton } from '../ContractStorageButton';
+import { ContractStorageButton } from '@/pages/ethereum/execution/gas-profiler/components/ContractStorageButton';
 
 /**
  * Sort field options for contracts table
@@ -32,16 +32,16 @@ function truncateAddress(address: string | null): string {
 function getCallTypeStyles(callType: string): { bg: string; text: string } {
   switch (callType) {
     case 'CREATE':
-      return { bg: 'bg-data-orange/10', text: 'text-data-orange' };
+      return { bg: 'bg-data-orange-10', text: 'text-data-orange' };
     case 'CREATE2':
-      return { bg: 'bg-warning/10', text: 'text-warning' };
+      return { bg: 'bg-warning-10', text: 'text-warning' };
     case 'DELEGATECALL':
-      return { bg: 'bg-data-purple/10', text: 'text-data-purple' };
+      return { bg: 'bg-data-purple-10', text: 'text-data-purple' };
     case 'STATICCALL':
-      return { bg: 'bg-data-cyan/10', text: 'text-data-cyan' };
+      return { bg: 'bg-data-cyan-10', text: 'text-data-cyan' };
     case 'CALL':
     default:
-      return { bg: 'bg-data-blue/10', text: 'text-data-blue' };
+      return { bg: 'bg-data-blue-10', text: 'text-data-blue' };
   }
 }
 
@@ -69,7 +69,7 @@ function ContractRow({
   const hasChildren = showImplementations && contract.implementations && contract.implementations.length > 0;
 
   return (
-    <tr className={clsx('transition-colors hover:bg-background', rowIndex % 2 === 0 ? 'bg-surface/30' : 'bg-surface')}>
+    <tr className={clsx('transition-colors hover:bg-background', rowIndex % 2 === 0 ? 'bg-surface-30' : 'bg-surface')}>
       <td className="px-4 py-2">
         <div className="flex items-center gap-2">
           {/* Cog icon for delegated contracts */}
@@ -137,7 +137,7 @@ function ContractRow({
           })}
         </div>
       </td>
-      <td className="px-2 py-2">
+      <td className="p-2">
         {contract.address && contract.address !== 'unknown' && (
           <ContractStorageButton address={contract.address} size="sm" />
         )}
@@ -161,7 +161,7 @@ function ImplementationRow({
   const pct = totalGas > 0 ? (contract.gas / totalGas) * 100 : 0;
 
   return (
-    <tr className="bg-surface/50 transition-colors hover:bg-background">
+    <tr className="bg-surface-50 transition-colors hover:bg-background">
       <td className="px-4 py-2">
         <div className="flex items-center gap-2 pl-7">
           {/* Indent + cog icon */}
@@ -192,7 +192,7 @@ function ImplementationRow({
       <td className="px-4 py-2 text-right">
         <div className="flex items-center justify-end gap-2">
           <div className="h-1.5 w-10 overflow-hidden rounded-full bg-border">
-            <div className="h-full bg-primary/50" style={{ width: `${Math.min(pct, 100)}%` }} />
+            <div className="h-full bg-primary-50" style={{ width: `${Math.min(pct, 100)}%` }} />
           </div>
           <span className="w-12 text-right text-xs text-muted">{pct.toFixed(1)}%</span>
         </div>
@@ -210,7 +210,7 @@ function ImplementationRow({
           })}
         </div>
       </td>
-      <td className="px-2 py-2">
+      <td className="p-2">
         {contract.address && contract.address !== 'unknown' && (
           <ContractStorageButton address={contract.address} size="sm" />
         )}
@@ -235,24 +235,20 @@ export function ContractInteractionsTable({
   initialVisibleCount = 10,
 }: ContractInteractionsTableProps): JSX.Element {
   const [visibleCount, setVisibleCount] = useState(initialVisibleCount);
-  const [expandedContracts, setExpandedContracts] = useState<Set<string>>(new Set());
-  const [sortField, setSortField] = useState<ContractSortField>('gas');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
-
-  // Auto-expand contracts with implementations on mount
-  useEffect(() => {
+  // Contracts with implementations start expanded
+  const [expandedContracts, setExpandedContracts] = useState<Set<string>>(() => {
+    const toExpand = new Set<string>();
     if (showImplementations) {
-      const toExpand = new Set<string>();
       contracts.forEach(contract => {
         if (contract.implementations && contract.implementations.length > 0) {
           toExpand.add(contract.address);
         }
       });
-      if (toExpand.size > 0) {
-        setExpandedContracts(toExpand);
-      }
     }
-  }, [contracts, showImplementations]);
+    return toExpand;
+  });
+  const [sortField, setSortField] = useState<ContractSortField>('gas');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
   const toggleExpand = useCallback((address: string) => {
     setExpandedContracts(prev => {
@@ -298,7 +294,7 @@ export function ContractInteractionsTable({
 
   if (contracts.length === 0) {
     return (
-      <div className="rounded-sm border border-border bg-surface/30 p-8 text-center text-sm text-muted">
+      <div className="rounded-sm border border-border bg-surface-30 p-8 text-center text-sm text-muted">
         No contract interactions
       </div>
     );

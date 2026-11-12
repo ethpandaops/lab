@@ -156,8 +156,8 @@ describe('clientThroughput', () => {
     ];
     const result = clientThroughput(rows);
     expect(result.map(r => r.client)).toEqual(['reth', 'geth']);
-    expect(result[0].throughput).toBeCloseTo(1000);
-    expect(result[1].throughput).toBeCloseTo(150_000 / 350);
+    expect(result[0]?.throughput).toBeCloseTo(1000);
+    expect(result[1]?.throughput).toBeCloseTo(150_000 / 350);
   });
 });
 

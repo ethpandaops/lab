@@ -2,7 +2,7 @@ import { type JSX, useMemo, useState, useRef, useEffect, useCallback } from 'rea
 import { createPortal } from 'react-dom';
 import { BarChart } from '@/components/Charts/Bar';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CATEGORY_COLORS, getOpcodeCategory } from '../../utils';
+import { CATEGORY_COLORS, getOpcodeCategory } from '@/pages/ethereum/execution/gas-profiler/utils';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();
@@ -10,7 +10,7 @@ const { DATA_COLORS } = getDataVizColors();
 /**
  * Opcode stats type
  */
-export interface OpcodeStats {
+interface OpcodeStats {
   opcode: string;
   count: number;
   totalGas: number;
@@ -79,7 +79,8 @@ function OpcodeByGasChart({
       tooltipFormatter={(params: unknown) => {
         const p = params as { name: string; value: number }[];
         if (!p || !p[0]) return '';
-        const stat = opcodeStats.find(s => s.opcode === p[0].name);
+        const { name } = p[0];
+        const stat = opcodeStats.find(s => s.opcode === name);
         if (!stat) return '';
         const pct = totalGas > 0 ? ((stat.totalGas / totalGas) * 100).toFixed(1) : '0';
         return `
@@ -139,7 +140,8 @@ function OpcodeByCountChart({
       tooltipFormatter={(params: unknown) => {
         const p = params as { name: string; value: number }[];
         if (!p || !p[0]) return '';
-        const stat = opcodeStats.find(s => s.opcode === p[0].name);
+        const { name } = p[0];
+        const stat = opcodeStats.find(s => s.opcode === name);
         if (!stat) return '';
         const pct = totalCount > 0 ? ((stat.count / totalCount) * 100).toFixed(1) : '0';
         return `
@@ -159,12 +161,12 @@ function OpcodeByCountChart({
 function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JSX.Element {
   const [hoveredOpcode, setHoveredOpcode] = useState<string | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
-  const cellRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cellsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   // Update tooltip position when hovered opcode changes
   useEffect(() => {
-    if (hoveredOpcode && cellRefs.current.has(hoveredOpcode)) {
-      const cell = cellRefs.current.get(hoveredOpcode)!;
+    if (hoveredOpcode && cellsRef.current.has(hoveredOpcode)) {
+      const cell = cellsRef.current.get(hoveredOpcode)!;
       const rect = cell.getBoundingClientRect();
       setTooltipPosition({
         top: rect.top - 8,
@@ -175,9 +177,9 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
 
   const setCellRef = useCallback((opcode: string, el: HTMLDivElement | null) => {
     if (el) {
-      cellRefs.current.set(opcode, el);
+      cellsRef.current.set(opcode, el);
     } else {
-      cellRefs.current.delete(opcode);
+      cellsRef.current.delete(opcode);
     }
   }, []);
 
@@ -218,13 +220,13 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
   const getColorIntensity = (gas: number): string => {
     const ratio = maxGas > 0 ? gas / maxGas : 0;
     // Indigo gradient: light to dark
-    if (ratio === 0) return 'bg-data-indigo/5';
-    if (ratio < 0.1) return 'bg-data-indigo/15';
-    if (ratio < 0.25) return 'bg-data-indigo/25';
-    if (ratio < 0.4) return 'bg-data-indigo/40';
-    if (ratio < 0.55) return 'bg-data-indigo/55';
-    if (ratio < 0.7) return 'bg-data-indigo/70';
-    if (ratio < 0.85) return 'bg-data-indigo/85';
+    if (ratio === 0) return 'bg-data-indigo-5';
+    if (ratio < 0.1) return 'bg-data-indigo-15';
+    if (ratio < 0.25) return 'bg-data-indigo-25';
+    if (ratio < 0.4) return 'bg-data-indigo-40';
+    if (ratio < 0.55) return 'bg-data-indigo-55';
+    if (ratio < 0.7) return 'bg-data-indigo-70';
+    if (ratio < 0.85) return 'bg-data-indigo-85';
     return 'bg-data-indigo';
   };
 
@@ -235,12 +237,12 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
         <div className="flex items-center gap-2 text-xs text-muted">
           <span>Low</span>
           <div className="flex gap-px">
-            <div className="size-3 bg-data-indigo/15" />
-            <div className="size-3 bg-data-indigo/25" />
-            <div className="size-3 bg-data-indigo/40" />
-            <div className="size-3 bg-data-indigo/55" />
-            <div className="size-3 bg-data-indigo/70" />
-            <div className="size-3 bg-data-indigo/85" />
+            <div className="size-3 bg-data-indigo-15" />
+            <div className="size-3 bg-data-indigo-25" />
+            <div className="size-3 bg-data-indigo-40" />
+            <div className="size-3 bg-data-indigo-55" />
+            <div className="size-3 bg-data-indigo-70" />
+            <div className="size-3 bg-data-indigo-85" />
             <div className="size-3 bg-data-indigo" />
           </div>
           <span>High</span>
@@ -276,10 +278,7 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
                     />
 
                     {/* Opcode label (vertical using writing-mode) */}
-                    <div
-                      className="mt-1 font-mono text-2xs whitespace-nowrap text-muted"
-                      style={{ writingMode: 'vertical-rl' }}
-                    >
+                    <div className="mt-1 font-mono text-2xs whitespace-nowrap text-muted writing-vertical-rl">
                       {opcode}
                     </div>
                   </div>
@@ -300,7 +299,7 @@ function OpcodeHeatmapChart({ opcodeStats }: { opcodeStats: OpcodeStats[] }): JS
 
           return createPortal(
             <div
-              className="pointer-events-none fixed z-[9999] -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
+              className="pointer-events-none fixed z-9999 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background px-3 py-2 text-xs whitespace-nowrap"
               style={{ top: tooltipPosition.top, left: tooltipPosition.left }}
             >
               <div className="font-mono font-semibold">{hoveredOpcode}</div>

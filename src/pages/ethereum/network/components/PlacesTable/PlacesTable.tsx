@@ -8,7 +8,7 @@ import type {
   FctPeerCountByClientAsnDaily,
   FctPeerCountByClientCountryDaily,
 } from '@/pages/ethereum/clients/api/client-models';
-import { countDelta, rankPlaces, type PlaceRow } from '../../utils/network-census';
+import { countDelta, rankPlaces, type PlaceRow } from '@/pages/ethereum/network/utils/network-census';
 
 /** Key of the census's bucket of countries too small to list */
 export const OTHER_COUNTRY = 'other';

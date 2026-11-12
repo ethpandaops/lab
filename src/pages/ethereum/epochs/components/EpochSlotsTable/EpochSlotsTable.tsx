@@ -12,7 +12,7 @@ import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useTablesBounds } from '@/hooks/useBounds';
 import { useNetwork } from '@/hooks/useNetwork';
 import { timestampToSlot } from '@/utils/beacon';
-import type { SlotData } from '../../hooks/useEpochDetailData.types';
+import type { SlotData } from '@/pages/ethereum/epochs/hooks/useEpochDetailData.types';
 import type { EpochSlotsTableProps } from './EpochSlotsTable.types';
 
 /**
@@ -56,12 +56,13 @@ export function EpochSlotsTable({
   // Use minOfMaxes to get the earliest ending point across both tables
   // This ensures we only mark slots as missed if BOTH tables have processed beyond that slot
   // Bounds are returned as Unix timestamps, so convert to slot number
+  const minOfMaxes = boundsData?.aggregate.minOfMaxes;
   const maxProcessedSlot = useMemo(() => {
-    if (!boundsData?.aggregate.minOfMaxes || !currentNetwork) {
+    if (!minOfMaxes || !currentNetwork) {
       return undefined;
     }
-    return timestampToSlot(boundsData.aggregate.minOfMaxes, currentNetwork.genesis_time);
-  }, [boundsData?.aggregate.minOfMaxes, currentNetwork]);
+    return timestampToSlot(minOfMaxes, currentNetwork.genesis_time);
+  }, [minOfMaxes, currentNetwork]);
 
   /**
    * Sort slots by slot number
@@ -237,7 +238,7 @@ export function EpochSlotsTable({
 
     return clsx({
       // Current slot - highlighted with accent color
-      'bg-accent/20 border-l-4 border-l-accent': isCurrent,
+      'bg-accent-20 border-l-4 border-l-accent': isCurrent,
       // Future slots - muted appearance
       'opacity-50': isFuture,
       // Past slots - normal appearance (default)

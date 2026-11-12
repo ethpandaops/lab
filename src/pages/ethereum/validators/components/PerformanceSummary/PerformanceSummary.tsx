@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { Stats } from '@/components/DataDisplay/Stats';
 import type { Stat } from '@/components/DataDisplay/Stats';
-import type { AggregateSummary } from '../../hooks/useValidatorsData.types';
+import type { AggregateSummary } from '@/pages/ethereum/validators/hooks/useValidatorsData.types';
 
 interface PerformanceSummaryProps {
   /** Aggregate summary data */
@@ -14,7 +14,7 @@ interface PerformanceSummaryProps {
 
 /** Skeleton placeholder shown in place of a value while loading */
 function ValueSkeleton(): JSX.Element {
-  return <span className="block h-8 w-20 animate-pulse rounded-xs bg-muted/20" />;
+  return <span className="block h-8 w-20 animate-pulse rounded-xs bg-muted-20" />;
 }
 
 /** Percentage with the given decimals; a dash when there is no rate */

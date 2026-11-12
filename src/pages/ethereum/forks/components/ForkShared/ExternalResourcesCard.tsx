@@ -22,7 +22,7 @@ export function ExternalResourcesCard({ links }: { links: ExternalResource[] }):
             rel="noopener noreferrer"
             className="group flex items-start gap-3 rounded-sm border border-border p-4 transition-colors hover:bg-background"
           >
-            <ArrowTopRightOnSquareIcon className="mt-0.5 h-4 w-4 shrink-0 text-muted transition-colors group-hover:text-foreground" />
+            <ArrowTopRightOnSquareIcon className="mt-0.5 size-4 shrink-0 text-muted transition-colors group-hover:text-foreground" />
             <div>
               <div className="text-sm font-medium text-foreground">{link.label}</div>
               <div className="mt-1 text-xs text-muted">{link.description}</div>

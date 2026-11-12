@@ -3,9 +3,9 @@ import { DataTable } from '@/components/DataTable';
 import type { DataTableColumn } from '@/components/DataTable/DataTable.types';
 import { Slot } from '@/components/Ethereum/Slot';
 import { Card } from '@/components/Layout/Card';
-import type { NodeDataColumns } from '../../hooks/useNodeDataColumns';
-import type { NodePerformance } from '../../hooks/useNodePerformance';
-import { formatMs } from '../../utils/node-stats';
+import type { NodeDataColumns } from '@/pages/xatu/nodes/hooks/useNodeDataColumns';
+import type { NodePerformance } from '@/pages/xatu/nodes/hooks/useNodePerformance';
+import { formatMs } from '@/pages/xatu/nodes/utils/node-stats';
 
 export interface NodeSlotsTableProps {
   performance: NodePerformance;

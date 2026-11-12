@@ -10,7 +10,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -64,7 +64,7 @@ export const WithNestedSubsections: Story = {
           <ListItem>
             <a
               href="#live"
-              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary/10 hover:text-primary"
+              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary-10 hover:text-primary"
             >
               Live
             </a>
@@ -72,7 +72,7 @@ export const WithNestedSubsections: Story = {
           <ListItem>
             <a
               href="#validators"
-              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary/10 hover:text-primary"
+              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary-10 hover:text-primary"
             >
               Validators
             </a>
@@ -83,7 +83,7 @@ export const WithNestedSubsections: Story = {
           <ListItem>
             <a
               href="#blocks"
-              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary/10 hover:text-primary"
+              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary-10 hover:text-primary"
             >
               Blocks
             </a>
@@ -91,7 +91,7 @@ export const WithNestedSubsections: Story = {
           <ListItem>
             <a
               href="#transactions"
-              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary/10 hover:text-primary"
+              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted hover:bg-primary-10 hover:text-primary"
             >
               Transactions
             </a>
@@ -160,7 +160,7 @@ export const SidebarExample: Story = {
             <ListItem>
               <a
                 href="#live"
-                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary-10 hover:text-primary"
               >
                 Live
               </a>
@@ -168,7 +168,7 @@ export const SidebarExample: Story = {
             <ListItem>
               <a
                 href="#validators"
-                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary-10 hover:text-primary"
               >
                 Validators
               </a>
@@ -176,7 +176,7 @@ export const SidebarExample: Story = {
             <ListItem>
               <a
                 href="#attestations"
-                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary-10 hover:text-primary"
               >
                 Attestations
               </a>
@@ -187,7 +187,7 @@ export const SidebarExample: Story = {
             <ListItem>
               <a
                 href="#blocks"
-                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary-10 hover:text-primary"
               >
                 Blocks
               </a>
@@ -195,7 +195,7 @@ export const SidebarExample: Story = {
             <ListItem>
               <a
                 href="#transactions"
-                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+                className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary-10 hover:text-primary"
               >
                 Transactions
               </a>
@@ -207,7 +207,7 @@ export const SidebarExample: Story = {
           <ListItem>
             <a
               href="#contributors"
-              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary-10 hover:text-primary"
             >
               Contributors
             </a>
@@ -215,7 +215,7 @@ export const SidebarExample: Story = {
           <ListItem>
             <a
               href="#geographical-checklist"
-              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary-10 hover:text-primary"
             >
               Geographical Checklist
             </a>
@@ -223,7 +223,7 @@ export const SidebarExample: Story = {
           <ListItem>
             <a
               href="#locally-built-blocks"
-              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary/10 hover:text-primary"
+              className="block rounded-lg px-2.5 py-1.5 text-sm font-semibold text-muted transition-all hover:bg-primary-10 hover:text-primary"
             >
               Locally Built Blocks
             </a>

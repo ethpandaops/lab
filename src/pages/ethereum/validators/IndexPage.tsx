@@ -90,7 +90,7 @@ export function IndexPage(): JSX.Element {
 
   const themeColors = useThemeColors();
   const { CHART_CATEGORICAL_COLORS: palette, DATA_COLORS } = getDataVizColors();
-  const credentialColors: Record<CredentialType, string> = {
+  const credentialColors: Record<CredentialType, string | undefined> = {
     '0x00': themeColors.muted,
     '0x01': palette[0],
     '0x02': palette[1],
@@ -103,7 +103,7 @@ export function IndexPage(): JSX.Element {
   // Some tables start inside long windows; say where, rather than leave the early periods blank
   const dataStart = (has: (d: OverviewPeriod) => boolean): string | undefined => {
     const first = days.find(has)?.day;
-    if (!first || first === days[0].day) return undefined;
+    if (!first || first === days[0]?.day) return undefined;
     const date = new Date(`${first}T00:00:00Z`).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -124,10 +124,11 @@ export function IndexPage(): JSX.Element {
       .flatMap(f => {
         const day = new Date(epochToTimestamp(f.epoch, currentNetwork.genesis_time) * 1000).toISOString().slice(0, 10);
         const idx = dayList.findIndex(d => d >= day);
-        if (idx <= 0) return [];
+        const dayLabel = labelList[idx];
+        if (idx <= 0 || dayLabel === undefined) return [];
         return [
           {
-            xValue: labelList[idx],
+            xValue: dayLabel,
             label: f.displayName,
             labelPosition: 'end' as const,
             color: DATA_COLORS.violet,
@@ -218,7 +219,7 @@ export function IndexPage(): JSX.Element {
               currentNetwork?.name !== 'mainnet' && (
                 <Link
                   to="/ethereum/validators/inspect"
-                  className="rounded-xs border border-primary bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/20"
+                  className="rounded-xs border border-primary bg-primary-10 px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary-20"
                 >
                   Inspect validators
                 </Link>
@@ -375,7 +376,7 @@ export function IndexPage(): JSX.Element {
               )}
             </PopoutCard>
 
-            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <div className="grid gap-4 *:min-w-0 xl:grid-cols-2">
               <PopoutCard title="Validators by status" anchorId="validators-by-status" modalSize="full">
                 {({ inModal }) => (
                   <MultiLineChart
@@ -459,7 +460,7 @@ export function IndexPage(): JSX.Element {
               </PopoutCard>
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <div className="grid gap-4 *:min-w-0 xl:grid-cols-2">
               <PopoutCard
                 title={`Validator operations ${perPeriod}`}
                 subtitle={opsStart}
@@ -536,7 +537,7 @@ export function IndexPage(): JSX.Element {
               </PopoutCard>
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
+            <div className="grid gap-4 *:min-w-0 xl:grid-cols-2">
               <PopoutCard
                 title={`Consensus rewards ${perPeriod}`}
                 subtitle={dataStart(d => d.rewards !== null)}

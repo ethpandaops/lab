@@ -1,8 +1,8 @@
 import type { JSX } from 'react';
 import type { FctPeerCustodyByColumnDaily, FctPeerCustodyCoverageDaily } from '@/api/types.gen';
-import { DayBarsCard } from '../DayBarsCard';
-import { SeriesCard } from '../SeriesCard';
-import { line, seriesDays } from '../../utils/network-series';
+import { DayBarsCard } from '@/pages/ethereum/network/components/DayBarsCard';
+import { SeriesCard } from '@/pages/ethereum/network/components/SeriesCard';
+import { line, seriesDays } from '@/pages/ethereum/network/utils/network-series';
 
 export interface ColumnCustodyProps {
   /** Custodians per column, one row a day */

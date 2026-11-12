@@ -2,7 +2,7 @@ import type { JSX, ReactNode } from 'react';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { CountryFlag } from '@/components/Elements/CountryFlag';
-import type { NodeRow } from '../../hooks/useNodeRows';
+import type { NodeRow } from '@/pages/xatu/nodes/hooks/useNodeRows';
 
 export interface LocationsBreakdownProps {
   /** Rows that carry a location */
@@ -29,8 +29,8 @@ interface Group {
 
 /** Groups rows by each key in turn, largest group first */
 function groupBy(rows: NodeRow[], levels: Array<(row: NodeRow) => { key: string; label: ReactNode }>): Group[] {
-  if (levels.length === 0) return [];
   const [level, ...rest] = levels;
+  if (!level) return [];
   const groups = new Map<string, { label: ReactNode; rows: NodeRow[] }>();
   rows.forEach(row => {
     const { key, label } = level(row);

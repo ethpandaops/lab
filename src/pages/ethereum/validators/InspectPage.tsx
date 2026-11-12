@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import clsx from 'clsx';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
@@ -73,7 +73,11 @@ export function InspectPage(): JSX.Element {
   const [tags, setTags] = useState<string[]>(() => tagsFromUrl(search.indices));
   const [range, setRange] = useState<{ from?: number; to?: number }>({ from: search.from, to: search.to });
   const [heatmapMetric, setHeatmapMetric] = useState<HeatmapMetric>('inclusion');
-  const [hasAnalyzed, setHasAnalyzed] = useState(false);
+  // Analyse straight away when the URL already names validators
+  const [hasAnalyzed, setHasAnalyzed] = useState(() => {
+    const { valid, pubkeys } = parseValidatorIndices(tagsFromUrl(search.indices));
+    return valid.length > 0 || pubkeys.length > 0;
+  });
   // When Activity was last asked to run to now; reset with each range, so its requests stay the same in between
   const [activityNow, setActivityNow] = useState(() => Date.now());
   const [selection, setSelection] = useState<ValidatorSelection>({
@@ -217,16 +221,6 @@ export function InspectPage(): JSX.Element {
     [applyRange]
   );
 
-  // Analyse straight away when the URL already names validators
-  const hasInitialized = useRef(false);
-  useEffect(() => {
-    if (hasInitialized.current) return;
-    hasInitialized.current = true;
-    const { valid, pubkeys } = parseValidatorIndices(tagsFromUrl(search.indices));
-    if (valid.length > 0 || pubkeys.length > 0) setHasAnalyzed(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const loading = isResolving || isLoading || rangeFrom === undefined;
   const busy = loading || isPlaceholderData;
   const rangeMeta = (
@@ -239,6 +233,8 @@ export function InspectPage(): JSX.Element {
     performanceFloor !== undefined && from < performanceFloor
       ? `Attestation and proposal data start ${formatDate(performanceFloor)}.`
       : undefined;
+  const singleIdentity = identityList.length === 1 ? identityList[0] : undefined;
+  const singleIndex = knownIndices.length === 1 ? knownIndices[0] : undefined;
 
   return (
     <Container>
@@ -295,9 +291,9 @@ export function InspectPage(): JSX.Element {
 
         {hasAnalyzed && !error && !resolverError && knownIndices.length > 0 && (
           <div className={clsx('flex flex-col gap-10 transition-opacity', isPlaceholderData && 'opacity-60')}>
-            <div className="grid gap-4 xl:grid-cols-2 [&>*]:min-w-0">
-              {identityList.length === 1 && (!endsEarlier || endStates) && (
-                <ValidatorIdentityCard identity={identityList[0]} endState={endStates?.get(identityList[0].index)} />
+            <div className="grid gap-4 *:min-w-0 xl:grid-cols-2">
+              {singleIdentity && (!endsEarlier || endStates) && (
+                <ValidatorIdentityCard identity={singleIdentity} endState={endStates?.get(singleIdentity.index)} />
               )}
               {identityList.length > 1 && (!endsEarlier || endStates) && (
                 <ValidatorSetCard identities={identityList} endStates={endStates} />
@@ -333,7 +329,7 @@ export function InspectPage(): JSX.Element {
               />
               {loading ? (
                 <ValidatorsSkeleton />
-              ) : hasData && knownIndices.length === 1 ? (
+              ) : hasData && singleIndex !== undefined ? (
                 // One validator: the cards above already summarise it, so only its day-by-day rows follow
                 <Card title="Daily breakdown">
                   <DailyBreakdownTable
@@ -341,23 +337,23 @@ export function InspectPage(): JSX.Element {
                     balanceData={balanceDaily}
                     syncCommitteeData={syncCommitteeDaily}
                     blockProposals={blockProposals}
-                    validatorIndex={knownIndices[0]}
+                    validatorIndex={singleIndex}
                     from={performanceFrom}
                     to={dataTo}
                     stepDays={resolution === 'week' ? 7 : 1}
                     onWeekSelect={weekStart => {
                       applyRange(weekRange(weekStart));
-                      setSelection({ validatorIndex: knownIndices[0], dayTimestamp: null, hourTimestamp: null });
+                      setSelection({ validatorIndex: singleIndex, dayTimestamp: null, hourTimestamp: null });
                     }}
                     getStatusAtTimestamp={getStatusAtTimestamp}
                     selectedDayTimestamp={selection.dayTimestamp}
                     selectedHourTimestamp={selection.hourTimestamp}
                     onDaySelect={dayTs =>
-                      setSelection({ validatorIndex: knownIndices[0], dayTimestamp: dayTs, hourTimestamp: null })
+                      setSelection({ validatorIndex: singleIndex, dayTimestamp: dayTs, hourTimestamp: null })
                     }
                     onHourSelect={hourTs =>
                       setSelection({
-                        validatorIndex: knownIndices[0],
+                        validatorIndex: singleIndex,
                         dayTimestamp: selection.dayTimestamp,
                         hourTimestamp: hourTs,
                       })

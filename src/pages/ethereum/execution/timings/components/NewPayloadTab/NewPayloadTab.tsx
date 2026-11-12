@@ -18,9 +18,14 @@ import type {
   FctEngineNewPayloadWinrateDaily,
   IntEngineNewPayloadFastestExecutionByNodeClass,
 } from '@/api/types.gen';
-import type { EngineTimingsData } from '../../hooks/useEngineTimingsData';
-import { PER_SLOT_CHART_RANGES, HOURLY_CHART_RANGES, TIME_RANGE_CONFIG, type TimeRange } from '../../IndexPage.types';
-import { ClientVersionBreakdown } from '../ClientVersionBreakdown';
+import type { EngineTimingsData } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
+import {
+  PER_SLOT_CHART_RANGES,
+  HOURLY_CHART_RANGES,
+  TIME_RANGE_CONFIG,
+  type TimeRange,
+} from '@/pages/ethereum/execution/timings/IndexPage.types';
+import { ClientVersionBreakdown } from '@/pages/ethereum/execution/timings/components/ClientVersionBreakdown';
 
 export interface NewPayloadTabProps {
   data: EngineTimingsData;
@@ -71,7 +76,10 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     : newPayloadByElClientDaily;
 
   // Filter to VALID status only for duration-based charts
-  const validPayloadByElClient = newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID');
+  const validPayloadByElClient = useMemo(
+    () => newPayloadByElClient.filter(r => r.status?.toUpperCase() === 'VALID'),
+    [newPayloadByElClient]
+  );
 
   // Hourly data is already filtered to VALID status in the SQL query (via quantileIf)
   // so we can use it directly for the summary table
@@ -284,9 +292,9 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
     };
   });
 
-  // Ensure valid bounds (fallback to now if no data)
-  if (trendMinTime === Infinity) trendMinTime = Date.now() - 3600000;
-  if (trendMaxTime === -Infinity) trendMaxTime = Date.now();
+  // Without duration points, the axis spans whatever points the chart has
+  const trendAxisMin = trendMinTime === Infinity ? 'dataMin' : trendMinTime;
+  const trendAxisMax = trendMaxTime === -Infinity ? 'dataMax' : trendMaxTime;
 
   // Axis and tooltip labels for the trend charts' hourly/daily buckets
   const formatTrendAxis = (value: number | string): string => {
@@ -507,7 +515,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                   enableDataZoom
                 />
               ) : (
-                <div className="flex h-[300px] items-center justify-center text-muted">No slot data available</div>
+                <div className="flex h-75 items-center justify-center text-muted">No slot data available</div>
               )
             }
           </PopoutCard>
@@ -537,8 +545,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: trendMinTime,
-                    max: trendMaxTime,
+                    min: trendAxisMin,
+                    max: trendAxisMax,
                     formatter: formatTrendAxis,
                   }}
                   yAxis={{
@@ -588,8 +596,8 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                   xAxis={{
                     type: 'value',
                     name: 'Time',
-                    min: trendMinTime,
-                    max: trendMaxTime,
+                    min: trendAxisMin,
+                    max: trendAxisMax,
                     formatter: formatTrendAxis,
                   }}
                   yAxis={{
@@ -648,7 +656,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
                 height={inModal ? 600 : 300}
               />
             ) : (
-              <div className="flex h-[300px] items-center justify-center text-muted">No histogram data available</div>
+              <div className="flex h-75 items-center justify-center text-muted">No histogram data available</div>
             )
           }
         </PopoutCard>
@@ -663,7 +671,7 @@ export function NewPayloadTab({ data, timeRange }: NewPayloadTabProps): JSX.Elem
             statusData.some(d => d.value > 0) ? (
               <BarChart data={statusData} labels={statusLabels} height={inModal ? 600 : 300} orientation="horizontal" />
             ) : (
-              <div className="flex h-[300px] items-center justify-center text-muted">No status data available</div>
+              <div className="flex h-75 items-center justify-center text-muted">No status data available</div>
             )
           }
         </PopoutCard>
@@ -707,11 +715,13 @@ function buildStandings(totalsByImpl: Map<string, number>, allClients: string[])
     .sort((a, b) => b.totalWins - a.totalWins);
 
   let currentRank = 1;
-  for (let idx = 0; idx < sorted.length; idx++) {
-    if (idx > 0 && sorted[idx].totalWins < sorted[idx - 1].totalWins) {
+  let previousWins: number | undefined;
+  for (const [idx, standing] of sorted.entries()) {
+    if (previousWins !== undefined && standing.totalWins < previousWins) {
       currentRank = idx + 1;
     }
-    sorted[idx].rank = currentRank;
+    standing.rank = currentRank;
+    previousWins = standing.totalWins;
   }
 
   return sorted;
@@ -790,7 +800,8 @@ function WinrateSection({
         }
 
         // Use the timestamp of the first slot in the bucket for the label
-        const ts = slotToTimestamp.get(bucketSlots[0]) ?? 0;
+        const firstSlot = bucketSlots[0];
+        const ts = firstSlot === undefined ? 0 : (slotToTimestamp.get(firstSlot) ?? 0);
         const date = new Date(ts * 1000);
         const label = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         const tooltipLabel = `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}, ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })} UTC`;
@@ -1025,7 +1036,7 @@ function WinrateSection({
   if (!chartConfig && standings.length === 0) return null;
 
   const totalWins = standings.reduce((s, st) => s + st.totalWins, 0);
-  const maxWinRate = standings.length > 0 ? standings[0].winRate : 0;
+  const maxWinRate = standings[0]?.winRate ?? 0;
 
   return (
     <PopoutCard
@@ -1073,27 +1084,33 @@ function WinrateSection({
                     key={standing.implementation}
                     className={clsx(
                       'relative overflow-hidden',
-                      isLeader ? 'rounded-sm border px-4 py-4' : 'rounded-xs px-3 py-2',
+                      isLeader ? 'rounded-sm border p-4' : 'rounded-xs px-3 py-2',
                       isLeader ? 'border-border' : '',
                       !isLeader && isTopThree && medal ? medal.bg : '',
-                      !isTopThree ? 'bg-surface/20' : ''
+                      !isTopThree ? 'bg-surface-20' : ''
                     )}
                   >
                     {/* Proportional fill bar */}
                     <div
-                      className={clsx('absolute inset-y-0 left-0', isLeader ? 'rounded-sm' : 'rounded-xs')}
+                      className={clsx(
+                        'absolute inset-y-0 left-0',
+                        isLeader
+                          ? 'rounded-sm opacity-12'
+                          : isTopThree
+                            ? 'rounded-xs opacity-10'
+                            : 'rounded-xs opacity-6'
+                      )}
                       style={{
                         width: `${barWidth}%`,
                         backgroundColor: standing.color,
-                        opacity: isLeader ? 0.12 : isTopThree ? 0.1 : 0.06,
                       }}
                     />
 
                     {/* Left accent bar for top 3 */}
                     {isTopThree && (
                       <div
-                        className={clsx('absolute inset-y-0 left-0', isLeader ? 'w-1' : 'w-0.5')}
-                        style={{ backgroundColor: standing.color, opacity: isLeader ? 0.8 : 0.5 }}
+                        className={clsx('absolute inset-y-0 left-0', isLeader ? 'w-1 opacity-80' : 'w-0.5 opacity-50')}
+                        style={{ backgroundColor: standing.color }}
                       />
                     )}
 
@@ -1103,7 +1120,7 @@ function WinrateSection({
                         className={clsx(
                           'shrink-0 text-center font-semibold tabular-nums',
                           isLeader ? 'w-9 text-2xl/8' : isTopThree ? 'w-8 text-xl/7' : 'w-5 text-xs/5',
-                          isTopThree && medal ? medal.text : 'text-muted/50'
+                          isTopThree && medal ? medal.text : 'text-muted-50'
                         )}
                       >
                         {standing.rank}
@@ -1131,7 +1148,7 @@ function WinrateSection({
                           {standing.implementation}
                         </div>
                         {isTopThree && (
-                          <div className="text-2xs/4 text-muted/60">{standing.totalWins.toLocaleString()} wins</div>
+                          <div className="text-2xs/4 text-muted-60">{standing.totalWins.toLocaleString()} wins</div>
                         )}
                       </div>
 
@@ -1141,7 +1158,7 @@ function WinrateSection({
                           'shrink-0 font-semibold tracking-tight tabular-nums',
                           isLeader ? 'text-2xl/7 text-foreground' : '',
                           !isLeader && isTopThree && medal ? `text-lg/6 ${medal.text}` : '',
-                          !isTopThree ? 'text-sm/5 text-muted/70' : ''
+                          !isTopThree ? 'text-sm/5 text-muted-70' : ''
                         )}
                       >
                         {standing.winRate > 0 ? `${standing.winRate}%` : '—'}
@@ -1154,7 +1171,7 @@ function WinrateSection({
 
             {/* Wins in total; a tie counts for every tied client */}
             {totalWins > 0 && (
-              <div className="mt-3 text-center text-2xs text-muted/40 tabular-nums">
+              <div className="mt-3 text-center text-2xs text-muted-40 tabular-nums">
                 {totalWins.toLocaleString()} wins
               </div>
             )}
@@ -1167,7 +1184,7 @@ function WinrateSection({
 
 /** Rank styling for the podium positions (neutral: a rank is not a status) */
 const MEDAL_CONFIG: Record<number, { bg: string; text: string }> = {
-  1: { bg: 'bg-muted/10', text: 'text-foreground' },
-  2: { bg: 'bg-muted/10', text: 'text-foreground' },
-  3: { bg: 'bg-muted/5', text: 'text-foreground' },
+  1: { bg: 'bg-muted-10', text: 'text-foreground' },
+  2: { bg: 'bg-muted-10', text: 'text-foreground' },
+  3: { bg: 'bg-muted-5', text: 'text-foreground' },
 };

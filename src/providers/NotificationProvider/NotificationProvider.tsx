@@ -67,7 +67,7 @@ export function NotificationProvider({ children }: NotificationProviderProps): J
   );
 
   return (
-    <NotificationContext.Provider value={value}>
+    <NotificationContext value={value}>
       {children}
       {notifications.map(notification => (
         <Notification
@@ -81,6 +81,6 @@ export function NotificationProvider({ children }: NotificationProviderProps): J
           {notification.message}
         </Notification>
       ))}
-    </NotificationContext.Provider>
+    </NotificationContext>
   );
 }

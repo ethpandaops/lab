@@ -113,11 +113,11 @@ export function getActiveFork(network: Network, epoch: number): ForkInfo | null 
   const activeForks = forks.filter(f => epoch >= f.epoch);
 
   // Return the most recent one (last in the filtered list, since they're sorted by epoch)
-  if (activeForks.length === 0) {
+  const fork = activeForks.at(-1);
+  if (!fork) {
     return null;
   }
 
-  const fork = activeForks[activeForks.length - 1];
   return {
     ...fork,
     isActive: true,
@@ -145,12 +145,13 @@ export function getNextFork(network: Network, epoch: number): ForkInfo | null {
   const upcomingForks = forks.filter(f => epoch < f.epoch);
 
   // Return the first one (earliest upcoming fork)
-  if (upcomingForks.length === 0) {
+  const fork = upcomingForks[0];
+  if (!fork) {
     return null;
   }
 
   return {
-    ...upcomingForks[0],
+    ...fork,
     isActive: false,
   };
 }
@@ -171,7 +172,7 @@ export function getNextFork(network: Network, epoch: number): ForkInfo | null {
  * ```
  */
 export function isForkActive(network: Network, forkName: ForkName, epoch?: number): boolean {
-  const fork = network.forks.consensus[forkName];
+  const fork = network.forks.consensus?.[forkName];
   if (!fork) {
     return false;
   }
@@ -198,7 +199,7 @@ export function isForkActive(network: Network, forkName: ForkName, epoch?: numbe
  * ```
  */
 export function getForkEpoch(network: Network, forkName: ForkName): number | null {
-  const fork = network.forks.consensus[forkName];
+  const fork = network.forks.consensus?.[forkName];
   return fork?.epoch ?? null;
 }
 
@@ -226,7 +227,7 @@ export function getForksAtEpoch(network: Network, epoch: number): ForkInfo[] {
  * Includes both consensus fork names (phase0, altair, etc.)
  * and combined upgrade names (merge, shapella, dencun, pectra, fusaka, glamsterdam).
  */
-export const VALID_FORK_SLUGS = [
+const VALID_FORK_SLUGS = [
   // Consensus fork names
   'phase0',
   'altair',
@@ -245,7 +246,7 @@ export const VALID_FORK_SLUGS = [
   'glamsterdam',
 ] as const;
 
-export type ForkSlug = (typeof VALID_FORK_SLUGS)[number];
+type ForkSlug = (typeof VALID_FORK_SLUGS)[number];
 
 /**
  * Check if a string is a valid fork slug.
@@ -253,7 +254,7 @@ export type ForkSlug = (typeof VALID_FORK_SLUGS)[number];
  * @param slug - String to validate
  * @returns True if the slug is a valid fork identifier
  */
-export function isValidForkSlug(slug: string): slug is ForkSlug {
+function isValidForkSlug(slug: string): slug is ForkSlug {
   return VALID_FORK_SLUGS.includes(slug as ForkSlug);
 }
 

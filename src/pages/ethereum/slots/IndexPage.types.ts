@@ -4,10 +4,10 @@ import { z } from 'zod';
 export const SLOT_SORTS = ['slot', 'gas', 'txs', 'blobs'] as const;
 export type SlotSort = (typeof SLOT_SORTS)[number];
 
-export const SLOT_STATUSES = ['proposed', 'missed', 'orphaned'] as const;
+const SLOT_STATUSES = ['proposed', 'missed', 'orphaned'] as const;
 export type SlotStatus = (typeof SLOT_STATUSES)[number];
 
-export const BLOCK_SOURCES = ['mev', 'local'] as const;
+const BLOCK_SOURCES = ['mev', 'local'] as const;
 export type BlockSource = (typeof BLOCK_SOURCES)[number];
 
 export const DEFAULT_PAGE_SIZE = 50;

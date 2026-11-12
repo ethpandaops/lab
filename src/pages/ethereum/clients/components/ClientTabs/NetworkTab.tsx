@@ -1,10 +1,10 @@
 import type { JSX } from 'react';
 import { SegmentedControl } from '@/components/Forms/SegmentedControl';
-import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS } from '../../constants';
-import { usePeerSupport } from '../../hooks';
-import { windowStart } from '../../utils/client-versions';
-import { CustodyCompliance, EnrReadiness, PeerCensus } from '../Census';
-import { PeerSupport } from '../PeerSupport';
+import { SHARE_WINDOW_DAYS, SHARE_WINDOW_OPTIONS } from '@/pages/ethereum/clients/constants';
+import { usePeerSupport } from '@/pages/ethereum/clients/hooks';
+import { windowStart } from '@/pages/ethereum/clients/utils/client-versions';
+import { CustodyCompliance, EnrReadiness, PeerCensus } from '@/pages/ethereum/clients/components/Census';
+import { PeerSupport } from '@/pages/ethereum/clients/components/PeerSupport';
 import type { ClientTabProps } from './ClientTabs.types';
 
 /**

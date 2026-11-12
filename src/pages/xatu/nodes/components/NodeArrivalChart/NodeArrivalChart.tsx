@@ -2,9 +2,9 @@ import type { JSX } from 'react';
 import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { getDataVizColors } from '@/utils';
-import { rowsByBucket, type NodeHistory } from '../../hooks/useNodeHistory';
-import { axisCeiling, formatMs } from '../../utils/node-stats';
-import { TimeSeriesChart } from '../TimeSeriesChart';
+import { rowsByBucket, type NodeHistory } from '@/pages/xatu/nodes/hooks/useNodeHistory';
+import { axisCeiling, formatMs } from '@/pages/xatu/nodes/utils/node-stats';
+import { TimeSeriesChart } from '@/pages/xatu/nodes/components/TimeSeriesChart';
 
 export interface NodeArrivalChartProps {
   block: NodeHistory;
@@ -19,7 +19,7 @@ export interface NodeArrivalChartProps {
  */
 export function NodeArrivalChart({ block, head, rangeLabel, behind }: NodeArrivalChartProps): JSX.Element {
   const colors = useThemeColors();
-  const headColor = getDataVizColors().CHART_CATEGORICAL_COLORS[0];
+  const headColor = getDataVizColors().CHART_CATEGORICAL_COLORS[0] ?? colors.muted;
   const blockRows = rowsByBucket(block.rows);
   const headRows = rowsByBucket(head?.rows ?? []);
   // Head history can start before the block table's, so the axis spans both
@@ -27,8 +27,8 @@ export function NodeArrivalChart({ block, head, rangeLabel, behind }: NodeArriva
   const aligned = buckets.map(start => blockRows.get(start) ?? null);
   const headP50 = buckets.map(start => headRows.get(start)?.p50 ?? null);
   // Hours spent catching up are shaded instead of plotted, so they don't flatten the rest
-  const plotted = aligned.map((row, index) => (behind?.has(buckets[index]) ? null : row));
-  const plottedHead = headP50.map((value, index) => (behind?.has(buckets[index]) ? null : value));
+  const plotted = buckets.map(start => (behind?.has(start) ? null : (blockRows.get(start) ?? null)));
+  const plottedHead = buckets.map(start => (behind?.has(start) ? null : (headRows.get(start)?.p50 ?? null)));
 
   return (
     <TimeSeriesChart

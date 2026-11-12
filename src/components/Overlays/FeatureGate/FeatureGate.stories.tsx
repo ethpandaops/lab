@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { http, HttpResponse } from 'msw';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import {
   RouterProvider,
   createMemoryHistory,
@@ -11,7 +11,8 @@ import {
 import { FeatureGate } from './FeatureGate';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { BASE_URL, PATH_PREFIX } from '@/utils/api-config';
-import { mockBounds } from '../../../../.storybook/mocks';
+import { createQueryClient } from '@/utils/query-client';
+import { boundsHandlers } from '@/test-utils/handlers';
 
 /**
  * FeatureGate is a component that checks if the current page is enabled for the active network.
@@ -89,21 +90,12 @@ export const Default: Story = {
         config: http.get(`${BASE_URL}${PATH_PREFIX}/config`, () => {
           return HttpResponse.json(mockConfigDisabled);
         }),
-        bounds: http.get(`${BASE_URL}${PATH_PREFIX}/*/bounds`, () => {
-          return HttpResponse.json(mockBounds);
-        }),
+        bounds: boundsHandlers.success,
       },
     },
   },
   render: () => {
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: 0,
-          staleTime: Infinity,
-        },
-      },
-    });
+    const queryClient = createQueryClient({ retry: false, staleTime: Infinity });
 
     // Create root and child routes
     const rootRoute = createRootRoute();

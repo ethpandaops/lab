@@ -4,8 +4,11 @@ import { Dialog, DialogBackdrop, DialogPanel, DialogTitle, Transition, Transitio
 import { XMarkIcon, MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 import clsx from 'clsx';
-import type { GasSchedule, GasScheduleDefaults } from '../../SimulatePage.types';
-import { getOpcodeCategory, CATEGORY_COLORS } from '../../utils/opcodeUtils';
+import type { GasSchedule, GasScheduleDefaults } from '@/pages/ethereum/execution/gas-profiler/SimulatePage.types';
+import { getOpcodeCategory, CATEGORY_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils/opcodeUtils';
+import { getDataVizColors } from '@/utils/dataVizColors';
+
+const { DATA_COLORS } = getDataVizColors();
 
 /** Category ordering for display */
 const CATEGORY_ORDER = [
@@ -101,7 +104,7 @@ function InfoTooltip({ title, description }: { title: string; description: strin
   const tooltipContent = isVisible && (
     <div
       role="tooltip"
-      className="fixed z-[9999] w-64 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3"
+      className="fixed z-9999 w-64 -translate-x-1/2 -translate-y-full rounded-xs border border-border bg-background p-3"
       style={{ top: position.top, left: position.left }}
     >
       <div className="mb-1.5 text-sm font-medium text-foreground">{title}</div>
@@ -117,7 +120,7 @@ function InfoTooltip({ title, description }: { title: string; description: strin
         type="button"
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
-        className="text-muted/60 transition-colors hover:text-muted focus:outline-hidden"
+        className="text-muted-60 transition-colors hover:text-muted focus:outline-hidden"
         aria-label={`Info about ${title}`}
       >
         <QuestionMarkCircleIcon className="size-3.5" />
@@ -151,8 +154,6 @@ export function GasScheduleDrawer({
   // Committed schedule - only updates when user finishes an interaction (mouseup/blur),
   // not during drag or typing, to avoid layout shifts in Active Changes section
   const [committedSchedule, setCommittedSchedule] = useState<GasSchedule>(schedule);
-  const scheduleRef = useRef(schedule);
-  scheduleRef.current = schedule;
 
   // Build category groups from defaults
   const groups = useMemo((): CategoryGroup[] => {
@@ -175,7 +176,7 @@ export function GasScheduleDrawer({
     return Array.from(categoryMap.entries())
       .map(([name, keys]) => ({
         name,
-        color: CATEGORY_COLORS[name] || CATEGORY_COLORS.Other,
+        color: CATEGORY_COLORS[name] ?? CATEGORY_COLORS.Other ?? DATA_COLORS.slate,
         keys,
       }))
       .sort((a, b) => {
@@ -247,8 +248,8 @@ export function GasScheduleDrawer({
 
   // Commit the current schedule (called on slider release / input blur)
   const commitSchedule = useCallback(() => {
-    setCommittedSchedule(scheduleRef.current);
-  }, []);
+    setCommittedSchedule(schedule);
+  }, [schedule]);
 
   // Filter groups by search and active category
   const filteredGroups = useMemo(() => {
@@ -291,7 +292,7 @@ export function GasScheduleDrawer({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <DialogBackdrop className="fixed inset-0 bg-black/40" />
+          <DialogBackdrop className="fixed inset-0 bg-scrim" />
         </TransitionChild>
 
         <div className="fixed inset-0 overflow-hidden">
@@ -309,7 +310,7 @@ export function GasScheduleDrawer({
                 <DialogPanel className="pointer-events-auto w-screen max-w-lg">
                   <div className="flex h-full flex-col overflow-y-auto bg-background">
                     {/* Header */}
-                    <div className="border-b border-border px-4 py-4">
+                    <div className="border-b border-border p-4">
                       <div className="flex items-center justify-between">
                         <DialogTitle className="text-base font-semibold text-foreground">Gas Schedule</DialogTitle>
                         <button
@@ -350,7 +351,7 @@ export function GasScheduleDrawer({
                           className={clsx(
                             'rounded-xs px-2.5 py-1 text-xs font-medium transition-colors',
                             activeCategory === null
-                              ? 'bg-primary text-white'
+                              ? 'bg-primary text-on-fill'
                               : 'bg-surface text-muted hover:text-foreground'
                           )}
                         >
@@ -364,7 +365,7 @@ export function GasScheduleDrawer({
                             className={clsx(
                               'rounded-xs px-2.5 py-1 text-xs font-medium transition-colors',
                               activeCategory === group.name
-                                ? 'text-white'
+                                ? 'text-on-fill'
                                 : 'bg-surface text-muted hover:text-foreground'
                             )}
                             style={activeCategory === group.name ? { backgroundColor: group.color } : undefined}
@@ -400,7 +401,7 @@ export function GasScheduleDrawer({
                             return (
                               <span
                                 key={key}
-                                className="inline-flex items-center gap-1 rounded-xs bg-primary/10 px-2.5 py-1 text-xs"
+                                className="inline-flex items-center gap-1 rounded-xs bg-primary-10 px-2.5 py-1 text-xs"
                               >
                                 <span className="font-medium text-foreground">{key}</span>
                                 <span className="text-muted">
@@ -434,7 +435,7 @@ export function GasScheduleDrawer({
                                 <span className="size-2.5 rounded-full" style={{ backgroundColor: group.color }} />
                                 <span className="text-sm font-medium text-foreground">{group.name}</span>
                                 {modCount > 0 && (
-                                  <span className="rounded-xs bg-primary/10 px-1.5 py-0.5 text-2xs font-medium text-primary">
+                                  <span className="rounded-xs bg-primary-10 px-1.5 py-0.5 text-2xs font-medium text-primary">
                                     {modCount}
                                   </span>
                                 )}
@@ -469,7 +470,7 @@ export function GasScheduleDrawer({
                                     key={key}
                                     className={clsx(
                                       'flex items-center gap-2 rounded-xs py-1.5',
-                                      isModified && 'bg-primary/5 px-2'
+                                      isModified && 'bg-primary-5 px-2'
                                     )}
                                   >
                                     {/* Name */}
@@ -505,7 +506,7 @@ export function GasScheduleDrawer({
                                       onBlur={commitSchedule}
                                       className={clsx(
                                         'w-20 shrink-0 rounded-xs border bg-surface px-2 py-1 text-right font-mono text-xs focus:ring-1 focus:ring-primary focus:outline-hidden',
-                                        isModified ? 'border-primary/30 text-primary' : 'border-border text-foreground'
+                                        isModified ? 'border-primary-30 text-primary' : 'border-border text-foreground'
                                       )}
                                     />
 
@@ -576,7 +577,7 @@ export function GasScheduleDrawer({
                         <button
                           type="button"
                           onClick={onClose}
-                          className="rounded-xs bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+                          className="rounded-xs bg-primary px-4 py-2 text-sm font-medium text-on-fill transition-colors hover:bg-primary-90"
                         >
                           Close
                         </button>

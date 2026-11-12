@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { intTransactionOpcodeGasServiceList } from '@/api/sdk.gen';
 import type { IntTransactionOpcodeGas } from '@/api/types.gen';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { getOpcodeCategory } from '../utils/opcodeUtils';
+import { getOpcodeCategory } from '@/pages/ethereum/execution/gas-profiler/utils/opcodeUtils';
 
 /** Which opcodes a transaction executes and where most of its opcode gas goes */
 export interface TransactionOpcodeProfile {

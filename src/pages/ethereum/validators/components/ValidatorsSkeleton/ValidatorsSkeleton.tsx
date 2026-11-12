@@ -43,10 +43,7 @@ export function ValidatorsSkeleton({ className }: ValidatorsSkeletonProps): JSX.
       {/* Performance summary skeleton */}
       <div className="grid grid-cols-2 overflow-hidden rounded-sm bg-surface outline -outline-offset-1 outline-border lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="flex flex-col gap-2 px-4 py-3.5 shadow-[1px_0_0_0_var(--color-border),0_1px_0_0_var(--color-border)] sm:px-5"
-          >
+          <div key={i} className="flex flex-col gap-2 px-4 py-3.5 shadow-divider sm:px-5">
             <LoadingContainer className="h-4 w-24 rounded-sm" shimmer={false} />
             <LoadingContainer className="h-8 w-20 rounded-sm" shimmer={false} />
             <LoadingContainer className="h-3 w-32 rounded-sm" shimmer={false} />

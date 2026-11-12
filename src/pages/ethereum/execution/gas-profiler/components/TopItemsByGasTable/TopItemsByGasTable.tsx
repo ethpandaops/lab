@@ -1,7 +1,8 @@
 import { type JSX } from 'react';
 import { Link } from '@tanstack/react-router';
+import clsx from 'clsx';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
-import { CALL_TYPE_COLORS } from '../../utils';
+import { CALL_TYPE_COLORS } from '@/pages/ethereum/execution/gas-profiler/utils';
 import { getDataVizColors } from '@/utils/dataVizColors';
 
 const { DATA_COLORS } = getDataVizColors();
@@ -103,7 +104,7 @@ export function TopItemsByGasTable({
     );
 
     return (
-      <tr key={item.id} className="border-b border-border/50 last:border-0">
+      <tr key={item.id} className="border-b border-border-50 last:border-0">
         {/* First column: index or call type */}
         <td className="py-2 pr-2">
           {item.callType ? (
@@ -122,7 +123,7 @@ export function TopItemsByGasTable({
         </td>
 
         {/* Second column: name/identifier with link; takes the remaining width and truncates */}
-        <td className="w-full max-w-0 px-2 py-2">
+        <td className="w-full max-w-0 p-2">
           {getLinkProps ? (
             <Link {...getLinkProps(item)} className="group flex items-center gap-1.5">
               {identifierContent}
@@ -137,7 +138,7 @@ export function TopItemsByGasTable({
         </td>
 
         {/* Gas column */}
-        <td className="px-2 py-2 text-right font-mono text-foreground">{formatCompact(item.gas)}</td>
+        <td className="p-2 text-right font-mono text-foreground">{formatCompact(item.gas)}</td>
 
         {/* Percentage column */}
         <td className="py-2 pl-2 text-right">
@@ -158,13 +159,13 @@ export function TopItemsByGasTable({
         const displayItems = items.slice(0, inModal ? modalCount : compactCount);
 
         return displayItems.length > 0 ? (
-          <div className="overflow-auto" style={{ height: inModal ? 400 : 280 }}>
+          <div className={clsx('overflow-auto', inModal ? 'h-100' : 'h-70')}>
             <table className="min-w-full">
               <thead className="sticky top-0 bg-surface">
                 <tr className="border-b border-border text-xs text-muted">
                   <th className="py-2 pr-2 text-left font-medium">{columns.first}</th>
-                  <th className="px-2 py-2 text-left font-medium">{columns.second}</th>
-                  <th className="px-2 py-2 text-right font-medium">Gas</th>
+                  <th className="p-2 text-left font-medium">{columns.second}</th>
+                  <th className="p-2 text-right font-medium">Gas</th>
                   <th className="py-2 pl-2 text-right font-medium">%</th>
                 </tr>
               </thead>
@@ -183,9 +184,7 @@ export function TopItemsByGasTable({
             )}
           </div>
         ) : (
-          <div className="flex items-center justify-center text-sm text-muted" style={{ height: 280 }}>
-            No data
-          </div>
+          <div className="flex h-70 items-center justify-center text-sm text-muted">No data</div>
         );
       }}
     </PopoutCard>

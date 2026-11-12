@@ -1,3 +1,3 @@
 export { useStateSizeData, type NormalizedDataPoint } from './useStateSizeData';
-export { useStateDelta, type DeltaTimeframe, type StateDelta } from './useStateDelta';
-export { useTokenStorageShare, type TokenStorageByDay, type TokenStorageDay } from './useTokenStorageShare';
+export { useStateDelta, type DeltaTimeframe } from './useStateDelta';
+export { useTokenStorageShare } from './useTokenStorageShare';

@@ -22,8 +22,8 @@ describe('summariseProbeAge', () => {
   it('sums each client over all days and orders clients by probes', () => {
     const { byClient } = summariseProbeAge(rows);
     expect(byClient.map(row => row.client)).toEqual(['teku', 'prysm']);
-    expect(byClient[0].probes).toBe(500);
-    expect(byClient[1].availability['14-18d']).toBe(80);
-    expect(byClient[1].availability['1-3d']).toBeNull();
+    expect(byClient[0]?.probes).toBe(500);
+    expect(byClient[1]?.availability['14-18d']).toBe(80);
+    expect(byClient[1]?.availability['1-3d']).toBeNull();
   });
 });

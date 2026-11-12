@@ -7,6 +7,7 @@ import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { LoadingContainer } from '@/components/Layout/LoadingContainer';
 import { useNetworkChangeRedirect } from '@/hooks/useNetworkChangeRedirect';
+import { useNow } from '@/hooks/useNow';
 import { Route } from '@/routes/xatu/nodes/$nodeId';
 import {
   ActivityStrip,
@@ -65,24 +66,26 @@ export function DetailPage(): JSX.Element {
   const range = search.range ?? DEFAULT_NODE_RANGE;
   const rangeLabel = NODE_RANGE_CONFIG[range].label;
 
-  const { nodes, isLoading, error } = useLastSeenNodes(range, nodeId);
+  // Unix seconds, once a minute: a range moves on to its next bucket, and a node shows offline, at most a minute late
+  const now = useNow(60_000) / 1000;
+  const { nodes, isLoading, error } = useLastSeenNodes(range, now, nodeId);
   const filter = { nodeId };
-  const block = useNodeHistory('block', range, filter);
-  const head = useNodeHistory('head', range, filter);
-  const attestation = useNodeHistory('attestation', range, filter);
+  const block = useNodeHistory('block', range, filter, now);
+  const head = useNodeHistory('head', range, filter, now);
+  const attestation = useNodeHistory('attestation', range, filter, now);
   const row = buildNodeRows(
     nodes.filter(node => node.node_id === nodeId),
     block.data?.rows ?? [],
     attestation.data?.rows ?? [],
-    Date.now() / 1000
+    now
   )[0];
-  const dataColumn = useNodeHistory('dataColumn', range, filter);
-  const network = useNetworkHistory(range);
-  const blockSlots = useBlockSlots(range);
+  const dataColumn = useNodeHistory('dataColumn', range, filter, now);
+  const network = useNetworkHistory(range, now);
+  const blockSlots = useBlockSlots(range, now);
   // Only ethPandaOps nodes report engine API calls
   const reportsEngine = row?.node.classification === 'internal';
-  const newPayload = useNodeHistory('newPayload', range, filter, reportsEngine);
-  const getBlobs = useNodeHistory('getBlobs', range, filter, reportsEngine);
+  const newPayload = useNodeHistory('newPayload', range, filter, now, reportsEngine);
+  const getBlobs = useNodeHistory('getBlobs', range, filter, now, reportsEngine);
   const recent = useNodePerformance(nodeId, NETWORK_WINDOW_SLOTS);
   const recentNetwork = useNetworkObservations();
   const custody = useNodeDataColumns(nodeId);

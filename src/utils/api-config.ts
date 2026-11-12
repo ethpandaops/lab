@@ -9,10 +9,6 @@ export const REFETCH_INTERVALS = {
   BOUNDS: 5_000, // 5 seconds - bounds update frequently with new data
 } as const;
 
-const ROOT_PATHS = new Set([`${BASE_URL}${PATH_PREFIX}/config`]);
-
-export const isRootPath = (path: string): boolean => ROOT_PATHS.has(path);
-
 /**
  * Int64 fields that hold values past Number.MAX_SAFE_INTEGER. JSON.parse would round them (6292022559433348801
  * becomes 6292022559433349000), so they are quoted before parsing and reach callers as decimal strings, despite the

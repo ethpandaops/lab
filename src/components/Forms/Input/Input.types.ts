@@ -1,5 +1,4 @@
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
-import type { ButtonProps } from '@/components/Elements/Button/Button.types';
 
 export type InputSize = 'sm' | 'md' | 'lg';
 
@@ -49,25 +48,6 @@ export interface InputFieldProps extends Omit<ComponentPropsWithoutRef<'input'>,
 }
 
 /**
- * Props for add-ons that can appear inside or outside the input border
- */
-export interface AddonProps {
-  /**
-   * The content to display (text or React element)
-   */
-  content: ReactNode;
-  /**
-   * Whether the addon appears inside the input border (inline) or outside (external)
-   * @default false (external)
-   */
-  inline?: boolean;
-  /**
-   * Optional className for styling
-   */
-  className?: string;
-}
-
-/**
  * Props for select dropdowns that can be inline with the input
  */
 export interface SelectAddonProps {
@@ -103,16 +83,6 @@ export interface SelectAddonProps {
    * Optional className for styling
    */
   className?: string;
-}
-
-/**
- * Props for trailing button action
- */
-export interface TrailingButtonProps extends Omit<ButtonProps, 'size'> {
-  /**
-   * Button text or content
-   */
-  children: ReactNode;
 }
 
 export interface InputProps {

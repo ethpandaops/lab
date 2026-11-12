@@ -6,7 +6,7 @@ export interface SlotDownloadModalProps {
   open: boolean;
   /** Callback when the modal should close. */
   onClose: () => void;
-  /** Network name (used to build download-proxy URLs). */
+  /** Network name, whose archives the downloads come from. */
   network: string;
   /** Slot number. */
   slot: number;

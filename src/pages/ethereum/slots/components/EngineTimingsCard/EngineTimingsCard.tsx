@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Card } from '@/components/Layout/Card';
 import { MiniStat } from '@/components/DataDisplay/MiniStat';
-import type { SlotEngineTimingsData } from '../../hooks/useSlotEngineTimings';
+import type { SlotEngineTimingsData } from '@/pages/ethereum/slots/hooks/useSlotEngineTimings';
 import { ClientVersionBreakdown } from '@/pages/ethereum/execution/timings/components/ClientVersionBreakdown';
 import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
 
@@ -36,8 +36,8 @@ export function EngineTimingsCard({
     return (
       <Card title="Engine API Timings">
         <div className="space-y-3">
-          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
-          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
+          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30 bg-size-shimmer" />
+          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30 bg-size-shimmer" />
         </div>
       </Card>
     );

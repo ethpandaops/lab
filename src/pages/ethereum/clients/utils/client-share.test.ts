@@ -94,15 +94,15 @@ describe('buildShareChartConfig', () => {
     const config = buildShareChartConfig(records, keys, 'consensus', true, false);
     expect(config.labels).toHaveLength(3);
     expect(config.series.map(s => s.name)).toEqual(['Lighthouse', 'Prysm', 'Unknown']);
-    expect(config.series[0].data).toEqual([30, 40, null]);
-    expect(config.series[2].data).toEqual([60, 0, null]);
+    expect(config.series[0]?.data).toEqual([30, 40, null]);
+    expect(config.series[2]?.data).toEqual([60, 0, null]);
     expect(config.series.every(s => s.stack === 'share')).toBe(true);
   });
 
   it('should leave unknown out and renormalise when identified only', () => {
     const config = buildShareChartConfig(records, keys, 'execution', true, true);
     expect(config.series.map(s => s.name)).toEqual(['Geth', 'Nethermind']);
-    expect(config.series[0].data).toEqual([75, 100, null]);
+    expect(config.series[0]?.data).toEqual([75, 100, null]);
   });
 });
 

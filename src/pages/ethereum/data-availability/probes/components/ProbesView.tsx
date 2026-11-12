@@ -1,14 +1,9 @@
 import { type JSX, useState, useMemo, useCallback, type RefObject } from 'react';
-import {
-  createColumnHelper,
-  type VisibilityState,
-  type ColumnFiltersState,
-  type SortingState,
-} from '@tanstack/react-table';
+import type { VisibilityState, ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
 import { Dialog } from '@/components/Overlays/Dialog';
-import { DataTable } from '@/components/DataTable';
+import { DataTable, type DataTableColumn } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { BlobPosterLogo } from '@/components/Ethereum/BlobPosterLogo';
 import { Button } from '@/components/Elements/Button';
@@ -33,11 +28,6 @@ import {
 
 // Use generated type directly
 type CustodyProbe = IntCustodyProbe;
-
-/**
- * Column helper for type-safe column definitions
- */
-const columnHelper = createColumnHelper<CustodyProbe>();
 
 /**
  * Truncate a hash or long string for display
@@ -206,7 +196,7 @@ export function ProbesView({
   const getRowClassName = useCallback(
     (_probe: CustodyProbe, rowId: string): string | undefined => {
       if (isLive && newItemIdsRef?.current?.has(rowId)) {
-        return 'animate-[row-new_0.3s_ease-out]';
+        return 'animate-row-new';
       }
       return undefined;
     },
@@ -216,11 +206,11 @@ export function ProbesView({
   // Define table columns - ordered by default visibility preference:
   // Slot, Time, Result, Prober, Prober Country, Peer Client, Peer Country, PeerID, Blob Posters, Columns, Latency, Error
   const columns = useMemo(
-    () => [
+    (): DataTableColumn<CustodyProbe>[] => [
       // Actions column (first for easy access)
-      columnHelper.display({
+      {
         id: 'actions',
-        header: '',
+        header: () => <span className="sr-only">Details</span>,
         size: 40,
         cell: info => (
           <Button
@@ -230,20 +220,22 @@ export function ProbesView({
               e.stopPropagation();
               handleOpenDetails(info.row.original);
             }}
-            className="!p-1"
+            className="p-1!"
+            aria-label="View probe details"
           >
             <EyeIcon className="size-3" />
           </Button>
         ),
         meta: { enableHiding: false },
-      }),
+      },
 
       // Slot - show single slot value (moved to front)
-      columnHelper.accessor('slot', {
+      {
+        accessorKey: 'slot',
         header: 'Slot',
         size: 90,
         cell: info => {
-          const slot = info.getValue();
+          const slot = info.row.original.slot;
           if (slot === undefined || slot === null) return <span className="text-muted">-</span>;
           return (
             <FilterableCell field="slot" value={slot} onFilterClick={onFilterClick} className="font-mono text-xs">
@@ -253,27 +245,29 @@ export function ProbesView({
         },
         enableSorting: true,
         meta: { enableHiding: true },
-      }),
+      },
 
       // Time (relative format) - probe_date_time is in seconds
-      columnHelper.accessor('probe_date_time', {
+      {
+        accessorKey: 'probe_date_time',
         header: 'Time',
         size: 100,
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.probe_date_time;
           if (!value) return <span className="text-muted">-</span>;
           return <Timestamp timestamp={value} format="relative" />;
         },
         enableSorting: true,
         meta: { enableHiding: true },
-      }),
+      },
 
       // Result - more prominent display
-      columnHelper.accessor('result', {
+      {
+        accessorKey: 'result',
         header: 'Result',
         size: 90,
         cell: info => {
-          const result = info.getValue();
+          const result = info.row.original.result;
           if (!result) return <span className="text-muted">-</span>;
 
           const isSuccess = result === 'success';
@@ -294,10 +288,10 @@ export function ProbesView({
               <div
                 className={`inline-flex items-center gap-1 rounded-xs px-1.5 py-0.5 ${
                   isSuccess
-                    ? 'bg-success/10 text-success'
+                    ? 'bg-success-10 text-success'
                     : isFailure
-                      ? 'bg-warning/10 text-warning'
-                      : 'bg-danger/10 text-danger'
+                      ? 'bg-warning-10 text-warning'
+                      : 'bg-danger-10 text-danger'
                 }`}
               >
                 {icon}
@@ -308,33 +302,35 @@ export function ProbesView({
         },
         enableSorting: true,
         meta: { enableHiding: true },
-      }),
+      },
 
       // Prober Implementation
-      columnHelper.accessor('meta_client_implementation', {
+      {
+        accessorKey: 'meta_client_implementation',
         header: 'Prober',
         size: 100,
         cell: info => {
-          const client = info.getValue();
+          const client = info.row.original.meta_client_implementation;
           if (!client) return <span className="text-muted">-</span>;
           return (
             <FilterableCell field="meta_client_implementation" value={client} onFilterClick={onFilterClick}>
               <div className="flex items-center gap-1.5">
-                <ClientLogo client={client} size={16} />
+                <ClientLogo client={client} size={16} noLink decorative />
                 <span className="font-medium">{client}</span>
               </div>
             </FilterableCell>
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Prober Country
-      columnHelper.accessor('meta_client_geo_country', {
+      {
+        accessorKey: 'meta_client_geo_country',
         header: 'Prober Country',
         size: 130,
         cell: info => {
-          const country = info.getValue();
+          const country = info.row.original.meta_client_geo_country;
           const code = info.row.original.meta_client_geo_country_code;
           return (
             <FilterableCell field="meta_client_geo_country" value={country} onFilterClick={onFilterClick}>
@@ -346,33 +342,35 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Peer Implementation (renamed to Peer Client)
-      columnHelper.accessor('meta_peer_implementation', {
+      {
+        accessorKey: 'meta_peer_implementation',
         header: 'Peer Client',
         size: 100,
         cell: info => {
-          const client = info.getValue();
+          const client = info.row.original.meta_peer_implementation;
           if (!client) return <span className="text-muted">-</span>;
           return (
             <FilterableCell field="meta_peer_implementation" value={client} onFilterClick={onFilterClick}>
               <div className="flex items-center gap-1.5">
-                <ClientLogo client={client} size={16} />
+                <ClientLogo client={client} size={16} noLink decorative />
                 <span className="font-medium">{client}</span>
               </div>
             </FilterableCell>
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Peer Country
-      columnHelper.accessor('meta_peer_geo_country', {
+      {
+        accessorKey: 'meta_peer_geo_country',
         header: 'Peer Country',
         size: 130,
         cell: info => {
-          const country = info.getValue();
+          const country = info.row.original.meta_peer_geo_country;
           const code = info.row.original.meta_peer_geo_country_code;
           return (
             <FilterableCell field="meta_peer_geo_country" value={country} onFilterClick={onFilterClick}>
@@ -384,14 +382,15 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Peer ASN
-      columnHelper.accessor('meta_peer_geo_autonomous_system_number', {
+      {
+        accessorKey: 'meta_peer_geo_autonomous_system_number',
         header: 'Peer ASN',
         size: 120,
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.meta_peer_geo_autonomous_system_number;
           const org = info.row.original.meta_peer_geo_autonomous_system_organization;
           if (!value) return <span className="text-muted">-</span>;
           const displayText = org ? (org.length > 15 ? `${org.slice(0, 15)}…` : org) : `AS${value}`;
@@ -408,14 +407,15 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Blob Posters - show logos for blob submitters (top 4, ordered by count)
-      columnHelper.accessor('blob_submitters', {
+      {
+        accessorKey: 'blob_submitters',
         header: 'Blob Posters',
         size: 120,
         cell: info => {
-          const submitters = info.getValue();
+          const submitters = info.row.original.blob_submitters;
           if (!submitters?.length) return <span className="text-muted">-</span>;
 
           // Count occurrences and get unique posters sorted by count
@@ -449,27 +449,29 @@ export function ProbesView({
         },
         enableSorting: false,
         meta: { enableHiding: true },
-      }),
+      },
 
       // Columns - show count only
-      columnHelper.accessor('column_indices', {
+      {
+        accessorKey: 'column_indices',
         header: 'Cols',
         size: 50,
         cell: info => {
-          const cols = info.getValue();
+          const cols = info.row.original.column_indices;
           if (!cols?.length) return <span className="text-muted">-</span>;
           return <span className="font-mono text-xs text-foreground">{cols.length}</span>;
         },
         enableSorting: false,
         meta: { enableHiding: true },
-      }),
+      },
 
       // Latency - moved to end
-      columnHelper.accessor('response_time_ms', {
+      {
+        accessorKey: 'response_time_ms',
         header: 'Latency',
         size: 70,
         cell: info => {
-          const ms = info.getValue();
+          const ms = info.row.original.response_time_ms;
           if (!ms) return <span className="text-muted">-</span>;
           let color = 'text-success';
           if (ms > 4000) color = 'text-warning';
@@ -478,14 +480,15 @@ export function ProbesView({
         },
         enableSorting: true,
         meta: { enableHiding: true },
-      }),
+      },
 
       // Peer ID - with unique visual avatar (number shown in tooltip only)
-      columnHelper.accessor('peer_id_unique_key', {
+      {
+        accessorKey: 'peer_id_unique_key',
         header: 'Peer ID',
         size: 60,
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.peer_id_unique_key;
           if (!value) return <span className="text-muted">-</span>;
           return (
             <FilterableCell field="peer_id_unique_key" value={value} onFilterClick={onFilterClick}>
@@ -496,14 +499,15 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true, cellClassName: 'text-center' },
-      }),
+      },
 
       // Error - hidden by default
-      columnHelper.accessor('error', {
+      {
+        accessorKey: 'error',
         header: 'Error',
         size: 80,
         cell: info => {
-          const error = info.getValue();
+          const error = info.row.original.error;
           if (!error) return <span className="text-muted">-</span>;
           return (
             <span className="text-2xs text-danger" title={error}>
@@ -512,15 +516,16 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // --- Hidden by default columns below ---
 
       // Node ID
-      columnHelper.accessor('node_id', {
+      {
+        accessorKey: 'node_id',
         header: 'Node ID',
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.node_id;
           return (
             <FilterableCell field="node_id" value={value} onFilterClick={onFilterClick} className="font-mono text-2xs">
               {truncateHash(value, 20)}
@@ -528,13 +533,14 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Prober Version
-      columnHelper.accessor('meta_client_version', {
+      {
+        accessorKey: 'meta_client_version',
         header: 'Prober Ver',
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.meta_client_version;
           return (
             <FilterableCell
               field="meta_client_version"
@@ -547,13 +553,14 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Peer Version
-      columnHelper.accessor('meta_peer_version', {
+      {
+        accessorKey: 'meta_peer_version',
         header: 'Peer Ver',
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.meta_peer_version;
           return (
             <FilterableCell
               field="meta_peer_version"
@@ -566,13 +573,14 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Prober City
-      columnHelper.accessor('meta_client_geo_city', {
+      {
+        accessorKey: 'meta_client_geo_city',
         header: 'Prober City',
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.meta_client_geo_city;
           return (
             <FilterableCell
               field="meta_client_geo_city"
@@ -585,13 +593,14 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Peer City
-      columnHelper.accessor('meta_peer_geo_city', {
+      {
+        accessorKey: 'meta_peer_geo_city',
         header: 'Peer City',
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.meta_peer_geo_city;
           return (
             <FilterableCell field="meta_peer_geo_city" value={value} onFilterClick={onFilterClick} className="text-xs">
               {value || '-'}
@@ -599,14 +608,15 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Prober ASN
-      columnHelper.accessor('meta_client_geo_autonomous_system_number', {
+      {
+        accessorKey: 'meta_client_geo_autonomous_system_number',
         header: 'Prober ASN',
         size: 120,
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.meta_client_geo_autonomous_system_number;
           const org = info.row.original.meta_client_geo_autonomous_system_organization;
           if (!value) return <span className="text-muted">-</span>;
           const displayText = org ? (org.length > 15 ? `${org.slice(0, 15)}…` : org) : `AS${value}`;
@@ -623,13 +633,14 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
 
       // Classification
-      columnHelper.accessor('classification', {
+      {
+        accessorKey: 'classification',
         header: 'Classification',
         cell: info => {
-          const value = info.getValue();
+          const value = info.row.original.classification;
           return (
             <FilterableCell field="classification" value={value} onFilterClick={onFilterClick} className="text-xs">
               {value || '-'}
@@ -637,7 +648,7 @@ export function ProbesView({
           );
         },
         meta: { enableHiding: true },
-      }),
+      },
     ],
     [onFilterClick, handleOpenDetails]
   );
@@ -654,7 +665,7 @@ export function ProbesView({
                 href="https://github.com/ethp2p/dasmon"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="text-primary underline underline-offset-2 hover:text-primary-80"
               >
                 Dasmon
               </a>
@@ -682,7 +693,7 @@ export function ProbesView({
                 href="https://github.com/ethp2p/dasmon"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="text-primary underline underline-offset-2 hover:text-primary-80"
               >
                 Dasmon
               </a>
@@ -698,7 +709,7 @@ export function ProbesView({
               size="sm"
               aria-pressed={isLive}
               onClick={onLiveModeToggle}
-              className={isLive ? 'bg-success/10! text-success! inset-ring-success/50!' : 'text-muted!'}
+              className={isLive ? 'bg-success-10! text-success! inset-ring-success-50!' : 'text-muted!'}
               leadingIcon={isLive ? <PauseIcon /> : <PlayIcon />}
             >
               {isLive && <span className="size-2 rounded-full bg-success" />}
@@ -719,7 +730,7 @@ export function ProbesView({
 
       {/* Live mode indicator bar */}
       {isLive && (
-        <div className="mb-4 flex items-center rounded-sm border border-success/30 bg-success/10 px-4 py-2">
+        <div className="mb-4 flex items-center rounded-sm border border-success-30 bg-success-10 px-4 py-2">
           <div className="flex items-center gap-3">
             <SignalIcon className="size-5 text-success" />
             <div>
@@ -732,7 +743,7 @@ export function ProbesView({
 
       {/* Learn More Dialog */}
       <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About Custody Probes" size="lg">
-        <div className="space-y-4 text-sm leading-relaxed text-muted">
+        <div className="space-y-4 text-sm/relaxed text-muted">
           <p>
             <span className="font-medium text-foreground">
               Custody probes verify that peers are storing the data they claim.
@@ -741,7 +752,7 @@ export function ProbesView({
             commitments.
           </p>
           <p>The prober, a Xatu node, requests data from a peer.</p>
-          <div className="rounded-sm border border-accent/20 bg-accent/5 p-3">
+          <div className="rounded-sm border border-accent-20 bg-accent-5 p-3">
             <p className="text-foreground">
               <span className="font-medium">Result meanings:</span>
             </p>

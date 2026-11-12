@@ -16,7 +16,7 @@ import {
   type OpcodeCost,
   type OpcodeCostModel,
   type OpcodeMeta,
-} from '../utils/opcode-costs';
+} from '@/pages/ethereum/execution/performance/utils/opcode-costs';
 import { MethodologyButton } from './MethodologyDialog';
 
 export interface OpcodeCardProps {
@@ -55,10 +55,10 @@ function ratioStyle(cost: OpcodeCost): CSSProperties {
 /** Indices of opcodes common enough to estimate, ordered by the slowest client's ratio */
 function rowsFor(model: OpcodeCostModel, pricedFor: OpcodeMeta['pricedFor']): number[] {
   return model.opcodes
-    .map((op, i) => ({ op, i }))
+    .map((op, i) => ({ op, i, costs: model.clients.flatMap(c => c.ratios[i] ?? []) }))
     .filter(({ op }) => op.pricedFor === pricedFor && op.gasShare >= MIN_GAS_SHARE)
-    .filter(({ i }) => model.clients.some(c => isMispriced(c.ratios[i])))
-    .map(({ i }) => ({ i, worst: Math.max(...model.clients.map(c => c.ratios[i].ratio)) }))
+    .filter(({ costs }) => costs.some(isMispriced))
+    .map(({ i, costs }) => ({ i, worst: Math.max(...costs.map(cost => cost.ratio)) }))
     .sort((a, b) => b.worst - a.worst)
     .map(({ i }) => i);
 }
@@ -140,7 +140,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
                 <tr>
                   <td colSpan={3 + model.clients.length} className="px-1 pt-4 pb-1.5">
                     {/* Stays in view and wraps inside it while the matrix scrolls sideways */}
-                    <div className="sticky left-1 flex max-w-[calc(100vw-5rem)] flex-wrap gap-x-2 text-xs">
+                    <div className="sticky left-1 flex max-w-vw-less-20 flex-wrap gap-x-2 text-xs">
                       <span className="font-semibold text-foreground">{section.title}</span>
                       {section.note && <span className="text-muted">{section.note}</span>}
                     </div>
@@ -148,6 +148,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
                 </tr>
                 {section.rows.map(i => {
                   const op = model.opcodes[i];
+                  if (!op) return null;
                   return (
                     <tr key={op.name}>
                       <td className="sticky left-0 z-10 bg-surface px-1 py-0.5 font-mono text-xs text-foreground sm:whitespace-nowrap">
@@ -159,6 +160,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
                       <td className="px-1 py-0.5 text-right text-muted tabular-nums">{fmtGasPerOp(op.gasPerOp)}</td>
                       {model.clients.map(c => {
                         const cost = c.ratios[i];
+                        if (!cost) return <td key={c.client} />;
                         return (
                           <td
                             key={c.client}
@@ -185,13 +187,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
       <div className="flex flex-wrap items-center justify-end gap-3 border-t border-border px-4 py-3 text-xs text-muted sm:px-5">
         <span className="flex w-full items-center gap-2 whitespace-nowrap sm:w-auto">
           Faster than priced
-          <span
-            className="h-2 min-w-8 flex-1 rounded-full sm:w-32 sm:flex-none"
-            style={{
-              background:
-                'linear-gradient(to right, color-mix(in oklab, var(--color-chart-0) 70%, transparent), transparent, color-mix(in oklab, var(--color-chart-3) 70%, transparent))',
-            }}
-          />
+          <span className="h-2 min-w-8 flex-1 rounded-full bg-faster-to-slower sm:w-32 sm:flex-none" />
           Slower than priced
         </span>
       </div>
@@ -202,7 +198,7 @@ export function OpcodePricingCard({ model, onMethodology }: OpcodeCardProps): JS
 /** Short build id: the hash suffix of a version string */
 function shortVersion(version: string): string {
   const parts = version.split(/[-+]/);
-  return parts[parts.length - 1].replace(/^0x/, '').slice(0, 8);
+  return (parts.at(-1) ?? '').replace(/^0x/, '').slice(0, 8);
 }
 
 /** Round up to an axis max that splits into 4 even intervals */
@@ -278,7 +274,7 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
   return (
     <PopoutCard
       title="Opcode Cost Over Time"
-      subtitle={`Nanoseconds per ${op.name}, fitted per ${model.grain}`}
+      subtitle={`Nanoseconds per ${op?.name ?? ''}, fitted per ${model.grain}`}
       anchorId="opcode-versions"
       modalSize="full"
       noPadding
@@ -320,9 +316,10 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
                 const color = getExecutionClientColor(c.client, ci);
                 // A deploy is the first day a new version leads the day's blocks
                 const deploys = c.daily
-                  .filter((d, i) => i > 0 && d.versions[0] !== c.daily[i - 1].versions[0])
+                  .filter((d, i) => i > 0 && d.versions[0] !== c.daily[i - 1]?.versions[0])
                   .map(d => ({ xValue: d.day * 1000, color }));
-                const yMax = niceMax(Math.max(...c.daily.map(d => d.nsPerOp[opIndex]), 1e-9));
+                const yMax = niceMax(Math.max(...c.daily.flatMap(d => d.nsPerOp[opIndex] ?? []), 1e-9));
+                const median = c.ratios[opIndex]?.nsPerOp ?? 0;
                 return (
                   <div key={c.client}>
                     <div className="flex items-center justify-between gap-2 text-sm">
@@ -330,7 +327,7 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
                         <ClientLogo client={c.client} size={16} />
                         {c.client}
                       </span>
-                      <span className="text-xs text-muted tabular-nums">{fmtNs(c.ratios[opIndex].nsPerOp)} median</span>
+                      <span className="text-xs text-muted tabular-nums">{fmtNs(median)} median</span>
                     </div>
                     <MultiLineChart
                       series={[
@@ -344,8 +341,8 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
                         {
                           name: 'Median',
                           data: [
-                            [dayMin * 1000, c.ratios[opIndex].nsPerOp],
-                            [dayMax * 1000, c.ratios[opIndex].nsPerOp],
+                            [dayMin * 1000, median],
+                            [dayMax * 1000, median],
                           ],
                           color: themeColors.muted,
                           lineStyle: 'dotted',
@@ -362,7 +359,7 @@ export function OpcodeVersionsCard({ model, onMethodology }: OpcodeCardProps): J
                         const p = (Array.isArray(params) ? params : [params]) as { value?: [number, number] }[];
                         const day = c.daily.find(d => d.day * 1000 === p[0]?.value?.[0]);
                         if (!day) return '';
-                        return `<div style="font-weight:600">${fmtFit(day.day, model.grain)}</div><div>${fmtNs(day.nsPerOp[opIndex])}, ${day.blocks.toLocaleString()} blocks</div><div style="font-family:monospace;font-size:11px;opacity:.7">${day.versions.map(shortVersion).join(', ')}</div>`;
+                        return `<div style="font-weight:600">${fmtFit(day.day, model.grain)}</div><div>${fmtNs(day.nsPerOp[opIndex] ?? 0)}, ${day.blocks.toLocaleString()} blocks</div><div style="font-family:monospace;font-size:11px;opacity:.7">${day.versions.map(shortVersion).join(', ')}</div>`;
                       }}
                     />
                   </div>

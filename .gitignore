@@ -17,6 +17,9 @@ dist-ssr
 /build/stats.html
 storybook-static
 
+# Unit test coverage
+/coverage
+
 # Environment variables
 .env
 .env.local
@@ -34,12 +37,11 @@ storybook-static
 
 # Playwright
 .playwright-mcp
+/test-results/
 
 # Tanstack
 .tanstack
 
-# ESLint
-.eslintcache
 # design-sync (claude.ai/design)
 .design-sync/sb-reference/
 .design-sync/learnings/

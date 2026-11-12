@@ -1,4 +1,4 @@
-export interface ClientOption {
+interface ClientOption {
   /**
    * Client implementation name (e.g., "lighthouse", "prysm", "teku")
    */

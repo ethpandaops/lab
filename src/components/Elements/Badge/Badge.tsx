@@ -12,112 +12,102 @@ interface ColorClasses {
   };
 }
 
-/** green, orange and red are status colours and use the theme's status tokens; the rest are categories */
+/** green, orange and red are status colours and use the theme's status tokens; the rest are category tags */
 const colorStyles: Record<BadgeColor, ColorClasses> = {
   gray: {
-    border:
-      'bg-gray-50 text-gray-600 inset-ring inset-ring-gray-500/10 dark:bg-gray-400/10 dark:text-gray-400 dark:inset-ring-gray-400/20',
-    flat: 'bg-gray-100 text-gray-600 dark:bg-gray-400/10 dark:text-gray-400',
-    dotFill: 'fill-gray-400',
+    border: 'bg-tag-gray-wash text-tag-gray inset-ring inset-ring-tag-gray-ring',
+    flat: 'bg-tag-gray-bg text-tag-gray',
+    dotFill: 'fill-tag-gray-fill',
     removeButton: {
-      hover: 'hover:bg-gray-500/20 dark:hover:bg-gray-500/30',
-      stroke: 'stroke-gray-600/50 group-hover:stroke-gray-600/75 dark:stroke-gray-400 dark:group-hover:stroke-gray-300',
+      hover: 'hover:bg-tag-gray-hover',
+      stroke: 'stroke-tag-gray-stroke group-hover:stroke-tag-gray-stroke-hover',
     },
   },
   red: {
-    border: 'bg-danger/10 text-danger inset-ring inset-ring-danger/20',
-    flat: 'bg-danger/15 text-danger',
+    border: 'bg-danger-10 text-danger inset-ring inset-ring-danger-20',
+    flat: 'bg-danger-15 text-danger',
     dotFill: 'fill-danger',
     removeButton: {
-      hover: 'hover:bg-danger/20',
-      stroke: 'stroke-danger/50 group-hover:stroke-danger/75',
+      hover: 'hover:bg-danger-20',
+      stroke: 'stroke-danger-50 group-hover:stroke-danger-75',
     },
   },
   orange: {
-    border: 'bg-warning/10 text-warning inset-ring inset-ring-warning/20',
-    flat: 'bg-warning/15 text-warning',
+    border: 'bg-warning-10 text-warning inset-ring inset-ring-warning-20',
+    flat: 'bg-warning-15 text-warning',
     dotFill: 'fill-warning',
     removeButton: {
-      hover: 'hover:bg-warning/20',
-      stroke: 'stroke-warning/50 group-hover:stroke-warning/75',
+      hover: 'hover:bg-warning-20',
+      stroke: 'stroke-warning-50 group-hover:stroke-warning-75',
     },
   },
   yellow: {
-    border:
-      'bg-yellow-50 text-yellow-800 inset-ring inset-ring-yellow-600/20 dark:bg-yellow-400/10 dark:text-yellow-500 dark:inset-ring-yellow-400/20',
-    flat: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-400/10 dark:text-yellow-500',
-    dotFill: 'fill-yellow-500 dark:fill-yellow-400',
+    border: 'bg-tag-yellow-wash text-tag-yellow inset-ring inset-ring-tag-yellow-ring',
+    flat: 'bg-tag-yellow-bg text-tag-yellow',
+    dotFill: 'fill-tag-yellow-fill',
     removeButton: {
-      hover: 'hover:bg-yellow-600/20 dark:hover:bg-yellow-500/30',
-      stroke:
-        'stroke-yellow-700/50 group-hover:stroke-yellow-700/75 dark:stroke-yellow-300 dark:group-hover:stroke-yellow-200',
+      hover: 'hover:bg-tag-yellow-hover',
+      stroke: 'stroke-tag-yellow-stroke group-hover:stroke-tag-yellow-stroke-hover',
     },
   },
   green: {
-    border: 'bg-success/10 text-success inset-ring inset-ring-success/20',
-    flat: 'bg-success/15 text-success',
+    border: 'bg-success-10 text-success inset-ring inset-ring-success-20',
+    flat: 'bg-success-15 text-success',
     dotFill: 'fill-success',
     removeButton: {
-      hover: 'hover:bg-success/20',
-      stroke: 'stroke-success/50 group-hover:stroke-success/75',
+      hover: 'hover:bg-success-20',
+      stroke: 'stroke-success-50 group-hover:stroke-success-75',
     },
   },
   teal: {
-    border:
-      'bg-teal-50 text-teal-700 inset-ring inset-ring-teal-700/10 dark:bg-teal-400/10 dark:text-teal-400 dark:inset-ring-teal-400/30',
-    flat: 'bg-teal-100 text-teal-700 dark:bg-teal-400/10 dark:text-teal-400',
-    dotFill: 'fill-teal-500 dark:fill-teal-400',
+    border: 'bg-tag-teal-wash text-tag-teal inset-ring inset-ring-tag-teal-ring',
+    flat: 'bg-tag-teal-bg text-tag-teal',
+    dotFill: 'fill-tag-teal-fill',
     removeButton: {
-      hover: 'hover:bg-teal-600/20 dark:hover:bg-teal-500/30',
-      stroke: 'stroke-teal-700/50 group-hover:stroke-teal-700/75 dark:stroke-teal-400 dark:group-hover:stroke-teal-300',
+      hover: 'hover:bg-tag-teal-hover',
+      stroke: 'stroke-tag-teal-stroke group-hover:stroke-tag-teal-stroke-hover',
     },
   },
   blue: {
-    border:
-      'bg-blue-50 text-blue-700 inset-ring inset-ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:inset-ring-blue-400/30',
-    flat: 'bg-blue-100 text-blue-700 dark:bg-blue-400/10 dark:text-blue-400',
-    dotFill: 'fill-blue-500 dark:fill-blue-400',
+    border: 'bg-tag-blue-wash text-tag-blue inset-ring inset-ring-tag-blue-ring',
+    flat: 'bg-tag-blue-bg text-tag-blue',
+    dotFill: 'fill-tag-blue-fill',
     removeButton: {
-      hover: 'hover:bg-blue-600/20 dark:hover:bg-blue-500/30',
-      stroke: 'stroke-blue-700/50 group-hover:stroke-blue-700/75 dark:stroke-blue-400 dark:group-hover:stroke-blue-300',
+      hover: 'hover:bg-tag-blue-hover',
+      stroke: 'stroke-tag-blue-stroke group-hover:stroke-tag-blue-stroke-hover',
     },
   },
   indigo: {
-    border:
-      'bg-indigo-50 text-indigo-700 inset-ring inset-ring-indigo-700/10 dark:bg-indigo-400/10 dark:text-indigo-400 dark:inset-ring-indigo-400/30',
-    flat: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-400/10 dark:text-indigo-400',
-    dotFill: 'fill-indigo-500 dark:fill-indigo-400',
+    border: 'bg-tag-indigo-wash text-tag-indigo inset-ring inset-ring-tag-indigo-ring',
+    flat: 'bg-tag-indigo-bg text-tag-indigo',
+    dotFill: 'fill-tag-indigo-fill',
     removeButton: {
-      hover: 'hover:bg-indigo-600/20 dark:hover:bg-indigo-500/30',
-      stroke:
-        'stroke-indigo-600/50 group-hover:stroke-indigo-600/75 dark:stroke-indigo-400 dark:group-hover:stroke-indigo-300',
+      hover: 'hover:bg-tag-indigo-hover',
+      stroke: 'stroke-tag-indigo-stroke group-hover:stroke-tag-indigo-stroke-hover',
     },
   },
   purple: {
-    border:
-      'bg-purple-50 text-purple-700 inset-ring inset-ring-purple-700/10 dark:bg-purple-400/10 dark:text-purple-400 dark:inset-ring-purple-400/30',
-    flat: 'bg-purple-100 text-purple-700 dark:bg-purple-400/10 dark:text-purple-400',
-    dotFill: 'fill-purple-500 dark:fill-purple-400',
+    border: 'bg-tag-purple-wash text-tag-purple inset-ring inset-ring-tag-purple-ring',
+    flat: 'bg-tag-purple-bg text-tag-purple',
+    dotFill: 'fill-tag-purple-fill',
     removeButton: {
-      hover: 'hover:bg-purple-600/20 dark:hover:bg-purple-500/30',
-      stroke:
-        'stroke-violet-600/50 group-hover:stroke-violet-600/75 dark:stroke-violet-400 dark:group-hover:stroke-violet-300',
+      hover: 'hover:bg-tag-purple-hover',
+      stroke: 'stroke-tag-purple-stroke group-hover:stroke-tag-purple-stroke-hover',
     },
   },
   pink: {
-    border:
-      'bg-pink-50 text-pink-700 inset-ring inset-ring-pink-700/10 dark:bg-pink-400/10 dark:text-pink-400 dark:inset-ring-pink-400/20',
-    flat: 'bg-pink-100 text-pink-700 dark:bg-pink-400/10 dark:text-pink-400',
-    dotFill: 'fill-pink-500 dark:fill-pink-400',
+    border: 'bg-tag-pink-wash text-tag-pink inset-ring inset-ring-tag-pink-ring',
+    flat: 'bg-tag-pink-bg text-tag-pink',
+    dotFill: 'fill-tag-pink-fill',
     removeButton: {
-      hover: 'hover:bg-pink-600/20 dark:hover:bg-pink-500/30',
-      stroke: 'stroke-pink-700/50 group-hover:stroke-pink-700/75 dark:stroke-pink-400 dark:group-hover:stroke-pink-300',
+      hover: 'hover:bg-tag-pink-hover',
+      stroke: 'stroke-tag-pink-stroke group-hover:stroke-tag-pink-stroke-hover',
     },
   },
 };
 
 // Special styling for dot badges with border variant
-const dotBorderClasses = 'text-foreground inset-ring inset-ring-border dark:text-foreground dark:inset-ring-border';
+const dotBorderClasses = 'text-foreground inset-ring inset-ring-border';
 
 export function Badge({
   children,

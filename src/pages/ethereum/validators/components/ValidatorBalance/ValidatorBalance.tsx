@@ -6,8 +6,8 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { useTableBounds } from '@/hooks/useBounds';
 import { getDataVizColors } from '@/utils';
 import type { FctValidatorBalanceDaily } from '@/api/types.gen';
-import { useValidatorRewards } from '../../hooks/useValidatorRewards';
-import { formatDayLabel } from '../../utils/overview';
+import { useValidatorRewards } from '@/pages/ethereum/validators/hooks/useValidatorRewards';
+import { formatDayLabel } from '@/pages/ethereum/validators/utils/overview';
 
 interface ValidatorBalanceProps {
   balances: FctValidatorBalanceDaily[];
@@ -82,7 +82,8 @@ export function ValidatorBalance({
               const totals = balanceDays.map(
                 d => balances.filter(b => b.day_start_date === d).reduce((a, b) => a + (b.end_balance ?? 0), 0) / 1e9
               );
-              return totals.map(t => Number((t - totals[0]).toFixed(4)));
+              const first = totals[0] ?? 0;
+              return totals.map(t => Number((t - first).toFixed(4)));
             })(),
             color: themeColors.primary,
             showSymbol: false,

@@ -101,13 +101,3 @@ export * from '../src/pages/ethereum/live/components/BlobDataAvailability/BlobDa
 export * from '../src/pages/ethereum/live/components/DataColumnDataAvailability/DataColumnDataAvailability';
 export * from '../src/pages/ethereum/live/components/Timeline/Timeline';
 export * from '../src/pages/ethereum/slots/components/PreparedBlocksComparisonChart/PreparedBlocksComparisonChart';
-export * from '../src/pages/xatu/contributors/components/UserCard/UserCard';
-export * from '../src/pages/xatu/contributors/components/UserCardSkeleton/UserCardSkeleton';
-export * from '../src/pages/xatu/contributors/components/UserDetailsSkeleton/UserDetailsSkeleton';
-export * from '../src/pages/xatu/fork-readiness/components/ClientReadinessCard/ClientReadinessCard';
-export * from '../src/pages/xatu/fork-readiness/components/ForkReadinessLoading/ForkReadinessLoading';
-export * from '../src/pages/xatu/geographical-checklist/components/GeographicalChecklistSkeleton/GeographicalChecklistSkeleton';
-export * from '../src/pages/xatu/geographical-checklist/components/GeographicalFilters/GeographicalFilters';
-export * from '../src/pages/xatu/geographical-checklist/components/GeographicalListView/GeographicalListView';
-export * from '../src/pages/xatu/geographical-checklist/components/GeographicalMapView/GeographicalMapView';
-export * from '../src/pages/xatu/locally-built-blocks/components/LocallyBuiltBlocksSkeleton/LocallyBuiltBlocksSkeleton';

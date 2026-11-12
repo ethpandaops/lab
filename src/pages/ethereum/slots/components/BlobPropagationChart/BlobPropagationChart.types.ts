@@ -2,7 +2,7 @@
  * Blob or data column propagation data point from the first seen by node API endpoint
  * Pre-Fulu uses blob_index, Fulu+ uses column_index
  */
-export interface BlobPropagationDataPoint {
+interface BlobPropagationDataPoint {
   /**
    * Blob index (pre-Fulu: 0-5, typically 0-3)
    */

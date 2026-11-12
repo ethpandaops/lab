@@ -3,7 +3,7 @@ import type { DataAvailabilityGranularity } from '@/pages/ethereum/data-availabi
 /**
  * Parent context from the drill-down hierarchy
  */
-export interface ParentContext {
+interface ParentContext {
   /** Date string (YYYY-MM-DD) - available at day level and below */
   date?: string;
   /** Hour start timestamp - available at hour level and below */

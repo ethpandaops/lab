@@ -49,8 +49,8 @@ export function entitiesToReach(
   if (total <= 0) return null;
   const sorted = [...stakes].sort((a, b) => b - a);
   let sum = 0;
-  for (let i = 0; i < sorted.length; i++) {
-    sum += sorted[i];
+  for (const [i, stake] of sorted.entries()) {
+    sum += stake;
     if (sum >= total * fraction) return { count: i + 1, share: sum / total };
   }
   return null;

@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import clsx from 'clsx';
-import type { PhaseNodeProps } from '../../SlotProgressTimeline.types';
+import type { PhaseNodeProps } from '@/components/Ethereum/SlotProgressTimeline/SlotProgressTimeline.types';
 
 /**
  * PhaseNode - Indicator for a phase in the slot timeline
@@ -27,13 +27,13 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
           status === 'pending' && ['bg-surface text-muted', !onClick && 'cursor-default'],
           // Active state
           status === 'active' && [
-            isSuccess ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary',
+            isSuccess ? 'bg-success-10 text-success' : 'bg-primary-10 text-primary',
             onClick && 'cursor-pointer',
             !onClick && 'cursor-default',
           ],
           // Completed state
           status === 'completed' && [
-            isSuccess ? 'bg-success/10 text-success' : 'bg-surface text-muted',
+            isSuccess ? 'bg-success-10 text-success' : 'bg-surface text-muted',
             onClick && 'cursor-pointer',
             !onClick && 'cursor-default',
           ]
@@ -49,8 +49,8 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         {/* Label - always rendered with fixed line height */}
         <span
           className={clsx(
-            'text-center text-2xs leading-tight font-medium',
-            status === 'pending' && 'text-muted/50',
+            'text-center text-2xs/tight font-medium',
+            status === 'pending' && 'text-muted-50',
             status === 'active' && 'text-foreground',
             status === 'completed' && 'text-muted'
           )}
@@ -61,10 +61,10 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         {/* Time badge - always rendered with fixed line height */}
         <span
           className={clsx(
-            'text-center font-mono text-2xs leading-tight',
-            status === 'pending' && 'text-muted/50',
+            'text-center font-mono text-2xs/tight',
+            status === 'pending' && 'text-muted-50',
             status === 'active' && (isSuccess ? 'text-success' : 'text-primary'),
-            status === 'completed' && (isSuccess ? 'text-success/70' : 'text-muted/70')
+            status === 'completed' && (isSuccess ? 'text-success-70' : 'text-muted-70')
           )}
         >
           {phase.id !== 'attesting' && phase.timestamp !== undefined
@@ -77,10 +77,10 @@ export function PhaseNode({ phase, status, showStats = true, onClick, className 
         {/* Stats - always rendered with fixed line height, hidden with opacity when empty */}
         <span
           className={clsx(
-            'text-center text-2xs leading-tight',
-            status === 'pending' && 'text-muted/50',
+            'text-center text-2xs/tight',
+            status === 'pending' && 'text-muted-50',
             status === 'active' && 'text-muted',
-            status === 'completed' && 'text-muted/70',
+            status === 'completed' && 'text-muted-70',
             // Hide with opacity when no stats, but maintain layout space
             !showStats || !phase.stats ? 'opacity-0' : 'opacity-100'
           )}

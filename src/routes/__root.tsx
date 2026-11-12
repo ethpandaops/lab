@@ -1,4 +1,4 @@
-import { type JSX, useState, useEffect } from 'react';
+import { type JSX, useState, useEffect, useSyncExternalStore } from 'react';
 import {
   createRootRouteWithContext,
   Outlet,
@@ -8,7 +8,6 @@ import {
   useSearch,
   retainSearchParams,
 } from '@tanstack/react-router';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { z } from 'zod';
 import { NetworkProvider } from '@/providers/NetworkProvider';
 import { ThemeProvider } from '@/providers/ThemeProvider';
@@ -22,8 +21,6 @@ import { Sidebar } from '@/components/Layout/Sidebar';
 import { Breadcrumb } from '@/components/Navigation/Breadcrumb';
 import { NetworkIcon } from '@/components/Ethereum/NetworkIcon';
 import { useNetwork } from '@/hooks/useNetwork';
-import type { Config } from '@/hooks/useConfig';
-import type { Bounds } from '@/hooks/useBounds';
 
 // Define router context interface
 interface MyRouterContext {
@@ -47,36 +44,12 @@ export type RootSearch = z.infer<typeof rootSearchSchema>;
 // Extend Window interface for type safety
 declare global {
   interface Window {
-    __CONFIG__?: Config;
-    __BOUNDS__?: Record<string, Bounds>;
     __VERSION__?: {
       version: string;
       git_commit: string;
       build_date: string;
     };
   }
-}
-
-// Create QueryClient for hydrated data
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: Infinity, // Keep retrying forever - critical queries like config/bounds need to succeed
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff, max 30s
-    },
-  },
-});
-
-// Hydrate the config query if the global variable exists
-if (typeof window !== 'undefined' && window.__CONFIG__) {
-  queryClient.setQueryData(['config'], window.__CONFIG__);
-}
-
-// Hydrate bounds queries for each network if the global variable exists
-if (typeof window !== 'undefined' && window.__BOUNDS__) {
-  Object.entries(window.__BOUNDS__).forEach(([networkName, boundsData]) => {
-    queryClient.setQueryData(['bounds', networkName], boundsData);
-  });
 }
 
 /**
@@ -92,19 +65,19 @@ function MobileHeader({
   const { currentNetwork } = useNetwork();
 
   return (
-    <div className="fixed top-0 right-0 left-0 z-40 flex items-center justify-between border-b border-border bg-background px-4 py-4 sm:px-6 lg:hidden">
+    <div className="fixed inset-x-0 top-0 z-40 flex items-center justify-between border-b border-border bg-background p-4 sm:px-6 lg:hidden">
       <div className="flex items-center gap-x-6">
         <button
           type="button"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="group -m-2.5 flex h-10 w-10 flex-col items-center justify-center gap-1.5 p-2.5 lg:hidden"
+          className="group -m-2.5 flex size-10 flex-col items-center justify-center gap-1.5 p-2.5 lg:hidden"
           aria-label="Toggle sidebar"
           aria-pressed={sidebarOpen}
         >
           <span className="sr-only">Toggle sidebar</span>
-          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:translate-y-2 group-[[aria-pressed=true]]:rotate-45" />
-          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:opacity-0" />
-          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-[[aria-pressed=true]]:-translate-y-2 group-[[aria-pressed=true]]:-rotate-45" />
+          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:translate-y-2 group-aria-pressed:rotate-45" />
+          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:opacity-0" />
+          <span className="h-0.5 w-6 origin-center rounded-full bg-muted transition-all duration-300 ease-out group-hover:bg-foreground group-aria-pressed:-translate-y-2 group-aria-pressed:-rotate-45" />
         </button>
         <Link to="/" className="flex items-center gap-2">
           <img alt="Lab Logo" src="/images/lab.png" className="h-8 w-auto" />
@@ -125,13 +98,37 @@ function MobileHeader({
 
 const SIDEBAR_COLLAPSED_KEY = 'lab-sidebar-collapsed';
 
+/**
+ * Detect Apple Watch using multiple heuristics
+ * Apple Watch reports as iPhone but has distinctive screen dimensions
+ */
+function isAppleWatchScreen(): boolean {
+  const isIOS = /iPhone/.test(navigator.userAgent);
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+
+  // Apple Watch specific dimensions (all models: 312-416px wide, 340-502px tall)
+  // Exclude iPhone dimensions which start at 375px wide minimum (iPhone SE)
+  const isWatchWidth = screenWidth >= 312 && screenWidth <= 416;
+  const isWatchHeight = screenHeight >= 340 && screenHeight <= 502;
+  const isTooSmallForPhone = screenWidth < 375; // iPhones are 375px+ wide
+
+  return isIOS && isWatchWidth && isWatchHeight && isTooSmallForPhone;
+}
+
+/** Re-reads the screen check whenever the window resizes */
+function subscribeToResize(onResize: () => void): () => void {
+  window.addEventListener('resize', onResize);
+  return () => window.removeEventListener('resize', onResize);
+}
+
 function RootComponent(): JSX.Element {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     if (typeof window === 'undefined') return false;
     return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === 'true';
   });
-  const [isAppleWatch, setIsAppleWatch] = useState(false);
+  const isAppleWatch = useSyncExternalStore(subscribeToResize, isAppleWatchScreen);
   const router = useRouter();
   const { embed, theme: themeOverride } = useSearch({ from: '__root__' });
 
@@ -139,31 +136,6 @@ function RootComponent(): JSX.Element {
   useEffect(() => {
     localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(sidebarCollapsed));
   }, [sidebarCollapsed]);
-
-  // Detect Apple Watch using multiple heuristics
-  // Apple Watch reports as iPhone but has distinctive screen dimensions
-  useEffect(() => {
-    const checkIsAppleWatch = (): void => {
-      const isIOS = /iPhone/.test(navigator.userAgent);
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-
-      // Apple Watch specific dimensions (all models: 312-416px wide, 340-502px tall)
-      // Exclude iPhone dimensions which start at 375px wide minimum (iPhone SE)
-      const isWatchWidth = screenWidth >= 312 && screenWidth <= 416;
-      const isWatchHeight = screenHeight >= 340 && screenHeight <= 502;
-      const isTooSmallForPhone = screenWidth < 375; // iPhones are 375px+ wide
-
-      setIsAppleWatch(isIOS && isWatchWidth && isWatchHeight && isTooSmallForPhone);
-    };
-
-    checkIsAppleWatch();
-    window.addEventListener('resize', checkIsAppleWatch);
-
-    return () => {
-      window.removeEventListener('resize', checkIsAppleWatch);
-    };
-  }, []);
 
   // Close sidebar on route navigation (path changes or network search param changes)
   useEffect(() => {
@@ -192,60 +164,19 @@ function RootComponent(): JSX.Element {
   // Show clown emoji for Apple Watch screens
   if (isAppleWatch) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider themeOverride={themeOverride}>
-          <div className="flex min-h-dvh items-center justify-center bg-background p-4">
-            <span
-              className="text-center"
-              style={{ fontSize: '80vw', lineHeight: '1' }}
-              role="img"
-              aria-label="Clown face"
-            >
-              🤡
-            </span>
-          </div>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <ThemeProvider themeOverride={themeOverride}>
+        <div className="flex min-h-dvh items-center justify-center bg-background p-4">
+          <span className="text-center text-vw-80" role="img" aria-label="Clown face">
+            🤡
+          </span>
+        </div>
+      </ThemeProvider>
     );
   }
 
   // Embed mode: minimal layout without sidebar, header, or breadcrumb
   if (embed) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider themeOverride={themeOverride}>
-          <NotificationProvider>
-            <TimezoneProvider>
-              <ConfigGate>
-                <NetworkProvider>
-                  <SharedCrosshairsProvider>
-                    <HeadContent />
-                    <main className="relative min-h-dvh bg-background">
-                      {/* ethPandaOps logo watermark */}
-                      <a
-                        href="https://lab.ethpandaops.io"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="absolute top-4 right-4 z-50 opacity-60 transition-opacity hover:opacity-100"
-                      >
-                        <img src="/images/ethpandaops-logo-64.png" alt="ethPandaOps" className="h-8 w-auto" />
-                      </a>
-                      <FeatureGate>
-                        <Outlet />
-                      </FeatureGate>
-                    </main>
-                  </SharedCrosshairsProvider>
-                </NetworkProvider>
-              </ConfigGate>
-            </TimezoneProvider>
-          </NotificationProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    );
-  }
-
-  return (
-    <QueryClientProvider client={queryClient}>
       <ThemeProvider themeOverride={themeOverride}>
         <NotificationProvider>
           <TimezoneProvider>
@@ -253,35 +184,65 @@ function RootComponent(): JSX.Element {
               <NetworkProvider>
                 <SharedCrosshairsProvider>
                   <HeadContent />
-                  <div className="bg-background">
-                    {/* Sidebar (mobile + desktop) */}
-                    <Sidebar
-                      sidebarOpen={sidebarOpen}
-                      setSidebarOpen={setSidebarOpen}
-                      collapsed={sidebarCollapsed}
-                      setCollapsed={setSidebarCollapsed}
-                    />
-
-                    {/* Mobile header */}
-                    <MobileHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-                    {/* Main content */}
-                    <main
-                      className={`bg-background pt-[65px] transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
+                  <main className="relative min-h-dvh bg-background">
+                    {/* ethPandaOps logo watermark */}
+                    <a
+                      href="https://lab.ethpandaops.io"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute top-4 right-4 z-50 opacity-60 transition-opacity hover:opacity-100"
                     >
-                      <FeatureGate>
-                        <Breadcrumb className="z-20 h-12 border-b border-border bg-background px-4 sm:px-6 lg:sticky lg:top-0 lg:px-8" />
-                        <Outlet />
-                      </FeatureGate>
-                    </main>
-                  </div>
+                      <img src="/images/ethpandaops-logo-64.png" alt="ethPandaOps" className="h-8 w-auto" />
+                    </a>
+                    <FeatureGate>
+                      <Outlet />
+                    </FeatureGate>
+                  </main>
                 </SharedCrosshairsProvider>
               </NetworkProvider>
             </ConfigGate>
           </TimezoneProvider>
         </NotificationProvider>
       </ThemeProvider>
-    </QueryClientProvider>
+    );
+  }
+
+  return (
+    <ThemeProvider themeOverride={themeOverride}>
+      <NotificationProvider>
+        <TimezoneProvider>
+          <ConfigGate>
+            <NetworkProvider>
+              <SharedCrosshairsProvider>
+                <HeadContent />
+                <div className="bg-background">
+                  {/* Sidebar (mobile + desktop) */}
+                  <Sidebar
+                    sidebarOpen={sidebarOpen}
+                    setSidebarOpen={setSidebarOpen}
+                    collapsed={sidebarCollapsed}
+                    setCollapsed={setSidebarCollapsed}
+                  />
+
+                  {/* Mobile header */}
+                  <MobileHeader sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+                  {/* Main content */}
+                  <main
+                    className={`bg-background pt-16.25 transition-all duration-200 lg:min-h-dvh lg:pt-0 ${sidebarCollapsed ? 'lg:pl-14' : 'lg:pl-56'}`}
+                  >
+                    <FeatureGate>
+                      <Breadcrumb className="z-20 h-12 border-b border-border bg-background px-4 sm:px-6 lg:sticky lg:top-0 lg:px-8" />
+                      <Outlet />
+                    </FeatureGate>
+                  </main>
+                </div>
+              </SharedCrosshairsProvider>
+            </NetworkProvider>
+          </ConfigGate>
+        </TimezoneProvider>
+      </NotificationProvider>
+    </ThemeProvider>
   );
 }
 

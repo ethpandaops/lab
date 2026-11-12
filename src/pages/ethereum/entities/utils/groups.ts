@@ -1,6 +1,6 @@
 import { ENTITY_GROUPS, entityGroupOf, entityLabel, isEntityGroup } from '@/pages/ethereum/clients/utils/client-share';
 
-import type { EntityStake } from '../hooks/useEntityStake';
+import type { EntityStake } from '@/pages/ethereum/entities/hooks/useEntityStake';
 import { addCounts, EMPTY_COUNTS, type PerformanceCounts } from './performance';
 
 export { entityGroupOf, entityLabel, isEntityGroup };
@@ -12,9 +12,6 @@ export function groupName(entity: string): string | undefined {
 
 /** The group's id as the group tables key it ("lido" for "*lido") */
 export const groupId = (group: string): string => group.slice(1);
-
-/** Every group value, such as "*lido" */
-export const GROUP_VALUES = ENTITY_GROUPS.map(({ id }) => `*${id}`);
 
 /**
  * Entities with each group's members merged into one row named by the group value. Stake, validators and change

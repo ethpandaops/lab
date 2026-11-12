@@ -3,13 +3,13 @@ import type { JSX, ReactNode } from 'react';
 /**
  * Color variants for gas formula segments
  */
-export type GasFormulaColor = 'blue' | 'purple' | 'green' | 'amber' | 'cyan';
+type GasFormulaColor = 'blue' | 'purple' | 'green' | 'amber' | 'cyan';
 
 /**
  * A segment in the gas formula (before the equals sign)
  */
-export interface GasFormulaSegment {
-  /** Display label for this segment */
+interface GasFormulaSegment {
+  /** Display label for this segment, unique within the formula */
   label: string;
   /** Numeric value */
   value: number;
@@ -24,7 +24,7 @@ export interface GasFormulaSegment {
 /**
  * The result segment (after the equals sign)
  */
-export interface GasFormulaResult {
+interface GasFormulaResult {
   /** Display label for the result */
   label: string;
   /** Numeric value */
@@ -48,17 +48,17 @@ export interface GasFormulaProps {
 function getColorClasses(color: GasFormulaColor): { border: string; bg: string; text: string } {
   switch (color) {
     case 'blue':
-      return { border: 'border-data-blue/30', bg: 'bg-data-blue/5', text: 'text-data-blue' };
+      return { border: 'border-data-blue-30', bg: 'bg-data-blue-5', text: 'text-data-blue' };
     case 'purple':
-      return { border: 'border-data-purple/30', bg: 'bg-data-purple/5', text: 'text-data-purple' };
+      return { border: 'border-data-purple-30', bg: 'bg-data-purple-5', text: 'text-data-purple' };
     case 'green':
-      return { border: 'border-success/30', bg: 'bg-success/5', text: 'text-success' };
+      return { border: 'border-success-30', bg: 'bg-success-5', text: 'text-success' };
     case 'amber':
-      return { border: 'border-warning/30', bg: 'bg-warning/5', text: 'text-warning' };
+      return { border: 'border-warning-30', bg: 'bg-warning-5', text: 'text-warning' };
     case 'cyan':
-      return { border: 'border-data-cyan/30', bg: 'bg-data-cyan/5', text: 'text-data-cyan' };
+      return { border: 'border-data-cyan-30', bg: 'bg-data-cyan-5', text: 'text-data-cyan' };
     default:
-      return { border: 'border-data-blue/30', bg: 'bg-data-blue/5', text: 'text-data-blue' };
+      return { border: 'border-data-blue-30', bg: 'bg-data-blue-5', text: 'text-data-blue' };
   }
 }
 
@@ -111,13 +111,13 @@ export function GasFormula({ segments, result, formatter = defaultFormatter }: G
     <>
       {/* Mobile: vertical stacked layout */}
       <div className="space-y-1.5 sm:hidden">
-        {segments.map((segment, index) => {
+        {segments.map(segment => {
           const colorClasses = getColorClasses(segment.color);
           const valueColor = getValueColor(segment.color);
 
           return (
             <div
-              key={`mobile-segment-${index}`}
+              key={segment.label}
               className={`flex items-center justify-between rounded-xs border-l-2 ${colorClasses.border} ${colorClasses.bg} px-3 py-2`}
             >
               <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ export function GasFormula({ segments, result, formatter = defaultFormatter }: G
         <div className="border-t border-border" />
 
         {/* Result row */}
-        <div className="flex items-center justify-between rounded-xs border-l-2 border-primary/40 bg-primary/5 px-3 py-2.5">
+        <div className="flex items-center justify-between rounded-xs border-l-2 border-primary-40 bg-primary-5 px-3 py-2.5">
           <div className="flex items-center gap-2">
             <span className="w-4 text-center text-sm font-bold text-primary">=</span>
             <span className="text-xs font-medium text-primary">{result.label}</span>
@@ -152,12 +152,12 @@ export function GasFormula({ segments, result, formatter = defaultFormatter }: G
 
       {/* Desktop: horizontal formula layout */}
       <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-2">
-        {segments.map((segment, index) => {
+        {segments.map(segment => {
           const colorClasses = getColorClasses(segment.color);
           const valueColor = getValueColor(segment.color);
 
           return (
-            <div key={`segment-${index}`} className="contents">
+            <div key={segment.label} className="contents">
               {/* Operator (if not first segment) */}
               {segment.operator && (
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-lg font-medium text-muted">
@@ -180,12 +180,12 @@ export function GasFormula({ segments, result, formatter = defaultFormatter }: G
         })}
 
         {/* Equals sign */}
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-primary/50 bg-primary/10 text-lg font-bold text-primary">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-50 bg-primary-10 text-lg font-bold text-primary">
           =
         </div>
 
         {/* Result box */}
-        <div className="min-w-0 flex-1 basis-24 rounded-sm border-2 border-primary/40 bg-primary/5 px-3 py-2.5 text-center">
+        <div className="min-w-0 flex-1 basis-24 rounded-sm border-2 border-primary-40 bg-primary-5 px-3 py-2.5 text-center">
           <div className="flex items-center justify-center gap-1 text-xs text-primary">
             {result.label}
             {result.tooltip}

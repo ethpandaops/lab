@@ -1,5 +1,5 @@
 import type { FctNodeActiveLast24h } from '@/api/types.gen';
-import { BEHIND_MS, ONLINE_THRESHOLD_SECONDS } from '../constants';
+import { BEHIND_MS, ONLINE_THRESHOLD_SECONDS } from '@/pages/xatu/nodes/constants';
 
 /** Distribution summary of a set of millisecond timings */
 export interface Summary {
@@ -23,7 +23,10 @@ export function quantile(sorted: number[], q: number): number {
   const position = (sorted.length - 1) * q;
   const lower = Math.floor(position);
   const upper = Math.ceil(position);
-  return sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower);
+  const lowerValue = sorted[lower];
+  const upperValue = sorted[upper];
+  if (lowerValue === undefined || upperValue === undefined) return NaN;
+  return lowerValue + (upperValue - lowerValue) * (position - lower);
 }
 
 /**
@@ -41,16 +44,18 @@ export function median(values: number[]): number | null {
  * Summarise a set of timings, or null when there are none.
  */
 export function summarize(values: number[]): Summary | null {
-  if (values.length === 0) return null;
   const sorted = [...values].sort((a, b) => a - b);
+  const min = sorted[0];
+  const max = sorted.at(-1);
+  if (min === undefined || max === undefined) return null;
   return {
     count: sorted.length,
-    min: sorted[0],
+    min,
     p10: quantile(sorted, 0.1),
     p50: quantile(sorted, 0.5),
     p90: quantile(sorted, 0.9),
     p95: quantile(sorted, 0.95),
-    max: sorted[sorted.length - 1],
+    max,
   };
 }
 
@@ -90,7 +95,7 @@ export function histogram(
   const counts = new Array<number>(bucketCount).fill(0);
   values.forEach(value => {
     const index = Math.min(bucketCount - 1, Math.max(0, Math.floor((value - minMs) / bucketMs)));
-    counts[index]++;
+    counts[index] = (counts[index] ?? 0) + 1;
   });
   return { starts: counts.map((_, i) => minMs + i * bucketMs), counts };
 }
@@ -128,9 +133,10 @@ export function shortVersion(version: string | undefined): string {
  */
 export function axisCeiling(values: (number | null)[]): number | undefined {
   const sorted = values.filter((value): value is number => value !== null).sort((a, b) => a - b);
-  if (sorted.length === 0) return undefined;
+  const max = sorted.at(-1);
+  if (max === undefined) return undefined;
   const target = Math.min(quantile(sorted, 0.98) * 1.2, quantile(sorted, 0.5) * 2.5);
-  if (target <= 0 || sorted[sorted.length - 1] <= target) return undefined;
+  if (target <= 0 || max <= target) return undefined;
   const step = 10 ** Math.floor(Math.log10(target));
   return Math.ceil(target / step) * step;
 }
@@ -140,7 +146,8 @@ export function axisCeiling(values: (number | null)[]): number | undefined {
  */
 export function getIngestedEndSlot(slots: Array<{ slot: number; nodeCount: number }>, fallback: number): number {
   for (let index = slots.length - 1; index >= 0; index--) {
-    if (slots[index].nodeCount > 0) return slots[index].slot + 1;
+    const entry = slots[index];
+    if (entry && entry.nodeCount > 0) return entry.slot + 1;
   }
   return fallback;
 }

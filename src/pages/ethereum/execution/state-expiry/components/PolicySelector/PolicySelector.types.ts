@@ -15,7 +15,7 @@ export interface PolicyData {
 }
 
 /** Configuration for a single expiry type (row) */
-export interface TypeConfig {
+interface TypeConfig {
   /** Display label */
   label: string;
   /** Icon component */
@@ -37,7 +37,7 @@ export interface TypeConfig {
 }
 
 /** Configuration for a single policy (column) */
-export interface PolicyConfig {
+interface PolicyConfig {
   /** Short label (e.g., "1y") */
   shortLabel: string;
   /** Full label (e.g., "1 year") */
@@ -47,7 +47,7 @@ export interface PolicyConfig {
 }
 
 /** Tooltip info for a type */
-export interface TypeTooltip {
+interface TypeTooltip {
   /** Tooltip title */
   title: string;
   /** Tooltip description */

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { TransactionSummary } from '../hooks/useBlockTransactions';
-import type { TransactionOpcodeProfile } from '../hooks/useBlockTransactionOpcodes';
+import type { TransactionSummary } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactions';
+import type { TransactionOpcodeProfile } from '@/pages/ethereum/execution/gas-profiler/hooks/useBlockTransactionOpcodes';
 import { filterBlockTransactions, formatRangeChip, sortBlockTransactions } from './blockTransactionFilters';
 
 function tx(overrides: Partial<TransactionSummary> & { transactionIndex: number }): TransactionSummary {

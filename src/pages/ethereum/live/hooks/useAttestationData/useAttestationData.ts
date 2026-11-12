@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { FctAttestationFirstSeenChunked50Ms } from '@/api/types.gen';
-import type { AttestationDataPoint } from '../../components/AttestationArrivals/AttestationArrivals.types';
+import type { AttestationDataPoint } from '@/pages/ethereum/live/components/AttestationArrivals/AttestationArrivals.types';
 
 export function useAttestationData(
   chunkedData: FctAttestationFirstSeenChunked50Ms[],

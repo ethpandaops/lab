@@ -1,10 +1,10 @@
 import type { JSX } from 'react';
 import { createBandSeries, createStatisticSeries } from '@/components/Charts/MultiLine';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import type { Granularity } from '../../constants';
-import type { BucketSpread } from '../../hooks/useNetworkHistory';
-import { formatMs } from '../../utils/node-stats';
-import { TimeSeriesChart } from '../TimeSeriesChart';
+import type { Granularity } from '@/pages/xatu/nodes/constants';
+import type { BucketSpread } from '@/pages/xatu/nodes/hooks/useNetworkHistory';
+import { formatMs } from '@/pages/xatu/nodes/utils/node-stats';
+import { TimeSeriesChart } from '@/pages/xatu/nodes/components/TimeSeriesChart';
 
 export interface NetworkArrivalChartProps {
   buckets: number[];
@@ -51,7 +51,7 @@ export function NetworkArrivalChart({
       ]}
       tooltipRows={index => {
         const bucket = byBucket[index];
-        if (bucket.nodeCount === 0) return [];
+        if (!bucket || bucket.nodeCount === 0) return [];
         return [
           { color: colors.primary, label: 'P90', value: formatMs(bucket.p90) },
           { color: colors.primary, label: 'Median', value: formatMs(bucket.p50) },

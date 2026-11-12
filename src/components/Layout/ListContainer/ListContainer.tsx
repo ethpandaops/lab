@@ -1,4 +1,4 @@
-import { type JSX, createContext, useContext } from 'react';
+import { type JSX, createContext, use } from 'react';
 import clsx from 'clsx';
 import type { ListContainerProps, ListItemProps, ListContainerVariant } from './ListContainer.types';
 
@@ -42,9 +42,8 @@ const variantStyles: Record<
     itemMobileFull: 'px-4 sm:px-6',
   },
   flat: {
-    wrapper: 'overflow-hidden border border-border bg-surface dark:border-border dark:bg-background',
-    wrapperMobileFull:
-      'overflow-hidden border border-border bg-surface sm:rounded-sm dark:border-border dark:bg-background',
+    wrapper: 'overflow-hidden border border-border bg-panel',
+    wrapperMobileFull: 'overflow-hidden border border-border bg-panel sm:rounded-sm',
     list: '',
     listWithDividers: 'divide-y divide-border',
     item: 'px-6',
@@ -57,8 +56,8 @@ const variantStyles: Record<
   },
 };
 
-export function ListItem({ children, className, onClick }: ListItemProps): JSX.Element {
-  const { variant, fullWidthOnMobile, compact } = useContext(ListContainerContext);
+export function ListItem({ children, className, onClick, as: Component = 'li' }: ListItemProps): JSX.Element {
+  const { variant, fullWidthOnMobile, compact } = use(ListContainerContext);
   const styles = variantStyles[variant];
   const itemClass = fullWidthOnMobile && styles.itemMobileFull ? styles.itemMobileFull : styles.item;
 
@@ -66,9 +65,9 @@ export function ListItem({ children, className, onClick }: ListItemProps): JSX.E
   const paddingClass = compact ? 'py-0.5' : 'py-4';
 
   return (
-    <li className={clsx(itemClass, paddingClass, className)} onClick={onClick}>
+    <Component className={clsx(itemClass, paddingClass, className)} onClick={onClick}>
       {children}
-    </li>
+    </Component>
   );
 }
 
@@ -84,6 +83,9 @@ export function ListContainer({
   const styles = variantStyles[variant];
   const contextValue: ListContainerContextValue = { variant, fullWidthOnMobile, compact, withDividers };
 
+  // A div is not a list (its items carry another role, such as radio options)
+  const role = Component === 'div' ? undefined : 'list';
+
   // Apply dividers based on withDividers prop and variant
   // Note: 'separate' variant doesn't use dividers
   const listClassName = clsx(styles.list, withDividers && variant !== 'separate' && styles.listWithDividers);
@@ -91,7 +93,7 @@ export function ListContainer({
   // Variants with wrapper need an extra container
   if (styles.wrapper) {
     const list = (
-      <Component role="list" className={listClassName}>
+      <Component role={role} className={listClassName}>
         {children}
       </Component>
     );
@@ -99,18 +101,18 @@ export function ListContainer({
     const wrapperClass = fullWidthOnMobile && styles.wrapperMobileFull ? styles.wrapperMobileFull : styles.wrapper;
 
     return (
-      <ListContainerContext.Provider value={contextValue}>
+      <ListContainerContext value={contextValue}>
         <div className={clsx(wrapperClass, className)}>{list}</div>
-      </ListContainerContext.Provider>
+      </ListContainerContext>
     );
   }
 
   // Simple variants render list directly
   const list = (
-    <Component role="list" className={clsx(listClassName, className)}>
+    <Component role={role} className={clsx(listClassName, className)}>
       {children}
     </Component>
   );
 
-  return <ListContainerContext.Provider value={contextValue}>{list}</ListContainerContext.Provider>;
+  return <ListContainerContext value={contextValue}>{list}</ListContainerContext>;
 }

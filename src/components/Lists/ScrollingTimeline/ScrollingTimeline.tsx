@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useRef, useMemo, memo } from 'react';
+import { type JSX, useCallback, useEffect, useRef, useMemo, memo } from 'react';
 import clsx from 'clsx';
 import type { ScrollingTimelineProps, TimelineItem } from './ScrollingTimeline.types';
 
@@ -11,7 +11,7 @@ interface TimelineItemComponentProps {
   item: TimelineItem;
   status: 'active' | 'completed' | 'pending';
   formatTime: (timestamp: number) => string;
-  onRefChange: (el: HTMLDivElement | null) => void;
+  onRefChange: (id: string, el: HTMLDivElement | null) => void;
 }
 
 const TimelineItemComponent = memo(function TimelineItemComponent({
@@ -20,12 +20,19 @@ const TimelineItemComponent = memo(function TimelineItemComponent({
   formatTime,
   onRefChange,
 }: TimelineItemComponentProps): JSX.Element {
+  const ref = useCallback(
+    (el: HTMLDivElement | null) => {
+      onRefChange(item.id, el);
+    },
+    [onRefChange, item.id]
+  );
+
   return (
     <div
-      ref={onRefChange}
+      ref={ref}
       className={clsx(
         'relative flex items-center gap-x-2 px-3 py-1 transition-all duration-300',
-        status === 'active' && 'bg-primary/10 dark:bg-primary/5',
+        status === 'active' && 'bg-row-active',
         status === 'pending' && 'opacity-40'
       )}
     >
@@ -35,8 +42,8 @@ const TimelineItemComponent = memo(function TimelineItemComponent({
           'shrink-0 text-right text-xs font-medium',
           'w-10',
           status === 'active' && 'text-primary',
-          status === 'completed' && 'text-foreground dark:text-muted',
-          status === 'pending' && 'text-muted dark:text-muted'
+          status === 'completed' && 'text-foreground-soft',
+          status === 'pending' && 'text-muted'
         )}
       >
         {formatTime(item.timestamp)}
@@ -47,9 +54,9 @@ const TimelineItemComponent = memo(function TimelineItemComponent({
         <div
           className={clsx(
             'size-1.5 rounded-full transition-all duration-300',
-            status === 'active' && 'bg-primary ring-3 ring-primary/20 dark:ring-primary/10',
-            status === 'completed' && 'bg-foreground/40 dark:bg-border',
-            status === 'pending' && 'bg-border dark:bg-surface'
+            status === 'active' && 'bg-primary ring-3 ring-primary-halo',
+            status === 'completed' && 'bg-dot-done',
+            status === 'pending' && 'bg-dot-pending'
           )}
         />
       </div>
@@ -60,8 +67,8 @@ const TimelineItemComponent = memo(function TimelineItemComponent({
           className={clsx(
             'flex shrink-0 items-center',
             status === 'active' && 'text-primary',
-            status === 'completed' && 'text-foreground dark:text-muted',
-            status === 'pending' && 'text-muted dark:text-muted'
+            status === 'completed' && 'text-foreground-soft',
+            status === 'pending' && 'text-muted'
           )}
         >
           {item.icon}
@@ -73,9 +80,9 @@ const TimelineItemComponent = memo(function TimelineItemComponent({
         <div
           className={clsx(
             'truncate text-xs transition-colors duration-300',
-            status === 'active' && 'font-medium text-foreground dark:text-foreground',
-            status === 'completed' && 'text-foreground dark:text-foreground',
-            status === 'pending' && 'text-muted dark:text-muted'
+            status === 'active' && 'font-medium text-foreground',
+            status === 'completed' && 'text-foreground',
+            status === 'pending' && 'text-muted'
           )}
         >
           {item.content}
@@ -94,10 +101,16 @@ export function ScrollingTimeline({
   formatTime = defaultFormatTime,
 }: ScrollingTimelineProps): JSX.Element {
   const containerRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const itemElementsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
-  // Store stable ref callbacks per item ID to prevent TimelineItemComponent re-renders
-  const refCallbacks = useRef<Map<string, (el: HTMLDivElement | null) => void>>(new Map());
+  // One stable ref callback for every item, so TimelineItemComponent doesn't re-render
+  const handleItemRef = useCallback((id: string, el: HTMLDivElement | null) => {
+    if (el) {
+      itemElementsRef.current.set(id, el);
+    } else {
+      itemElementsRef.current.delete(id);
+    }
+  }, []);
 
   // Auto-scroll to the active item based on currentTime
   const lastScrolledItemRef = useRef<string | null>(null);
@@ -109,7 +122,8 @@ export function ScrollingTimeline({
     // Find the active item index
     let activeIndex = -1;
     for (let i = items.length - 1; i >= 0; i--) {
-      if (items[i].timestamp <= currentTime) {
+      const item = items[i];
+      if (item && item.timestamp <= currentTime) {
         activeIndex = i;
         break;
       }
@@ -148,7 +162,7 @@ export function ScrollingTimeline({
       if (lastScrolledItemRef.current === activeItemId) return;
       lastScrolledItemRef.current = activeItemId;
 
-      const element = itemRefs.current.get(activeItemId);
+      const element = itemElementsRef.current.get(activeItemId);
       if (element && containerRef.current) {
         // Scroll the active item to the center of the container
         const container = containerRef.current;
@@ -173,12 +187,7 @@ export function ScrollingTimeline({
   return (
     <div
       ref={containerRef}
-      className={clsx(
-        'overflow-x-hidden overflow-y-auto rounded-sm bg-surface',
-        'scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border',
-        !height && 'flex-1',
-        className
-      )}
+      className={clsx('overflow-x-hidden overflow-y-auto rounded-sm bg-surface', !height && 'flex-1', className)}
       style={height ? { height } : undefined}
     >
       <div className="relative">
@@ -190,26 +199,13 @@ export function ScrollingTimeline({
           {items.map(item => {
             const status = itemStatuses.get(item.id) || 'pending';
 
-            // Get or create stable ref callback for this item
-            let refCallback = refCallbacks.current.get(item.id);
-            if (!refCallback) {
-              refCallback = (el: HTMLDivElement | null) => {
-                if (el) {
-                  itemRefs.current.set(item.id, el);
-                } else {
-                  itemRefs.current.delete(item.id);
-                }
-              };
-              refCallbacks.current.set(item.id, refCallback);
-            }
-
             return (
               <TimelineItemComponent
                 key={item.id}
                 item={item}
                 status={status}
                 formatTime={formatTime}
-                onRefChange={refCallback}
+                onRefChange={handleItemRef}
               />
             );
           })}

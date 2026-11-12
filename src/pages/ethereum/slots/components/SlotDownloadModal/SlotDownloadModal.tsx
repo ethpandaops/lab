@@ -7,7 +7,7 @@ import { SegmentedControl } from '@/components/Forms/SegmentedControl';
 import { Alert } from '@/components/Feedback/Alert';
 import { CopyToClipboard } from '@/components/Elements/CopyToClipboard';
 import { fctBlockBlobHeadServiceListOptions } from '@/api/@tanstack/react-query.gen';
-import { getBlobDownloadUrl, getBlockDownloadUrl, type BlockDownloadFormat } from '@/utils';
+import type { BlockDownloadFormat } from '@/lab-api';
 import { SLOTS_PER_EPOCH } from '@/utils/beacon';
 import { useBeaconClock } from '@/hooks/useBeaconClock';
 import { useArchiveDownload } from './useArchiveDownload';
@@ -38,7 +38,7 @@ export function SlotDownloadModal({
   blockRoot,
 }: SlotDownloadModalProps): JSX.Element {
   const [tab, setTab] = useState<TabKey>('block');
-  const { pendingKey, error, download } = useArchiveDownload();
+  const { pendingKey, error, download } = useArchiveDownload(network);
 
   // Blobs are not in the archive until the slot finalizes, so gate blob
   // downloads on finality (block downloads are available much sooner).
@@ -123,7 +123,7 @@ export function SlotDownloadModal({
                       leadingIcon={
                         pendingKey === key ? <ArrowPathIcon className="animate-spin" /> : <ArrowDownTrayIcon />
                       }
-                      onClick={() => download(key, getBlockDownloadUrl(network, slot, blockRoot, format))}
+                      onClick={() => download(key, { slot, block_root: blockRoot, format })}
                     >
                       Download
                     </Button>
@@ -168,7 +168,7 @@ export function SlotDownloadModal({
                             leadingIcon={
                               pendingKey === key ? <ArrowPathIcon className="animate-spin" /> : <ArrowDownTrayIcon />
                             }
-                            onClick={() => download(key, getBlobDownloadUrl(network, hash))}
+                            onClick={() => download(key, { versioned_hash: hash })}
                           >
                             {blobsArchived ? 'Download' : 'Pending'}
                           </Button>

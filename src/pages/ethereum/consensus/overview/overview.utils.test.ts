@@ -51,7 +51,7 @@ describe('trimDailyRecords', () => {
   });
 
   it('treats a missing day_start_date as excluded', () => {
-    const withMissing = [{ value: 9 }, ...records];
+    const withMissing: Array<{ day_start_date?: string; value: number }> = [{ value: 9 }, ...records];
     expect(trimDailyRecords(withMissing, '2025-01-01')).toEqual(records);
   });
 });

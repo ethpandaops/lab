@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ForkStatusBadge } from '../ForkShared';
+import { ForkStatusBadge } from '@/pages/ethereum/forks/components/ForkShared';
 import { Card } from '@/components/Layout/Card';
 import { Epoch } from '@/components/Ethereum/Epoch';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
@@ -31,12 +31,13 @@ export function ForksTimeline({
       <div>
         <div className="space-y-8">
           {forks.map((fork, forkIndex) => {
+            const prevFork = forks[forkIndex - 1];
+            const nextFork = forks[forkIndex + 1];
             const isActive = currentEpoch >= fork.epoch;
-            const isCurrentFork =
-              isActive && (forkIndex === forks.length - 1 || currentEpoch < forks[forkIndex + 1].epoch);
+            const isCurrentFork = isActive && (!nextFork || currentEpoch < nextFork.epoch);
 
             // Find blob schedule items that fall within this fork's epoch range
-            const nextForkEpoch = forkIndex < forks.length - 1 ? forks[forkIndex + 1].epoch : Infinity;
+            const nextForkEpoch = nextFork?.epoch ?? Infinity;
             const blobItems = blobSchedule
               .filter(item => item.epoch >= fork.epoch && item.epoch < nextForkEpoch)
               .sort((a, b) => a.epoch - b.epoch);
@@ -51,20 +52,20 @@ export function ForksTimeline({
                       className={clsx(
                         'absolute top-14 left-7 w-0.5',
                         blobItems.length > 0 ? '-bottom-6' : '-bottom-8',
-                        isActive ? 'bg-primary/30' : 'bg-border'
+                        isActive ? 'bg-primary-30' : 'bg-border'
                       )}
                     />
                   )}
 
                   {/* Fork icon */}
-                  <div className="relative flex h-14 w-14 flex-none items-center justify-center">
+                  <div className="relative flex size-14 flex-none items-center justify-center">
                     <div
                       className={clsx(
-                        'flex h-14 w-14 items-center justify-center rounded-sm border text-3xl transition-colors',
+                        'flex size-14 items-center justify-center rounded-sm border text-3xl transition-colors',
                         isCurrentFork
-                          ? 'border-primary/30 bg-primary/20'
+                          ? 'border-primary-30 bg-primary-20'
                           : isActive
-                            ? 'border-accent/20 bg-surface'
+                            ? 'border-accent-20 bg-surface'
                             : 'border-border bg-surface'
                       )}
                     >
@@ -134,9 +135,8 @@ export function ForksTimeline({
                                   </p>
                                 );
                               })()
-                            : forkIndex > 0
+                            : prevFork
                               ? (() => {
-                                  const prevFork = forks[forkIndex - 1];
                                   const epochsSincePrev = fork.epoch - prevFork.epoch;
                                   const daysSincePrev = Math.floor((epochsSincePrev * 32 * 12) / 86400);
 
@@ -193,19 +193,19 @@ export function ForksTimeline({
                       return (
                         <div key={`blob-${blobItem.epoch}`} className="relative flex items-start gap-x-4">
                           {/* Blob schedule icon */}
-                          <div className="relative flex h-9 w-9 flex-none items-center justify-center">
+                          <div className="relative flex size-9 flex-none items-center justify-center">
                             <div
                               className={clsx(
-                                'flex h-9 w-9 items-center justify-center rounded-sm border transition-colors',
+                                'flex size-9 items-center justify-center rounded-sm border transition-colors',
                                 isCurrentBlob
-                                  ? 'border-accent/30 bg-accent/20'
+                                  ? 'border-accent-30 bg-accent-20'
                                   : isBlobActive
-                                    ? 'border-accent/20 bg-surface'
+                                    ? 'border-accent-20 bg-surface'
                                     : 'border-border bg-surface'
                               )}
                             >
                               <ArrowTrendingUpIcon
-                                className={clsx('h-5 w-5', isBlobActive ? 'text-accent' : 'text-muted')}
+                                className={clsx('size-5', isBlobActive ? 'text-accent' : 'text-muted')}
                               />
                             </div>
                           </div>

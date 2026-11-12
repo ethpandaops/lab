@@ -4,7 +4,7 @@ import { Card } from '@/components/Layout/Card';
 /**
  * Shimmer animation class
  */
-const shimmer = 'animate-pulse bg-muted/20';
+const shimmer = 'animate-pulse bg-muted-20';
 
 /**
  * Skeleton loading state for the Gas Profiler page
@@ -21,7 +21,7 @@ export function GasProfilerSkeleton(): JSX.Element {
             <div className={`h-4 w-20 rounded-xs ${shimmer}`} />
           </div>
         </div>
-        <div className={`h-[80px] w-full rounded-xs ${shimmer}`} />
+        <div className={`h-20 w-full rounded-xs ${shimmer}`} />
         <div className="mt-3 grid grid-cols-4 gap-4 border-t border-border pt-3">
           {[...Array(4)].map((_, i) => (
             <div key={i}>

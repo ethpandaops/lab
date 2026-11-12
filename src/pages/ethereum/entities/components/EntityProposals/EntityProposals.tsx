@@ -27,7 +27,7 @@ import {
   useEntityBlocksByStatus,
   type ProposalStatus,
   type StatusBlock,
-} from '../../hooks/useEntityBlocksByStatus';
+} from '@/pages/ethereum/entities/hooks/useEntityBlocksByStatus';
 
 export interface EntityProposalsProps {
   entity: string;
@@ -102,12 +102,7 @@ function StatusBlocksTable({
           : 'Blocks its proposers produced that did not make the finalized chain'
       }
     >
-      <div
-        className={clsx(
-          'flex flex-col gap-4 [&>:last-child]:transition-opacity',
-          isPlaceholderData && '[&>:last-child]:opacity-60'
-        )}
-      >
+      <div className={clsx('flex flex-col gap-4 *:last:transition-opacity', isPlaceholderData && '*:last:opacity-60')}>
         <div className="flex flex-wrap items-center gap-3">
           {toolbar}
           <BlockFilterPanel filters={search} fields={fields} onChange={onSearchChange} />

@@ -47,18 +47,18 @@ export const GAS_EXPLANATIONS: Record<GasType, GasExplanation> = {
     description:
       'Base transaction cost charged before execution. Includes: 21,000 base + calldata cost (4 gas per zero byte, 16 per non-zero) + access list cost. For failed transactions, this may be unavailable.',
     color: {
-      bg: 'bg-data-amber/10',
-      text: 'text-amber-700 dark:text-data-amber',
-      border: 'border-data-amber/20',
+      bg: 'bg-data-amber-10',
+      text: 'text-phase-amber',
+      border: 'border-data-amber-20',
     },
   },
   evm: {
     title: 'EVM Execution',
     description: 'Gas consumed by opcode execution during the transaction. This is what the flame graph visualizes.',
     color: {
-      bg: 'bg-primary/10',
+      bg: 'bg-primary-10',
       text: 'text-primary',
-      border: 'border-primary/20',
+      border: 'border-primary-20',
     },
   },
   refund: {
@@ -66,9 +66,9 @@ export const GAS_EXPLANATIONS: Record<GasType, GasExplanation> = {
     description:
       'Gas returned for storage cleanup operations (SSTORE setting to zero). Capped at 20% of total gas per EIP-3529.',
     color: {
-      bg: 'bg-success/10',
+      bg: 'bg-success-10',
       text: 'text-success',
-      border: 'border-success/20',
+      border: 'border-success-20',
     },
   },
   receipt: {

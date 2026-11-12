@@ -4,8 +4,8 @@ import { Entity } from '@/components/Ethereum/Entity';
 import { entityLabel } from '@/pages/ethereum/clients/utils/client-share';
 import { Card } from '@/components/Layout/Card';
 
-import type { EntityStake } from '../../hooks';
-import { formatEthChange } from '../../utils/overview';
+import type { EntityStake } from '@/pages/ethereum/entities/hooks';
+import { formatEthChange } from '@/pages/ethereum/entities/utils/overview';
 
 /** Entities shown on each side */
 const PER_SIDE = 8;
@@ -64,8 +64,8 @@ export function StakeMovers({ entities, window }: StakeMoversProps): JSX.Element
   return (
     <Card title="Biggest movers" subtitle={`Change in active effective balance, ${window}`}>
       <div className="grid gap-6 lg:grid-cols-2">
-        {list(gained, 'Gained', 'bg-primary/70')}
-        {list(lost, 'Lost', 'bg-muted/50')}
+        {list(gained, 'Gained', 'bg-primary-70')}
+        {list(lost, 'Lost', 'bg-muted-50')}
       </div>
     </Card>
   );

@@ -248,7 +248,7 @@ export function IndexPage(): JSX.Element {
   const search = useSearch({ from: '/ethereum/data-availability/custody/' });
 
   // Derive drill-down state from URL
-  const currentLevel = deriveCurrentLevel(search);
+  const currentLevel = useMemo(() => deriveCurrentLevel(search), [search]);
 
   // All timestamps are displayed in UTC - data is aggregated by UTC boundaries
   const timezone = 'UTC' as const;
@@ -721,11 +721,13 @@ export function IndexPage(): JSX.Element {
    */
   const breadcrumbs = useMemo(() => {
     const crumbs: Array<{
+      level: DrillDownLevel['type'];
       label: string;
       onClick: () => void;
       icon: React.ComponentType<{ className?: string }>;
     }> = [
       {
+        level: 'window',
         label: `Window`,
         icon: Squares2X2Icon,
         onClick: () => {
@@ -749,6 +751,7 @@ export function IndexPage(): JSX.Element {
     ) {
       const breadcrumbLabelDate = new Date(currentLevel.date + 'T00:00:00Z');
       crumbs.push({
+        level: 'day',
         label: breadcrumbLabelDate.toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
@@ -767,6 +770,7 @@ export function IndexPage(): JSX.Element {
     // Add hour breadcrumb if we're at hour level or deeper
     if (currentLevel.type === 'hour' || currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
+        level: 'hour',
         label: new Date(currentLevel.hourStartDateTime * 1000).toLocaleTimeString('en-US', {
           hour: '2-digit',
           minute: '2-digit',
@@ -786,6 +790,7 @@ export function IndexPage(): JSX.Element {
     // Add epoch breadcrumb if we're at epoch level or deeper
     if (currentLevel.type === 'epoch' || currentLevel.type === 'slot') {
       crumbs.push({
+        level: 'epoch',
         label: formatEpoch(currentLevel.epoch),
         icon: CubeIcon,
         onClick: () =>
@@ -804,6 +809,7 @@ export function IndexPage(): JSX.Element {
     // Add slot breadcrumb if we're at slot level
     if (currentLevel.type === 'slot') {
       crumbs.push({
+        level: 'slot',
         label: formatSlot(currentLevel.slot),
         icon: Square2StackIcon,
         onClick: () =>
@@ -828,7 +834,7 @@ export function IndexPage(): JSX.Element {
   if (error) {
     return (
       <Container>
-        <div className="rounded-sm border border-danger/20 bg-danger/10 p-4 text-danger">
+        <div className="rounded-sm border border-danger-20 bg-danger-10 p-4 text-danger">
           Error loading data: {error instanceof Error ? error.message : 'Unknown error'}
         </div>
       </Container>
@@ -869,7 +875,7 @@ export function IndexPage(): JSX.Element {
 
       {/* Learn More Dialog */}
       <Dialog open={learnMoreOpen} onClose={() => setLearnMoreOpen(false)} title="About PeerDAS Custody" size="lg">
-        <div className="space-y-4 text-sm leading-relaxed text-muted">
+        <div className="space-y-4 text-sm/relaxed text-muted">
           <p>
             Instead of every beacon node storing every blob, data is erasure coded with 2x redundancy and split into 128
             columns. Each P2P peer commits to storing a subset based on its identity and validator balance.
@@ -922,15 +928,15 @@ export function IndexPage(): JSX.Element {
                 {breadcrumbs.slice(0, -1).map((crumb, index) => {
                   const Icon = crumb.icon;
                   return (
-                    <div key={index} className="flex items-center">
+                    <div key={crumb.level} className="flex items-center">
                       {index > 0 && <ChevronRightIcon className="mx-1 size-3 text-muted" />}
                       <button
                         type="button"
                         onClick={crumb.onClick}
-                        className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-colors hover:bg-accent/10 hover:text-accent"
+                        className="group flex items-center gap-1.5 rounded-sm px-2 py-1 text-muted transition-colors hover:bg-accent-10 hover:text-accent"
                       >
                         <Icon className="size-3.5 opacity-60 group-hover:opacity-100" />
-                        <span className="underline decoration-muted/50 underline-offset-2 group-hover:decoration-accent">
+                        <span className="underline decoration-muted-50 underline-offset-2 group-hover:decoration-accent">
                           {crumb.label}
                         </span>
                       </button>
@@ -944,8 +950,8 @@ export function IndexPage(): JSX.Element {
               {/* Back button */}
               <button
                 type="button"
-                onClick={breadcrumbs[breadcrumbs.length - 2].onClick}
-                className="group flex items-center gap-1.5 rounded-sm bg-muted/30 px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent/10 hover:text-accent"
+                onClick={breadcrumbs.at(-2)?.onClick}
+                className="group flex items-center gap-1.5 rounded-sm bg-muted-30 px-2.5 py-1.5 text-xs font-medium text-muted transition-colors hover:bg-accent-10 hover:text-accent"
               >
                 <ArrowLeftIcon className="size-3.5" />
                 <span>Back</span>
@@ -954,7 +960,7 @@ export function IndexPage(): JSX.Element {
           )}
 
           {/* Legend Strip */}
-          <div className="rounded-sm bg-muted/30 px-3 py-2">
+          <div className="rounded-sm bg-muted-30 px-3 py-2">
             <DataAvailabilityLegend orientation="horizontal" />
           </div>
 

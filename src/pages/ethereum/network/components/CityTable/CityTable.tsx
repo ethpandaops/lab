@@ -4,8 +4,8 @@ import type { FctPeerCountByClClientCityDaily } from '@/api/types.gen';
 import { Card } from '@/components/Layout/Card';
 import { Table } from '@/components/Lists/Table';
 import { formatDataDate } from '@/pages/ethereum/clients/utils/client-versions';
-import { dayStart, formatShare } from '../../utils/network-census';
-import { cityCounts, ROLLUP_CITIES } from '../../utils/network-peers';
+import { dayStart, formatShare } from '@/pages/ethereum/network/utils/network-census';
+import { cityCounts, ROLLUP_CITIES } from '@/pages/ethereum/network/utils/network-peers';
 
 export interface CityTableProps {
   /** Lowercase country code, as in the country page's URL */

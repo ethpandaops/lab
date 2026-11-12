@@ -1,5 +1,13 @@
-onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
-  - core-js
-  - esbuild
-  - msw
+saveExact: true
+
+# Refuse a version published with weaker provenance than an earlier one.
+trustPolicy: no-downgrade
+
+# The only install script that runs: esbuild fetches its binary.
+allowBuilds:
+  esbuild: true
+
+peerDependencyRules:
+  allowedVersions:
+    # echarts-gl 2 declares echarts ^5; Lab runs it on echarts 6.
+    echarts-gl>echarts: '6'

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import type { CountdownTime } from './countdown';
+import { useNow } from '@/hooks/useNow';
+import { secondsToCountdown } from './countdown';
 
 function Separator(): React.JSX.Element {
   return <div className="text-2xl text-muted">:</div>;
@@ -15,15 +16,19 @@ function CountdownCell({ value, unit }: { value: number; unit: string }): React.
 }
 
 interface ForkCountdownProps {
-  countdown: CountdownTime;
+  /** Activation time (unix seconds); the countdown reads zero while it is unknown */
+  timestamp?: number;
   /** Rendered under the digits, e.g. the local activation time */
   footer?: ReactNode;
 }
 
 /**
- * "Goes Live In" countdown. The days cell is hidden once less than a day remains.
+ * "Goes Live In" countdown, ticking every second. The days cell is hidden once less than a day remains.
  */
-export function ForkCountdown({ countdown, footer }: ForkCountdownProps): React.JSX.Element {
+export function ForkCountdown({ timestamp, footer }: ForkCountdownProps): React.JSX.Element {
+  const now = Math.floor(useNow() / 1000);
+  const countdown = secondsToCountdown(timestamp === undefined ? 0 : Math.max(0, timestamp - now));
+
   return (
     <div className="mb-6 rounded-sm border border-border py-6">
       <div className="mb-3 text-center text-xs font-medium text-muted">Goes Live In</div>
@@ -57,7 +62,7 @@ export function ForkCountdownSkeleton(): React.JSX.Element {
           <div key={unit} className="flex items-center gap-4">
             {index > 0 && <Separator />}
             <div className="text-center">
-              <div className="h-12 w-16 animate-pulse rounded-xs bg-muted/20"></div>
+              <div className="h-12 w-16 animate-pulse rounded-xs bg-muted-20"></div>
               <div className="mt-1 text-xs text-muted">{unit}</div>
             </div>
           </div>

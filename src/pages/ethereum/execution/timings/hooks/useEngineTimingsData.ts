@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueries, keepPreviousData } from '@tanstack/react-query';
 import {
   fctEngineNewPayloadByElClientServiceList,
@@ -34,14 +34,14 @@ import type {
 } from '@/api/types.gen';
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
-import { completeBucketEnd, currentUtcDate } from '@/utils/time';
+import { completeBucketEnd, currentUtcDate, toUtcDate } from '@/utils/time';
 import {
   TIME_RANGE_CONFIG,
   PER_SLOT_CHART_RANGES,
   HOURLY_CHART_RANGES,
   PERCENTILE_WINDOW,
   type TimeRange,
-} from '../IndexPage.types';
+} from '@/pages/ethereum/execution/timings/IndexPage.types';
 
 export interface EngineTimingsData {
   // newPayload per-EL-client aggregations (includes per-slot granularity)
@@ -81,7 +81,7 @@ export interface EngineTimingsData {
   winratePerSlot: IntEngineNewPayloadFastestExecutionByNodeClass[];
 }
 
-export type ActiveTab = 'newPayload' | 'getBlobs';
+type ActiveTab = 'newPayload' | 'getBlobs';
 
 export interface UseEngineTimingsDataOptions {
   timeRange: TimeRange;
@@ -95,6 +95,8 @@ export interface UseEngineTimingsDataResult {
   isLoading: boolean;
   isLoadingBlobs: boolean;
   error: Error | null;
+  /** First UTC day (YYYY-MM-DD) the daily tables are read from; undefined for All */
+  startDay: string | undefined;
 }
 
 /**
@@ -108,6 +110,8 @@ function getTimeRangeTimestamps(range: TimeRange): {
   hourlyEnd: number;
   /** The range's full days, ending yesterday, for the daily tables; All reads every complete day */
   days: DayFilter;
+  /** The first of those days; undefined for All */
+  startDay: string | undefined;
 } {
   const { seconds } = TIME_RANGE_CONFIG[range];
 
@@ -119,8 +123,9 @@ function getTimeRangeTimestamps(range: TimeRange): {
     seconds === null
       ? { day_start_date_ne: currentUtcDate() }
       : { day_start_date_in_values: generateDateRange(todayStart - seconds, todayStart - 1) };
+  const startDay = seconds === null ? undefined : toUtcDate(todayStart - seconds);
 
-  return { hourlyStart, hourlyEnd, days };
+  return { hourlyStart, hourlyEnd, days, startDay };
 }
 
 type DayFilter = { day_start_date_in_values: string } | { day_start_date_ne: string };
@@ -197,7 +202,7 @@ export function useEngineTimingsData({
 }: UseEngineTimingsDataOptions): UseEngineTimingsDataResult {
   const { currentNetwork } = useNetwork();
 
-  const { hourlyStart, hourlyEnd, days } = useMemo(() => getTimeRangeTimestamps(timeRange), [timeRange]);
+  const { hourlyStart, hourlyEnd, days, startDay } = useMemo(() => getTimeRangeTimestamps(timeRange), [timeRange]);
 
   // Track if blobs tab has ever been visited (to keep data cached after switching away)
   const [blobsVisited, setBlobsVisited] = useState(false);
@@ -534,32 +539,50 @@ export function useEngineTimingsData({
   const error = coreQueries.find(q => q.error)?.error as Error | null;
 
   // Build data object whenever any query has data (stale data is fine during refetch)
-  const freshData: EngineTimingsData | null =
-    hasAnyPrimaryData && !error
-      ? {
-          newPayloadByElClient: newPayloadByElClientQuery.data ?? [],
-          newPayloadByElClientHourly: newPayloadByElClientHourlyQuery.data ?? [],
-          newPayloadByElClientDaily: newPayloadByElClientDailyQuery.data ?? [],
-          newPayloadPercentiles: (newPayloadPercentilesQuery.data ?? []).filter(r => (r.observation_count ?? 0) > 0),
-          newPayloadDurationHistogram: newPayloadDurationHistogramQuery.data ?? [],
-          getBlobsByElClient: getBlobsByElClientQuery.data ?? [],
-          getBlobsByElClientHourly: getBlobsByElClientHourlyQuery.data ?? [],
-          getBlobsByElClientDaily: getBlobsByElClientDailyQuery.data ?? [],
-          getBlobsDurationHistogram: getBlobsDurationHistogramQuery.data ?? [],
-          winrateHourly: winrateHourlyQuery.data ?? [],
-          winrateDaily: winrateDailyQuery.data ?? [],
-          winratePerSlot: winratePerSlotQuery.data ?? [],
-        }
-      : null;
+  const freshData = useMemo(
+    (): EngineTimingsData | null =>
+      hasAnyPrimaryData && !error
+        ? {
+            newPayloadByElClient: newPayloadByElClientQuery.data ?? [],
+            newPayloadByElClientHourly: newPayloadByElClientHourlyQuery.data ?? [],
+            newPayloadByElClientDaily: newPayloadByElClientDailyQuery.data ?? [],
+            newPayloadPercentiles: (newPayloadPercentilesQuery.data ?? []).filter(r => (r.observation_count ?? 0) > 0),
+            newPayloadDurationHistogram: newPayloadDurationHistogramQuery.data ?? [],
+            getBlobsByElClient: getBlobsByElClientQuery.data ?? [],
+            getBlobsByElClientHourly: getBlobsByElClientHourlyQuery.data ?? [],
+            getBlobsByElClientDaily: getBlobsByElClientDailyQuery.data ?? [],
+            getBlobsDurationHistogram: getBlobsDurationHistogramQuery.data ?? [],
+            winrateHourly: winrateHourlyQuery.data ?? [],
+            winrateDaily: winrateDailyQuery.data ?? [],
+            winratePerSlot: winratePerSlotQuery.data ?? [],
+          }
+        : null,
+    [
+      hasAnyPrimaryData,
+      error,
+      newPayloadByElClientQuery.data,
+      newPayloadByElClientHourlyQuery.data,
+      newPayloadByElClientDailyQuery.data,
+      newPayloadPercentilesQuery.data,
+      newPayloadDurationHistogramQuery.data,
+      getBlobsByElClientQuery.data,
+      getBlobsByElClientHourlyQuery.data,
+      getBlobsByElClientDailyQuery.data,
+      getBlobsDurationHistogramQuery.data,
+      winrateHourlyQuery.data,
+      winrateDailyQuery.data,
+      winratePerSlotQuery.data,
+    ]
+  );
 
-  // Keep the last non-null data in a ref so the UI never flashes back to skeleton
+  // Keep the last non-null data so the UI never flashes back to skeleton
   // on time range changes (query key changes cause brief null data transitions)
-  const lastDataRef = useRef<EngineTimingsData | null>(null);
-  if (freshData !== null) {
-    lastDataRef.current = freshData;
+  const [lastData, setLastData] = useState<EngineTimingsData | null>(null);
+  if (freshData !== null && freshData !== lastData) {
+    setLastData(freshData);
   }
 
-  const data = freshData ?? lastDataRef.current;
+  const data = freshData ?? lastData;
 
-  return { data, isLoading, isLoadingBlobs, error };
+  return { data, isLoading, isLoadingBlobs, error, startDay };
 }

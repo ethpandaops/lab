@@ -1,9 +1,9 @@
 import { type JSX, useMemo, useState, useCallback } from 'react';
-import { createColumnHelper, type SortingState } from '@tanstack/react-table';
+import type { SortingState } from '@tanstack/react-table';
 import { Link } from '@tanstack/react-router';
 import { Container } from '@/components/Layout/Container';
 import { Header } from '@/components/Layout/Header';
-import { DataTable } from '@/components/DataTable';
+import { DataTable, type DataTableColumn } from '@/components/DataTable';
 import { ClientLogo } from '@/components/Ethereum/ClientLogo';
 import { EIP7870SpecsBanner } from '@/components/Ethereum/EIP7870SpecsBanner';
 import { ClusterSpecsModal } from '@/components/Ethereum/ClusterSpecsModal';
@@ -12,11 +12,11 @@ import { TracoorIcon } from '@/components/Ethereum/TracoorIcon';
 import { Alert } from '@/components/Feedback/Alert';
 import { Timestamp } from '@/components/DataDisplay/Timestamp';
 import type { IntEngineNewPayload } from '@/api/types.gen';
-import { FilterPanel } from '../FilterPanel';
-import { QuickFilters } from '../QuickFilters';
-import { ReferenceNodesInfoDialog } from '../../../timings/components/ReferenceNodesInfoDialog';
-import type { FilterValues } from '../../IndexPage.types';
-import { DEFAULT_DURATION_MIN } from '../../IndexPage.types';
+import { FilterPanel } from '@/pages/ethereum/execution/payloads/components/FilterPanel';
+import { QuickFilters } from '@/pages/ethereum/execution/payloads/components/QuickFilters';
+import { ReferenceNodesInfoDialog } from '@/pages/ethereum/execution/timings/components/ReferenceNodesInfoDialog';
+import type { FilterValues } from '@/pages/ethereum/execution/payloads/IndexPage.types';
+import { DEFAULT_DURATION_MIN } from '@/pages/ethereum/execution/payloads/IndexPage.types';
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -27,8 +27,6 @@ import {
 import { clsx } from 'clsx';
 
 type Payload = IntEngineNewPayload;
-
-const columnHelper = createColumnHelper<Payload>();
 
 /**
  * Truncate a hash for display
@@ -46,7 +44,7 @@ function getDurationColorClass(durationMs?: number): string {
   if (durationMs === undefined) return 'text-muted';
   if (durationMs < 500) return 'text-success';
   if (durationMs < 1000) return 'text-warning';
-  if (durationMs < 2000) return 'text-danger/70';
+  if (durationMs < 2000) return 'text-danger-70';
   return 'text-danger';
 }
 
@@ -194,11 +192,12 @@ export function PayloadsView({
 
   // Define table columns
   const columns = useMemo(
-    () => [
-      columnHelper.accessor('block_number', {
+    (): DataTableColumn<Payload>[] => [
+      {
+        accessorKey: 'block_number',
         header: 'Block',
         cell: info => {
-          const blockNumber = info.getValue();
+          const blockNumber = info.row.original.block_number;
           const slot = info.row.original.slot;
           if (!blockNumber) return <span className="text-muted">-</span>;
           return (
@@ -214,11 +213,12 @@ export function PayloadsView({
           );
         },
         sortingFn: 'basic',
-      }),
-      columnHelper.accessor('duration_ms', {
+      },
+      {
+        accessorKey: 'duration_ms',
         header: 'Duration',
         cell: info => {
-          const duration = info.getValue();
+          const duration = info.row.original.duration_ms;
           return (
             <span className={clsx('font-mono font-medium', getDurationColorClass(duration))}>
               {duration !== undefined ? `${duration.toLocaleString()}ms` : '-'}
@@ -226,11 +226,12 @@ export function PayloadsView({
           );
         },
         sortingFn: 'basic',
-      }),
-      columnHelper.accessor('meta_execution_implementation', {
+      },
+      {
+        accessorKey: 'meta_execution_implementation',
         header: 'EL Client',
         cell: info => {
-          const client = info.getValue();
+          const client = info.row.original.meta_execution_implementation;
           if (!client) return <span className="text-muted">-</span>;
           const clientLower = client.toLowerCase();
           const version = info.row.original.meta_execution_version;
@@ -246,11 +247,12 @@ export function PayloadsView({
             </FilterableCell>
           );
         },
-      }),
-      columnHelper.accessor('meta_client_name', {
+      },
+      {
+        accessorKey: 'meta_client_name',
         header: 'Xatu node',
         cell: info => {
-          const nodeName = info.getValue();
+          const nodeName = info.row.original.meta_client_name;
           if (!nodeName) return <span className="text-muted">-</span>;
           // Transform prefixes to shorter format (utility-mainnet- → utility/)
           const shortName = nodeName
@@ -282,45 +284,50 @@ export function PayloadsView({
             </span>
           );
         },
-      }),
-      columnHelper.accessor('status', {
+      },
+      {
+        accessorKey: 'status',
         header: 'Status',
-        cell: info => <StatusBadge status={info.getValue()} onFilterClick={onFilterClick} />,
-      }),
-      columnHelper.accessor('gas_used', {
+        cell: info => <StatusBadge status={info.row.original.status} onFilterClick={onFilterClick} />,
+      },
+      {
+        accessorKey: 'gas_used',
         header: 'Gas Used',
         cell: info => {
-          const gas = info.getValue();
+          const gas = info.row.original.gas_used;
           return <span className="font-mono text-xs">{gas !== undefined ? gas.toLocaleString() : '-'}</span>;
         },
-      }),
-      columnHelper.accessor('tx_count', {
+      },
+      {
+        accessorKey: 'tx_count',
         header: 'Txs',
         cell: info => {
-          const count = info.getValue();
+          const count = info.row.original.tx_count;
           return <span className="font-mono text-xs">{count ?? '-'}</span>;
         },
-      }),
-      columnHelper.accessor('block_hash', {
+      },
+      {
+        accessorKey: 'block_hash',
         header: 'Block Hash',
         cell: info => {
-          const hash = info.getValue();
+          const hash = info.row.original.block_hash;
           return <span className="font-mono text-xs text-muted">{truncateHash(hash)}</span>;
         },
-      }),
-      columnHelper.accessor('slot_start_date_time', {
+      },
+      {
+        accessorKey: 'slot_start_date_time',
         header: 'Time',
         cell: info => {
-          const timestamp = info.getValue();
+          const timestamp = info.row.original.slot_start_date_time;
           if (!timestamp) return <span className="text-muted">-</span>;
           return <Timestamp timestamp={timestamp} format="relative" className="text-xs text-muted" />;
         },
         sortingFn: 'basic',
-      }),
+      },
       // Tracoor external link column (only shown if tracoorUrl is available)
       ...(tracoorUrl
         ? [
-            columnHelper.display({
+            {
               id: 'tracoor',
               header: '',
               cell: info => {
@@ -341,7 +348,7 @@ export function PayloadsView({
                 );
               },
               enableSorting: false,
-            }),
+            } satisfies DataTableColumn<Payload>,
           ]
         : []),
     ],
@@ -364,7 +371,7 @@ export function PayloadsView({
         <button
           type="button"
           onClick={() => setLearnMoreOpen(true)}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary/50 hover:bg-primary/20"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-primary-30 bg-primary-10 px-3 py-1.5 text-sm font-medium text-primary transition-all hover:border-primary-50 hover:bg-primary-20"
         >
           <InformationCircleIcon className="size-4" />
           Learn more
@@ -410,8 +417,8 @@ export function PayloadsView({
           const isReferenceNode = row.node_class === 'eip7870-block-builder';
           const showReferenceHighlight = !filters.referenceNodes && isReferenceNode;
           return clsx(
-            'cursor-pointer transition-colors hover:bg-surface/50',
-            showReferenceHighlight && 'bg-primary/5 border-l-2 border-l-primary'
+            'cursor-pointer transition-colors hover:bg-surface-50',
+            showReferenceHighlight && 'bg-primary-5 border-l-2 border-l-primary'
           );
         }}
         hideGlobalFilter

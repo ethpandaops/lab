@@ -54,7 +54,7 @@ export function FilterBar<T extends object>({
           <FunnelIcon className="size-4" />
           Filters
           {chips.length > 0 && (
-            <span className="flex size-5 items-center justify-center rounded-xs bg-primary text-xs text-white">
+            <span className="flex size-5 items-center justify-center rounded-xs bg-primary text-xs text-on-fill">
               {chips.length}
             </span>
           )}
@@ -65,7 +65,7 @@ export function FilterBar<T extends object>({
             {chips.map(chip => (
               <span
                 key={chip.id}
-                className="inline-flex items-center gap-1 rounded-xs border border-primary/30 bg-primary/10 py-0.5 pr-0.5 pl-2 text-xs text-primary"
+                className="inline-flex items-center gap-1 rounded-xs border border-primary-30 bg-primary-10 py-0.5 pr-0.5 pl-2 text-xs text-primary"
               >
                 <span className="font-medium">{chip.label}:</span>
                 <span className="inline-flex items-center gap-1 tabular-nums">{chip.value}</span>
@@ -73,7 +73,7 @@ export function FilterBar<T extends object>({
                   type="button"
                   onClick={chip.onRemove}
                   aria-label={`Remove ${chip.label} filter`}
-                  className="rounded-xs p-0.5 transition-colors hover:bg-primary/20"
+                  className="rounded-xs p-0.5 transition-colors hover:bg-primary-20"
                 >
                   <XMarkIcon className="size-3" />
                 </button>
@@ -201,8 +201,8 @@ export function FilterToggle({ selected, onClick, children }: FilterToggleProps)
       className={clsx(
         'inline-flex h-8 items-center gap-1.5 rounded-sm border px-3 text-xs font-medium transition-colors',
         selected
-          ? 'border-primary bg-primary/10 text-primary'
-          : 'border-border bg-surface text-muted hover:border-primary/40 hover:text-foreground'
+          ? 'border-primary bg-primary-10 text-primary'
+          : 'border-border bg-surface text-muted hover:border-primary-40 hover:text-foreground'
       )}
     >
       {children}

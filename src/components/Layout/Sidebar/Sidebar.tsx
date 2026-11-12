@@ -89,12 +89,12 @@ function SidebarFooter({
   if (collapsed) {
     // Collapsed: vertical stack of icons
     return (
-      <div className="flex flex-col items-center gap-2 border-t border-border/50 py-3">
+      <div className="flex flex-col items-center gap-2 border-t border-border-50 py-3">
         <a
           href="https://github.com/ethpandaops/lab"
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+          className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary-10 hover:text-primary"
           aria-label="GitHub repository"
         >
           <GitHubIcon className="size-4" />
@@ -103,7 +103,7 @@ function SidebarFooter({
           href="https://twitter.com/ethpandaops"
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+          className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary-10 hover:text-primary"
           aria-label="X (Twitter)"
         >
           <XIcon className="size-4" />
@@ -111,7 +111,7 @@ function SidebarFooter({
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+          className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary-10 hover:text-primary"
           aria-label="Expand sidebar"
         >
           <ChevronRightIcon className="size-4" />
@@ -122,14 +122,14 @@ function SidebarFooter({
 
   // Expanded: horizontal layout with version
   return (
-    <div className="border-t border-border/50 px-1 py-2">
+    <div className="border-t border-border-50 px-1 py-2">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           <a
             href="https://github.com/ethpandaops/lab"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+            className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary-10 hover:text-primary"
             aria-label="GitHub repository"
           >
             <GitHubIcon className="size-4" />
@@ -138,17 +138,17 @@ function SidebarFooter({
             href="https://twitter.com/ethpandaops"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+            className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary-10 hover:text-primary"
             aria-label="X (Twitter)"
           >
             <XIcon className="size-4" />
           </a>
         </div>
-        {window.__VERSION__ && <span className="text-2xs text-muted/60">{window.__VERSION__.version}</span>}
+        {window.__VERSION__ && <span className="text-2xs text-muted-60">{window.__VERSION__.version}</span>}
         <button
           type="button"
           onClick={onToggleCollapse}
-          className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+          className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary-10 hover:text-primary"
           aria-label="Collapse sidebar"
         >
           <ChevronLeftIcon className="size-4" />
@@ -251,8 +251,8 @@ function isPageEnabled(
 }
 
 const navItemClassName =
-  'group flex items-center gap-x-2.5 rounded-sm text-muted transition-colors hover:bg-foreground/5 hover:text-foreground';
-const navItemActiveClassName = 'bg-foreground/[0.07] !text-foreground [&>svg]:text-primary';
+  'group flex items-center gap-x-2.5 rounded-sm text-muted transition-colors hover:bg-foreground-5 hover:text-foreground';
+const navItemActiveClassName = 'bg-foreground-7 text-foreground! [&>svg]:text-primary';
 
 /**
  * Navigation link component that handles both collapsed and expanded states.
@@ -320,7 +320,7 @@ function NavFlyout({
           aria-label={page.name}
           className={clsx(
             navItemClassName,
-            'w-full justify-center p-2 data-open:bg-foreground/5 data-open:text-foreground',
+            'w-full justify-center p-2 data-open:bg-foreground-5 data-open:text-foreground',
             inSection && navItemActiveClassName
           )}
         >
@@ -331,7 +331,7 @@ function NavFlyout({
           {link}
           <PopoverButton
             aria-label={`${page.name} pages`}
-            className="shrink-0 rounded-sm p-1.5 text-muted/70 transition-colors hover:bg-foreground/5 hover:text-foreground data-open:bg-foreground/[0.07] data-open:text-foreground"
+            className="shrink-0 rounded-sm p-1.5 text-muted-70 transition-colors hover:bg-foreground-5 hover:text-foreground data-open:bg-foreground-7 data-open:text-foreground"
           >
             <Chevron className="size-3.5" />
           </PopoverButton>
@@ -340,7 +340,7 @@ function NavFlyout({
       <PopoverPanel
         transition
         anchor={{ to: inDrawer ? 'bottom end' : 'right start', gap: inDrawer ? 4 : 18, padding: 8 }}
-        className="z-60 flex max-w-[calc(100vw-1rem)] flex-col gap-y-2 rounded-sm border border-border bg-background p-2 shadow-lg transition duration-100 ease-out data-closed:-translate-x-1 data-closed:opacity-0"
+        className="z-60 flex max-w-vw-less-4 flex-col gap-y-2 rounded-sm border border-border bg-background p-2 shadow-lg transition duration-100 ease-out data-closed:-translate-x-1 data-closed:opacity-0"
       >
         {({ close }) => (
           <>
@@ -348,16 +348,20 @@ function NavFlyout({
               <Link
                 to={page.to}
                 onClick={() => close()}
-                className="rounded-sm px-2 py-1 text-sm/5 font-semibold text-foreground hover:bg-foreground/5"
+                className="rounded-sm px-2 py-1 text-sm/5 font-semibold text-foreground hover:bg-foreground-5"
               >
                 {page.name}
               </Link>
             )}
             <div className="flex flex-wrap gap-x-3 gap-y-2">
-              {page.children?.map((group, index) => (
-                <div key={group.label ?? index} className="flex min-w-40 flex-1 flex-col">
+              {page.children?.map(group => (
+                <div
+                  // An unlabelled group is known by the pages it lists
+                  key={group.label ?? group.items.map(item => item.to).join()}
+                  className="flex min-w-40 flex-1 flex-col"
+                >
                   {group.label && (
-                    <div className="px-2 pt-0.5 pb-1 text-2xs font-semibold tracking-wider text-muted/60 uppercase">
+                    <div className="px-2 pt-0.5 pb-1 text-2xs font-semibold tracking-wider text-muted-60 uppercase">
                       {group.label}
                     </div>
                   )}
@@ -366,8 +370,8 @@ function NavFlyout({
                       key={item.to}
                       to={item.to}
                       onClick={() => close()}
-                      className="flex items-center gap-x-2 rounded-sm px-2 py-1 text-sm/5 font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
-                      activeProps={{ className: 'bg-foreground/[0.07] !text-foreground' }}
+                      className="flex items-center gap-x-2 rounded-sm px-2 py-1 text-sm/5 font-medium text-muted transition-colors hover:bg-foreground-5 hover:text-foreground"
+                      activeProps={{ className: 'bg-foreground-7 text-foreground!' }}
                     >
                       {item.icon}
                       <span className="truncate">{item.name}</span>
@@ -400,7 +404,7 @@ function SectionHeader({
   if (collapsed) {
     return (
       <div className="flex justify-center py-2" title={title}>
-        <Logo className="size-5 text-muted/70" />
+        <Logo className="size-5 text-muted-70" />
       </div>
     );
   }
@@ -421,7 +425,7 @@ function SubsectionHeader({ title, collapsed }: { title: string; collapsed: bool
     return null as unknown as JSX.Element;
   }
 
-  return <div className="mb-1 ml-1 text-2xs font-semibold tracking-wider text-muted/60 uppercase">{title}</div>;
+  return <div className="mb-1 ml-1 text-2xs font-semibold tracking-wider text-muted-60 uppercase">{title}</div>;
 }
 
 export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }: SidebarProps): JSX.Element {
@@ -456,7 +460,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
   return (
     <>
       {/* Mobile sidebar */}
-      <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-30 lg:hidden">
+      <Dialog open={sidebarOpen} onClose={setSidebarOpen} aria-label="Sidebar" className="relative z-30 lg:hidden">
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-background transition-opacity duration-300 ease-linear data-closed:opacity-0"
@@ -533,14 +537,14 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                 </nav>
               </div>
 
-              <div className="shrink-0 border-t border-border/50 px-4 py-3">
+              <div className="shrink-0 border-t border-border-50 px-4 py-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <a
                       href="https://github.com/ethpandaops/lab"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+                      className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary-10 hover:text-primary"
                       aria-label="GitHub repository"
                     >
                       <GitHubIcon className="size-5" />
@@ -549,13 +553,13 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
                       href="https://twitter.com/ethpandaops"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary/10 hover:text-primary"
+                      className="rounded-sm p-1.5 text-muted transition-colors hover:bg-primary-10 hover:text-primary"
                       aria-label="X (Twitter)"
                     >
                       <XIcon className="size-5" />
                     </a>
                   </div>
-                  {window.__VERSION__ && <span className="text-xs text-muted/60">{window.__VERSION__.version}</span>}
+                  {window.__VERSION__ && <span className="text-xs text-muted-60">{window.__VERSION__.version}</span>}
                 </div>
               </div>
             </div>
@@ -581,8 +585,8 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
             <img alt="Lab Logo" src="/images/lab.png" className="h-7 w-auto" />
             {!collapsed && (
               <div className="flex flex-col">
-                <span className="font-display text-lg leading-tight font-bold text-foreground">The Lab</span>
-                <span className="text-2xs leading-tight text-muted">lab.ethpandaops.io</span>
+                <span className="font-display text-lg/tight font-bold text-foreground">The Lab</span>
+                <span className="text-2xs/tight text-muted">lab.ethpandaops.io</span>
               </div>
             )}
           </Link>
@@ -590,7 +594,7 @@ export function Sidebar({ sidebarOpen, setSidebarOpen, collapsed, setCollapsed }
         </div>
 
         {/* Scrollable content */}
-        <div className={clsx('flex grow flex-col gap-y-3 overflow-y-auto', collapsed ? 'px-2 py-3' : 'px-3 py-3')}>
+        <div className={clsx('flex grow flex-col gap-y-3 overflow-y-auto', collapsed ? 'px-2 py-3' : 'p-3')}>
           {/* Network Selector */}
           {collapsed ? (
             currentNetwork && (

@@ -3,7 +3,7 @@ export interface ProgressBarSegment {
   label: string;
   /** Whether to show a vertical mark at this segment position */
   showMark?: boolean;
-  /** Tailwind background color class for the mark (e.g., 'bg-red-500', 'bg-primary') */
+  /** Tailwind background color class for the mark (e.g., 'bg-danger', 'bg-primary') */
   markColor?: string;
   /** Percentage when to activate this segment (0-100). If not provided, segments are evenly distributed */
   percentage?: number;

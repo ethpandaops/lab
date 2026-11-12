@@ -15,7 +15,6 @@ import { TimelineGrid } from './TimelineGrid';
 import { TimelineTooltip } from './TimelineTooltip';
 import { TimelineLegend } from './TimelineLegend';
 
-const ROW_HEIGHT = 28;
 const LABEL_WIDTH = 280;
 
 /**
@@ -44,10 +43,10 @@ export function SlotProgressTimeline({
 }: SlotProgressTimelineProps): JSX.Element {
   const canHover = useCanHover();
   const [hoveredSpan, setHoveredSpan] = useState<TraceSpan | null>(null);
-  const [mousePos, setMousePos] = useState<{ x: number; y: number } | null>(null);
-  const [collapsedSpans, setCollapsedSpans] = useState<Set<string>>(new Set());
+  const [mousePos, setMousePos] = useState<{ x: number; y: number; containerWidth: number } | null>(null);
+  const [collapsedSpans, setCollapsedSpans] = useState<Set<string>>(() => new Set());
   const [excludeOutliers, setExcludeOutliers] = useState(true);
-  const hasInitializedCollapsed = useRef(false);
+  const hasInitializedCollapsedRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Use contributor from URL params
@@ -112,8 +111,8 @@ export function SlotProgressTimeline({
 
   // Initialize collapsed state from spans' defaultCollapsed property
   useEffect(() => {
-    if (!hasInitializedCollapsed.current && spans.length > 1) {
-      hasInitializedCollapsed.current = true;
+    if (!hasInitializedCollapsedRef.current && spans.length > 1) {
+      hasInitializedCollapsedRef.current = true;
       const initial = new Set<string>();
       for (const span of spans) {
         if (span.defaultCollapsed && span.collapsible) {
@@ -126,7 +125,7 @@ export function SlotProgressTimeline({
 
   // Reset collapsed state when filter changes
   useEffect(() => {
-    hasInitializedCollapsed.current = false;
+    hasInitializedCollapsedRef.current = false;
   }, [selectedUsername]);
 
   // Handle mouse events for tooltip (disabled on touch devices)
@@ -149,7 +148,11 @@ export function SlotProgressTimeline({
       if (!canHover) return;
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+        setMousePos({
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top,
+          containerWidth: containerRef.current.clientWidth,
+        });
       }
     },
     [canHover]
@@ -159,7 +162,7 @@ export function SlotProgressTimeline({
   if (isLoading || executionLoading) {
     return (
       <Card title="Slot Trace">
-        <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30 bg-[length:200%_100%]" />
+        <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30 bg-size-shimmer" />
       </Card>
     );
   }
@@ -226,7 +229,7 @@ export function SlotProgressTimeline({
       <div ref={containerRef} className="relative">
         {/* Scrollable timeline container for mobile */}
         <div className="overflow-x-auto">
-          <div style={{ minWidth: 600 }}>
+          <div className="min-w-150">
             <TimelineHeader labelWidth={LABEL_WIDTH} />
 
             {/* Trace Rows */}
@@ -248,10 +251,9 @@ export function SlotProgressTimeline({
                   <div
                     key={span.id}
                     className={clsx(
-                      'relative flex items-center border-b border-border/30 transition-colors',
-                      isHovered && 'bg-surface/80'
+                      'relative flex h-7 items-center border-b border-border-30 transition-colors',
+                      isHovered && 'bg-surface-80'
                     )}
-                    style={{ height: ROW_HEIGHT }}
                     onMouseEnter={() => handleMouseEnter(span)}
                     onMouseLeave={handleMouseLeave}
                     onMouseMove={handleMouseMove}
@@ -260,7 +262,7 @@ export function SlotProgressTimeline({
                     <div
                       className={clsx(
                         'flex shrink-0 items-center gap-1 px-2 font-mono text-xs',
-                        span.collapsible && 'cursor-pointer hover:bg-surface/50'
+                        span.collapsible && 'cursor-pointer hover:bg-surface-50'
                       )}
                       style={{ width: LABEL_WIDTH, paddingLeft: 8 + span.depth * 16 }}
                       onClick={span.collapsible ? () => toggleCollapse(span.id) : undefined}
@@ -304,16 +306,14 @@ export function SlotProgressTimeline({
                     <div className="relative h-full flex-1">
                       <div
                         className={clsx(
-                          'absolute top-1 rounded-xs transition-all',
+                          'absolute top-1 h-5 min-w-1 rounded-xs transition-all',
                           colors.bg,
-                          isHovered && 'ring-1 ring-white/20 brightness-110',
+                          isHovered && 'ring-1 ring-on-fill-20 brightness-110',
                           span.collapsible && 'cursor-pointer'
                         )}
                         style={{
                           left: `${startPercent}%`,
                           width: `${widthPercent}%`,
-                          height: ROW_HEIGHT - 8,
-                          minWidth: 4,
                         }}
                         title={span.details}
                         onClick={span.collapsible ? () => toggleCollapse(span.id) : undefined}
@@ -321,10 +321,7 @@ export function SlotProgressTimeline({
                     </div>
 
                     {/* Duration column - show absolute time for point-in-time events */}
-                    <div
-                      className={clsx('shrink-0 px-2 text-right font-mono text-xs', colors.text)}
-                      style={{ width: 80 }}
-                    >
+                    <div className={clsx('w-20 shrink-0 px-2 text-right font-mono text-xs', colors.text)}>
                       {span.isPointInTime ? formatMs(span.startMs) : formatMs(duration)}
                     </div>
                   </div>
@@ -336,11 +333,7 @@ export function SlotProgressTimeline({
 
         {/* Floating Tooltip */}
         {hoveredSpan && mousePos && (
-          <TimelineTooltip
-            span={hoveredSpan}
-            position={mousePos}
-            containerWidth={containerRef.current?.clientWidth ?? 400}
-          />
+          <TimelineTooltip span={hoveredSpan} position={mousePos} containerWidth={mousePos.containerWidth} />
         )}
       </div>
 

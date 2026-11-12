@@ -37,14 +37,11 @@ function SlotTimelineComponent({
   const totalDuration = slotDuration ?? phases.reduce((sum, phase) => sum + phase.duration, 0);
 
   // Calculate cumulative positions for each phase
-  let cumulativeTime = 0;
-  const phasePositions = phases.map(phase => {
-    const startTime = cumulativeTime;
+  const phasePositions = phases.map((phase, index) => {
+    const startTime = phases.slice(0, index).reduce((sum, earlier) => sum + earlier.duration, 0);
     const endTime = startTime + phase.duration;
     const startPercent = (startTime / totalDuration) * 100;
     const widthPercent = (phase.duration / totalDuration) * 100;
-
-    cumulativeTime = endTime;
 
     return {
       ...phase,
@@ -121,8 +118,6 @@ function SlotTimelineComponent({
 
   return (
     <div className="w-full">
-      <h4 className="sr-only">{ariaLabel}</h4>
-
       {/* Timeline container */}
       <div className="relative w-full">
         {/* Phase segments */}
@@ -153,11 +148,11 @@ function SlotTimelineComponent({
         >
           {phasePositions.map((phase, index) => (
             <div
-              key={`${phase.label}-${index}`}
+              key={phase.label}
               className={clsx(
                 phase.className,
                 'relative transition-colors duration-200',
-                index < phasePositions.length - 1 && 'border-r border-border/50'
+                index < phasePositions.length - 1 && 'border-r border-border-50'
               )}
               style={{ width: `${phase.widthPercent}%` }}
               title={phase.description ?? phase.label}
@@ -165,7 +160,7 @@ function SlotTimelineComponent({
               {/* Inline phase labels */}
               {showInlineLabels && (
                 <div className="absolute inset-0 flex items-center justify-center px-1">
-                  <span className={clsx('truncate text-xs/4', phase.textClassName ?? 'font-medium text-background/90')}>
+                  <span className={clsx('truncate text-xs/4', phase.textClassName ?? 'font-medium text-background-90')}>
                     {phase.label}
                   </span>
                 </div>
@@ -173,7 +168,7 @@ function SlotTimelineComponent({
               {/* Optional time labels inside segments */}
               {showTimeLabels && !showInlineLabels && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className={clsx('text-2xs/4', phase.textClassName ?? 'font-medium text-background/80')}>
+                  <span className={clsx('text-2xs/4', phase.textClassName ?? 'font-medium text-background-80')}>
                     {phase.startTime / 1000}s
                   </span>
                 </div>
@@ -184,7 +179,7 @@ function SlotTimelineComponent({
           {/* Hover preview indicator */}
           {hoverPercent !== null && (
             <div
-              className="pointer-events-none absolute top-0 h-full w-0.5 bg-muted/60 transition-opacity duration-150"
+              className="pointer-events-none absolute top-0 h-full w-0.5 bg-muted-60 transition-opacity duration-150"
               style={{ left: `${hoverPercent}%` }}
             />
           )}
@@ -197,8 +192,8 @@ function SlotTimelineComponent({
         {showTimeCutovers && (
           <div className="mt-1 flex w-full justify-between">
             <span className="text-xs text-muted">0s</span>
-            {phasePositions.map((phase, index) => (
-              <span key={`cutover-${phase.label}-${index}`} className="text-xs text-muted">
+            {phasePositions.map(phase => (
+              <span key={phase.label} className="text-xs text-muted">
                 {(phase.endTime / 1000).toFixed(0)}s
               </span>
             ))}
@@ -208,8 +203,8 @@ function SlotTimelineComponent({
         {/* Current time label */}
         {showCurrentTime && (
           <div
-            className="pointer-events-none absolute -top-6 transition-all duration-300"
-            style={{ left: `${currentTimePercent}%`, transform: 'translateX(-50%)' }}
+            className="pointer-events-none absolute -top-6 -translate-x-1/2 transition-all duration-300"
+            style={{ left: `${currentTimePercent}%` }}
           >
             <span className="text-xs/4 font-semibold text-foreground">{(currentTime / 1000).toFixed(1)}s</span>
           </div>
@@ -219,14 +214,14 @@ function SlotTimelineComponent({
       {/* Phase labels below timeline */}
       {showPhaseLabels && phases.length > 0 && (
         <div className="mt-8 flex gap-4">
-          {phasePositions.map((phase, index) => (
-            <div key={`${phase.label}-label-${index}`} className="flex items-center gap-2">
+          {phasePositions.map(phase => (
+            <div key={phase.label} className="flex items-center gap-2">
               {/* Color indicator */}
               <div className={clsx('size-3 rounded-xs border border-border', phase.className)} />
               {/* Phase label */}
               <span className="text-xs/4 text-muted">
                 {phase.label}
-                {showTimeLabels && <span className="ml-1 text-2xs/4 text-muted/70">({phase.duration / 1000}s)</span>}
+                {showTimeLabels && <span className="ml-1 text-2xs/4 text-muted-70">({phase.duration / 1000}s)</span>}
               </span>
             </div>
           ))}

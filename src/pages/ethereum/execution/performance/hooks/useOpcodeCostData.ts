@@ -5,8 +5,8 @@ import type { FctOpcodeCostByElClientDaily, FctOpcodeCostByElClientWeekly } from
 import { useNetwork } from '@/hooks/useNetwork';
 import { fetchAllPages } from '@/utils/api-pagination';
 import { currentUtcWeek } from '@/utils/time';
-import { buildOpcodeCostModel, type OpcodeCostModel } from '../utils/opcode-costs';
-import { rangeDays } from '../utils/performance';
+import { buildOpcodeCostModel, type OpcodeCostModel } from '@/pages/ethereum/execution/performance/utils/opcode-costs';
+import { rangeDays } from '@/pages/ethereum/execution/performance/utils/performance';
 import { generateDateRange } from '@/pages/ethereum/execution/timings/hooks/useEngineTimingsData';
 
 /** The opcode model is fitted only on reference nodes, which share hardware */

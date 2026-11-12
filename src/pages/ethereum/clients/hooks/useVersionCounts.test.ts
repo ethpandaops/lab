@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { chunksFor, weekChunks } from './useVersionCounts';
+import { renderHook } from '@/test-utils';
+import { chunksFor, useKeepPrevious, weekChunks } from './useVersionCounts';
 
 const to = Date.UTC(2026, 10, 5) / 1000;
 
@@ -18,7 +19,7 @@ describe('chunksFor', () => {
   it('lists the days of a short window', () => {
     const chunks = chunksFor('daily', to - 2 * 86400, to);
     expect(chunks).toHaveLength(1);
-    expect(chunks[0].query).toEqual({ day_start_date_in_values: '2026-11-03,2026-11-04' });
+    expect(chunks[0]?.query).toEqual({ day_start_date_in_values: '2026-11-03,2026-11-04' });
   });
 
   it('reads nothing when the data starts after the last complete day', () => {
@@ -27,7 +28,37 @@ describe('chunksFor', () => {
   });
 
   it('still lists the last complete day when the data starts during it', () => {
-    expect(chunksFor('daily', to - 3600, to)[0].query).toEqual({ day_start_date_in_values: '2026-11-04' });
+    expect(chunksFor('daily', to - 3600, to)[0]?.query).toEqual({ day_start_date_in_values: '2026-11-04' });
+  });
+});
+
+describe('useKeepPrevious', () => {
+  interface Counts {
+    rows: number[];
+    isLoading: boolean;
+    settled: boolean;
+  }
+  const loading: Counts = { rows: [], isLoading: true, settled: false };
+  const first: Counts = { rows: [1], isLoading: false, settled: true };
+  const second: Counts = { rows: [2], isLoading: false, settled: true };
+
+  it('returns the last settled result while the next one loads', () => {
+    const { result, rerender } = renderHook(({ value }: { value: Counts }) => useKeepPrevious(value), {
+      initialProps: { value: loading },
+    });
+    expect(result.current).toBe(loading);
+
+    rerender({ value: first });
+    expect(result.current).toBe(first);
+
+    rerender({ value: loading });
+    expect(result.current).toBe(first);
+
+    rerender({ value: second });
+    expect(result.current).toBe(second);
+
+    rerender({ value: loading });
+    expect(result.current).toBe(second);
   });
 });
 

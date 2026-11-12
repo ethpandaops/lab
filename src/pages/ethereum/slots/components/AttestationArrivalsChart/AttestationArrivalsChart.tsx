@@ -65,14 +65,18 @@ export function AttestationArrivalsChart({
     const votes = [...blockGroups.entries()].map(([blockRoot, timeMap]) => {
       const blockSlot = blockSlotMap.get(blockRoot) ?? currentSlot;
       const times = [...timeMap.keys()].sort((x, y) => x - y);
+      const first = times[0];
+      const last = times.at(-1);
       const distance = currentSlot - blockSlot;
       // Votes for this block are a continuous curve over their arrival window. Votes for older blocks
       // are a handful of scattered chunks: plot only the chunks that had any, so they read as marks
       // rather than a flat line along the baseline
       const data: Array<[number, number | null]> = [];
-      for (let t = times[0]; t <= times[times.length - 1]; t += CHUNK_MS) {
-        const count = timeMap.get(t) ?? 0;
-        data.push([t / 1000, count || distance === 0 ? count : null]);
+      if (first !== undefined && last !== undefined) {
+        for (let t = first; t <= last; t += CHUNK_MS) {
+          const count = timeMap.get(t) ?? 0;
+          data.push([t / 1000, count || distance === 0 ? count : null]);
+        }
       }
       return { blockSlot, distance, data };
     });
@@ -127,7 +131,7 @@ export function AttestationArrivalsChart({
   return (
     <PopoutCard title={title} anchorId={anchorId} subtitle={participationMessage} modalSize="fullscreen">
       {({ inModal }) => (
-        <div className={inModal ? 'h-[calc(100vh-12rem)]' : 'h-88'}>
+        <div className={inModal ? 'h-vh-less-48' : 'h-88'}>
           <MultiLineChart
             series={series}
             xAxis={{ type: 'value', name: 'Slot Time (s)', min: 0, max: 12 }}

@@ -1,5 +1,8 @@
-import type { CallTreeNode } from '../IndexPage.types';
-import type { AllCallFrameOpcodesMap, CallFrameOpcodeData } from '../hooks/useAllCallFrameOpcodes';
+import type { CallTreeNode } from '@/pages/ethereum/execution/gas-profiler/IndexPage.types';
+import type {
+  AllCallFrameOpcodesMap,
+  CallFrameOpcodeData,
+} from '@/pages/ethereum/execution/gas-profiler/hooks/useAllCallFrameOpcodes';
 import { getOpcodeCategory } from './opcodeUtils';
 
 /**
@@ -112,11 +115,4 @@ function createCodeDepositNode(parentFrameId: number, gas: number): CallTreeNode
       executionCount: 1,
     } as CallTreeNode['metadata'] & { isOpcode: boolean; isCodeDeposit: boolean; executionCount: number },
   };
-}
-
-/**
- * Check if a node represents an opcode (vs a call frame)
- */
-export function isOpcodeNode(node: CallTreeNode): boolean {
-  return (node.metadata as { isOpcode?: boolean })?.isOpcode === true;
 }

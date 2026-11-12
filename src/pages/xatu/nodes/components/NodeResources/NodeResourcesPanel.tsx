@@ -14,10 +14,10 @@ import type {
   FctHeadFirstSeenByNode,
   FctBlockDataColumnSidecarFirstSeenByNode,
 } from '@/api/types.gen';
-import { useSlotNodeResources } from '../../hooks/useSlotNodeResources';
-import { useSlotNodeMemory } from '../../hooks/useSlotNodeMemory';
-import { useSlotNodeDiskIo } from '../../hooks/useSlotNodeDiskIo';
-import { useSlotNodeNetworkIo } from '../../hooks/useSlotNodeNetworkIo';
+import { useSlotNodeResources } from '@/pages/xatu/nodes/hooks/useSlotNodeResources';
+import { useSlotNodeMemory } from '@/pages/xatu/nodes/hooks/useSlotNodeMemory';
+import { useSlotNodeDiskIo } from '@/pages/xatu/nodes/hooks/useSlotNodeDiskIo';
+import { useSlotNodeNetworkIo } from '@/pages/xatu/nodes/hooks/useSlotNodeNetworkIo';
 import { NodeSelector, type NodeClientInfo } from './NodeSelector';
 import { CpuUtilizationChart } from './CpuUtilizationChart';
 import { MemoryUsageChart } from './MemoryUsageChart';
@@ -32,8 +32,6 @@ import {
   type AnnotationEvent,
   type HighlightRange,
 } from './types';
-
-export type { CpuMetric } from './types';
 
 function nodeMatches(cpuNodeName: string, eventNodeName: string): boolean {
   const short = cpuNodeName.split('/').pop() ?? cpuNodeName;
@@ -250,8 +248,8 @@ export function NodeResourcesPanel({
     return (
       <Card title="Xatu nodes" subtitle="Resource metrics from observoor eBPF agent">
         <div className="space-y-3">
-          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
-          <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border/30 via-surface/50 to-border/30" />
+          <div className="h-16 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30" />
+          <div className="h-64 animate-shimmer rounded-xs bg-linear-to-r from-border-30 via-surface-50 to-border-30" />
         </div>
       </Card>
     );

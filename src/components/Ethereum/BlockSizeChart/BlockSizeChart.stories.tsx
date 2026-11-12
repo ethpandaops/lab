@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BlockSizeChart } from './BlockSizeChart';
+import { seededRandom } from '@/test-utils/random';
+import { NOW_MS } from '@/test-utils/time';
+
+const random = seededRandom(20);
 
 const meta = {
   title: 'Components/Ethereum/BlockSizeChart',
@@ -11,7 +15,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -37,15 +41,15 @@ function generateBlockSizeData(
   executionSizeCompressed: number;
 }> {
   return Array.from({ length: count }, (_, i) => {
-    const clUncompressed = Math.floor(Math.random() * 100000 + 50000); // 50-150 KB in bytes
-    const elUncompressed = Math.floor(Math.random() * 60000 + 20000); // 20-80 KB in bytes
+    const clUncompressed = Math.floor(random() * 100000 + 50000); // 50-150 KB in bytes
+    const elUncompressed = Math.floor(random() * 60000 + 20000); // 20-80 KB in bytes
 
     return {
       x: startX + i,
       consensusSize: clUncompressed,
-      consensusSizeCompressed: Math.floor(clUncompressed * (0.6 + Math.random() * 0.1)), // 60-70%
+      consensusSizeCompressed: Math.floor(clUncompressed * (0.6 + random() * 0.1)), // 60-70%
       executionSize: elUncompressed,
-      executionSizeCompressed: Math.floor(elUncompressed * (0.6 + Math.random() * 0.1)), // 60-70%
+      executionSizeCompressed: Math.floor(elUncompressed * (0.6 + random() * 0.1)), // 60-70%
     };
   });
 }
@@ -82,11 +86,11 @@ export const EpochGranularity: Story = {
 export const TimestampGranularity: Story = {
   args: {
     data: Array.from({ length: 30 }, (_, i) => {
-      const clUncompressed = Math.floor(Math.random() * 100000 + 50000);
-      const elUncompressed = Math.floor(Math.random() * 60000 + 20000);
+      const clUncompressed = Math.floor(random() * 100000 + 50000);
+      const elUncompressed = Math.floor(random() * 60000 + 20000);
 
       return {
-        x: Date.now() / 1000 - (30 - i) * 86400, // Last 30 days
+        x: NOW_MS / 1000 - (30 - i) * 86400, // Last 30 days
         consensusSize: clUncompressed,
         consensusSizeCompressed: Math.floor(clUncompressed * 0.65),
         executionSize: elUncompressed,
@@ -125,8 +129,8 @@ export const CustomLabels: Story = {
 export const CLDominant: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => {
-      const clUncompressed = Math.floor(Math.random() * 50000 + 100000); // Large CL blocks
-      const elUncompressed = Math.floor(Math.random() * 20000 + 10000); // Small EL blocks
+      const clUncompressed = Math.floor(random() * 50000 + 100000); // Large CL blocks
+      const elUncompressed = Math.floor(random() * 20000 + 10000); // Small EL blocks
 
       return {
         x: 10000000 + i,
@@ -150,8 +154,8 @@ export const CLDominant: Story = {
 export const ELDominant: Story = {
   args: {
     data: Array.from({ length: 32 }, (_, i) => {
-      const clUncompressed = Math.floor(Math.random() * 30000 + 40000); // Smaller CL blocks
-      const elUncompressed = Math.floor(Math.random() * 80000 + 60000); // Large EL blocks
+      const clUncompressed = Math.floor(random() * 30000 + 40000); // Smaller CL blocks
+      const elUncompressed = Math.floor(random() * 80000 + 60000); // Large EL blocks
 
       return {
         x: 10000000 + i,
@@ -186,8 +190,8 @@ export const SparseData: Story = {
         };
       }
 
-      const clUncompressed = Math.floor(Math.random() * 100000 + 50000);
-      const elUncompressed = Math.floor(Math.random() * 60000 + 20000);
+      const clUncompressed = Math.floor(random() * 100000 + 50000);
+      const elUncompressed = Math.floor(random() * 60000 + 20000);
 
       return {
         x: 10000000 + i,

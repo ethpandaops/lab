@@ -49,8 +49,8 @@ function MobileSlotHeaderComponent({
         </div>
         {activeFork && (
           <div className="flex flex-col items-center gap-0.5" style={{ color: activeFork.color }}>
-            <span className="text-lg leading-none">{activeFork.emoji}</span>
-            <span className="text-2xs leading-none font-medium">{activeFork.displayName}</span>
+            <span className="text-lg/none">{activeFork.emoji}</span>
+            <span className="text-2xs/none font-medium">{activeFork.displayName}</span>
           </div>
         )}
       </div>
@@ -59,24 +59,24 @@ function MobileSlotHeaderComponent({
       <div className="flex items-center gap-2">
         <button
           onClick={onBackward}
-          className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary/90"
+          className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary-90"
           aria-label="Previous slot"
         >
-          <ChevronLeftIcon className="h-5 w-5" />
+          <ChevronLeftIcon className="size-5" />
         </button>
         <button
           onClick={onPlayPause}
-          className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary/90"
+          className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary-90"
           aria-label={isPlaying ? 'Pause' : 'Play'}
         >
-          {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
+          {isPlaying ? <PauseIcon className="size-5" /> : <PlayIcon className="size-5" />}
         </button>
         <button
           onClick={onForward}
-          className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary/90"
+          className="rounded-sm bg-primary p-1.5 text-background transition-colors hover:bg-primary-90"
           aria-label="Next slot"
         >
-          <ChevronRightIcon className="h-5 w-5" />
+          <ChevronRightIcon className="size-5" />
         </button>
       </div>
     </div>

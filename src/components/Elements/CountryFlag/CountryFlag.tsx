@@ -30,21 +30,17 @@ function loaderFor(code: string | null | undefined): (() => Promise<string>) | u
 export function CountryFlag({ code, title, showUnknown = false, className }: CountryFlagProps): JSX.Element | null {
   const key = code?.toUpperCase() ?? '';
   const load = loaderFor(code);
-  const [src, setSrc] = useState<string | undefined>(() => loaded.get(key));
+  // The flag this component loaded itself; one already loaded comes straight from the cache
+  const [fetched, setFetched] = useState<{ key: string; src: string }>();
+  const src = fetched?.key === key ? fetched.src : loaded.get(key);
 
   useEffect(() => {
-    if (!load) return;
-    const cached = loaded.get(key);
-    if (cached) {
-      setSrc(cached);
-      return;
-    }
+    if (!load || loaded.has(key)) return;
     let current = true;
-    setSrc(undefined);
     load().then(svg => {
       const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
       loaded.set(key, url);
-      if (current) setSrc(url);
+      if (current) setFetched({ key, src: url });
     });
     return () => {
       current = false;
@@ -53,18 +49,18 @@ export function CountryFlag({ code, title, showUnknown = false, className }: Cou
 
   const label = title ? { role: 'img', 'aria-label': title, title } : { 'aria-hidden': true };
   // A className replaces the default 18 × 12 px, slightly rounded box rather than competing with it
-  const box = clsx('inline-block shrink-0 align-middle', className ?? 'h-3 w-[18px] rounded-[2px]');
+  const box = clsx('inline-block shrink-0 align-middle', className ?? 'h-3 w-4.5 rounded-2xs');
 
   if (!load) {
     return showUnknown ? <GlobeAltIcon className={clsx(box, 'text-muted')} {...label} /> : null;
   }
   return (
-    <span className={clsx(box, 'overflow-hidden bg-border/60')} data-country={key} {...label}>
+    <span className={clsx(box, 'overflow-hidden bg-border-60')} data-country={key} {...label}>
       {src && (
         <img
           src={src}
           alt=""
-          className="block size-full object-cover outline -outline-offset-1 outline-foreground/15"
+          className="block size-full object-cover outline -outline-offset-1 outline-foreground-15"
         />
       )}
     </span>

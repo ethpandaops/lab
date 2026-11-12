@@ -1,4 +1,4 @@
-import { type JSX, cloneElement, isValidElement } from 'react';
+import { type JSX, Fragment, isValidElement } from 'react';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import clsx from 'clsx';
 import type { DropdownProps, DropdownItemProps, DropdownHeaderProps, DropdownSectionProps } from './Dropdown.types';
@@ -26,14 +26,14 @@ export function Dropdown({
 }: DropdownProps): JSX.Element {
   return (
     <Menu as="div" className={clsx('relative inline-block', className)} {...menuProps}>
-      {/* Render trigger as MenuButton if it's a valid element */}
-      {isValidElement(trigger) ? <MenuButton as="div">{trigger}</MenuButton> : <MenuButton>{trigger}</MenuButton>}
+      {/* An element trigger becomes the menu button itself, so no wrapper carries its ARIA attributes */}
+      {isValidElement(trigger) ? <MenuButton as={Fragment}>{trigger}</MenuButton> : <MenuButton>{trigger}</MenuButton>}
 
       <MenuItems
         anchor={align === 'left' ? 'bottom start' : 'bottom end'}
         transition
         className={clsx(
-          'z-50 mt-2 w-56 rounded-sm bg-surface outline-1 -outline-offset-1 outline-border [--anchor-gap:8px]',
+          'z-50 mt-2 w-56 rounded-sm bg-surface outline-1 -outline-offset-1 outline-border anchor-gap-2',
           'transition data-closed:opacity-0',
           'data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in',
           withDividers && 'divide-y divide-border'
@@ -68,35 +68,21 @@ export function DropdownItem({
     'flex w-full items-center px-4 py-2 text-sm',
     'transition-colors duration-150',
     'data-focus:outline-hidden',
-    variant === 'default' && [
-      'text-foreground dark:text-muted',
-      'data-focus:bg-background data-focus:text-foreground',
-      'dark:data-focus:bg-muted/10 dark:data-focus:text-foreground',
-    ],
-    variant === 'danger' && [
-      'text-danger',
-      'data-focus:bg-danger/10 data-focus:text-danger',
-      'dark:data-focus:bg-danger/20',
-    ],
+    variant === 'default' && ['text-foreground-soft', 'data-focus:bg-surface-hover data-focus:text-foreground'],
+    variant === 'danger' && ['text-danger', 'data-focus:bg-danger-soft data-focus:text-danger'],
     disabled && 'cursor-not-allowed opacity-50',
     className
   );
 
+  // Styles the icon from a box-less wrapper, so the icon stays a flex item of the row
   const iconClasses = clsx(
-    'mr-3 size-5',
-    variant === 'default' && [
-      'text-muted group-data-focus:text-muted',
-      'dark:text-muted dark:group-data-focus:text-foreground',
-    ],
-    variant === 'danger' && 'text-danger'
+    'contents *:mr-3 *:size-5',
+    variant === 'default' && ['*:text-muted *:group-data-focus:text-foreground'],
+    variant === 'danger' && '*:text-danger'
   );
 
   // Render icon with appropriate styles
-  const iconElement = icon
-    ? cloneElement(icon as React.ReactElement<{ className?: string }>, {
-        className: iconClasses,
-      })
-    : null;
+  const iconElement = icon ? <span className={iconClasses}>{icon}</span> : null;
 
   const content = (
     <>

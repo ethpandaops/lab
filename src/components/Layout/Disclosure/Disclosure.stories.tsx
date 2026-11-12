@@ -6,7 +6,7 @@ const meta: Meta<typeof Disclosure> = {
   component: Disclosure,
   decorators: [
     Story => (
-      <div className="min-w-[600px] rounded-sm bg-surface p-6">
+      <div className="min-w-150 rounded-sm bg-surface p-6">
         <Story />
       </div>
     ),
@@ -60,7 +60,7 @@ export const WithRightContent: Story = {
   args: {
     title: 'Filter Series (29 of 31 shown)',
     rightContent: (
-      <span className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted/10 hover:text-foreground">
+      <span className="cursor-pointer px-2 py-0.5 text-xs text-muted hover:bg-muted-10 hover:text-foreground">
         Show All
       </span>
     ),

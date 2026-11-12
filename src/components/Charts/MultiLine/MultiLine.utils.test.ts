@@ -1,4 +1,4 @@
-import { dateCategoryTicks, describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createBandSeries, createStatisticSeries, dateCategoryTicks, timeAxisTicks } from './MultiLine.utils';
 
 describe('createBandSeries', () => {
@@ -191,7 +191,7 @@ describe('dateCategoryTicks', () => {
       '2025',
       '2026',
     ]);
-    expect(labels[[...ticks.keys()][0]]).toBe("Jan 1 '16");
+    expect([...ticks.keys()][0]).toBe(labels.indexOf("Jan 1 '16"));
   });
 
   it('ticks month starts within a year, naming the year on the first tick and each January', () => {

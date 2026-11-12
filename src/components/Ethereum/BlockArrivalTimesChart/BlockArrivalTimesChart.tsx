@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { MultiLineChart } from '@/components/Charts/MultiLine';
 import { PopoutCard } from '@/components/Layout/PopoutCard';
 import { getDataVizColors } from '@/utils/dataVizColors';
-import { DEFAULT_BEACON_SLOT_PHASES } from '@/utils/beacon';
+import { ATTESTATION_DEADLINE_MS } from '@/utils/beacon';
 
 import type { BlockArrivalTimesChartProps } from './BlockArrivalTimesChart.types';
 
@@ -49,8 +49,8 @@ export function BlockArrivalTimesChart({
 }: BlockArrivalTimesChartProps): React.JSX.Element {
   const { CHART_CATEGORICAL_COLORS, DATA_COLORS } = getDataVizColors();
 
-  // Calculate attestation deadline from slot phases (end of Block phase)
-  const attestationDeadlineSeconds = DEFAULT_BEACON_SLOT_PHASES[0].duration / 1000;
+  // Attestation deadline (end of Block phase)
+  const attestationDeadlineSeconds = ATTESTATION_DEADLINE_MS / 1000;
 
   const { series, minX, maxY } = useMemo(() => {
     if (data.length === 0) {

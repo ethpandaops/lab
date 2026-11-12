@@ -19,6 +19,18 @@ const { CHART_CATEGORICAL_COLORS } = getDataVizColors();
 echarts.use([Lines3DChart, Scatter3DChart, Geo3DComponent]);
 
 /**
+ * Whether the world map is already registered with echarts, e.g. by an earlier MapChart
+ */
+function isWorldMapRegistered(): boolean {
+  try {
+    return Boolean(echarts.getMap('world'));
+  } catch {
+    // Map not registered yet
+    return false;
+  }
+}
+
+/**
  * MapChart - A 3D map visualization component using ECharts GL
  * Displays flight routes on a 3D world map with animated effects
  *
@@ -52,7 +64,7 @@ export function MapChart({
 }: MapChartProps): React.JSX.Element {
   const themeColors = useThemeColors();
   const { theme } = useTheme();
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(isWorldMapRegistered);
 
   // Convert OKLCH colors (from Tailwind v4) to hex format for ECharts compatibility
   const convertedLineColor = lineColor ? resolveCssColorToHex(lineColor) : undefined;
@@ -60,39 +72,27 @@ export function MapChart({
   const convertedEnvironment = environment ? resolveCssColorToHex(environment) : undefined;
   const convertedPointColor = pointColor ? resolveCssColorToHex(pointColor) : undefined;
 
-  // Load and register world map on mount
+  // Load and register world map on mount, unless it is already registered
   useEffect(() => {
-    // Check if map is already registered
-    let alreadyRegistered = false;
-    try {
-      const existingMap = echarts.getMap('world');
-      if (existingMap) {
-        alreadyRegistered = true;
+    if (mapLoaded) return;
+
+    const loadWorldMap = async (): Promise<void> => {
+      try {
+        // Fetch world map GeoJSON from local public directory
+        const response = await fetch('/data/maps/world.json');
+        const worldGeoJson = await response.json();
+
+        // Register the map with echarts
+        echarts.registerMap('world', worldGeoJson);
         setMapLoaded(true);
+      } catch (error) {
+        console.error('Failed to load world map:', error);
+        setMapLoaded(false);
       }
-    } catch {
-      // Map not registered yet
-    }
+    };
 
-    if (!alreadyRegistered) {
-      const loadWorldMap = async (): Promise<void> => {
-        try {
-          // Fetch world map GeoJSON from local public directory
-          const response = await fetch('/data/maps/world.json');
-          const worldGeoJson = await response.json();
-
-          // Register the map with echarts
-          echarts.registerMap('world', worldGeoJson);
-          setMapLoaded(true);
-        } catch (error) {
-          console.error('Failed to load world map:', error);
-          setMapLoaded(false);
-        }
-      };
-
-      loadWorldMap();
-    }
-  }, []);
+    loadWorldMap();
+  }, [mapLoaded]);
 
   // Prepare options and memoize to avoid unnecessary re-renders
   const option = useMemo(() => {
@@ -272,11 +272,12 @@ export function MapChart({
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="size-full">
       <ReactECharts
         theme={ECHARTS_THEME}
         option={option}
-        style={{ height, width: '100%', minHeight: height }}
+        className="w-full"
+        style={{ height, minHeight: height }}
         notMerge={false}
         lazyUpdate={true}
         opts={{ renderer: 'canvas' }}
