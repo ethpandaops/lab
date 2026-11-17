@@ -408,11 +408,22 @@ function versionLine(version: string, level: VersionLevel): string {
   return `${match[1]}${match[2]}.${match[3]}.x`;
 }
 
-/** Share of blocks the `limit` largest entries cover */
-function topCoverage(counts: Map<string, number>, limit: number): number {
-  const values = [...counts.values()].sort((a, b) => b - a);
-  const total = values.reduce((sum, value) => sum + value, 0);
-  return total > 0 ? values.slice(0, limit).reduce((sum, value) => sum + value, 0) / total : 1;
+/**
+ * Whether `lines` cover `coverage` of the blocks over the whole window and over its last `recentDays` days. Over a long
+ * window the old releases' blocks outweigh a new release's, so the window alone would leave it in Other.
+ */
+function covers(days: VersionDay[], lines: string[], coverage: number, recentDays = 7): boolean {
+  return [days, days.slice(-recentDays)].every(range => {
+    let total = 0;
+    let covered = 0;
+    for (const day of range) {
+      for (const [version, count] of day.counts) {
+        total += count;
+        if (lines.includes(version)) covered += count;
+      }
+    }
+    return total === 0 || covered / total >= coverage;
+  });
 }
 
 /** The `limit` versions with the most blocks over the last `recentDays` days, so current releases are drawn */
@@ -452,7 +463,8 @@ function pickLines(days: VersionDay[], limit: number, recentDays = 7): string[] 
 /**
  * Days regrouped for a version share chart, with the lines drawn on their own (the rest stack as Other).
  *
- * Releases are drawn as they are when the `limit` largest cover `coverage` of the blocks. Otherwise they are grouped
+ * Releases are drawn as they are when the `limit` largest cover `coverage` of the blocks, over the window and over its
+ * last week. Otherwise they are grouped
  * into minor lines when that leaves at least three lines and merges a good share of releases, since a single-major
  * client with a long tail would otherwise become one band; never into major lines. The lines drawn are the ones with
  * the most recent blocks plus the main line of each stretch of the window, and the rest stacks as Other.
@@ -471,9 +483,8 @@ export function groupVersionLines(
       minors.set(line, (minors.get(line) ?? 0) + count);
     }
   }
-  if (topCoverage(patches, limit) >= coverage) {
-    return { days, top: recentTopVersions(days, limit, days.length), level: 'patch' };
-  }
+  const largest = recentTopVersions(days, limit, days.length);
+  if (covers(days, largest, coverage)) return { days, top: largest, level: 'patch' };
   const minorsHelp = minors.size >= 3 && minors.size <= patches.size * 0.6;
   if (!minorsHelp) return { days, top: pickLines(days, limit), level: 'patch' };
   const grouped = days.map(day => {
@@ -484,10 +495,8 @@ export function groupVersionLines(
     }
     return { ...day, counts };
   });
-  const top =
-    topCoverage(minors, limit) >= coverage
-      ? recentTopVersions(grouped, limit, grouped.length)
-      : pickLines(grouped, limit);
+  const largestLines = recentTopVersions(grouped, limit, grouped.length);
+  const top = covers(grouped, largestLines, coverage) ? largestLines : pickLines(grouped, limit);
   return { days: grouped, top, level: 'minor' };
 }
 

@@ -433,6 +433,14 @@ describe('groupVersionLines', () => {
     expect(Object.fromEntries(result.days[0]?.counts ?? [])).toEqual({ 'v8.2.x': 60 });
   });
 
+  it('draws a new release that the old ones outweigh over a long window', () => {
+    // The two older releases hold 92% of the window but a third of the last week, which the new release leads
+    const days = Array.from({ length: 60 }, (_, i) =>
+      day(`d${String(i).padStart(2, '0')}`, i < 53 ? { 'v8.1.0': 100, 'v8.0.0': 50 } : { 'v8.2.0': 100, 'v8.0.0': 50 })
+    );
+    expect(groupVersionLines(days, 2).top).toContain('v8.2.0');
+  });
+
   it('gives each stretch of a long window its main release', () => {
     const noise = Object.fromEntries(Array.from({ length: 20 }, (_, i) => [`v1.${40 + i}.0`, 3]));
     const era = (i: number): string => (i < 20 ? 'v1.10.0' : i < 40 ? 'v1.20.0' : 'v1.30.0');
