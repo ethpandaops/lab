@@ -120,12 +120,24 @@ jobs:
             "lab-${TAG_NAME}.zip"
 
       # Assets are uploaded, so lab-backend can now cut a release that
-      # embeds this frontend version.
+      # embeds this frontend version. The dispatch uses an ethpandaops-ci
+      # App token limited to lab-backend that expires with the run.
+      - name: Get lab-backend token
+        id: lab-backend-token
+        if: github.event_name != 'release' || !github.event.release.prerelease
+        uses: actions/create-github-app-token@f418cff399f7aef4c2f0ad47e25ca7a6abbdd6fc # v3.4.0
+        with:
+          app-id: ${{ secrets.CI_APP_ID }}
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+          owner: ethpandaops
+          repositories: lab-backend
+          permission-contents: write
+
       - name: Trigger lab-backend release
         if: github.event_name != 'release' || !github.event.release.prerelease
         uses: peter-evans/repository-dispatch@28959ce8df70de7be546dd1250a005dd32156697 # v4.0.1
         with:
-          token: ${{ secrets.EPOBOT_TOKEN }}
+          token: ${{ steps.lab-backend-token.outputs.token }}
           repository: ethpandaops/lab-backend
           event-type: frontend-release
           client-payload: '{"frontend_tag": "${{ env.TAG_NAME }}"}'
