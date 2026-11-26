@@ -208,7 +208,14 @@ export function IndexPage(): JSX.Element {
       <Header title="Validators" description="Validator set, stake, queues and rewards across the network" />
 
       {error && <Alert variant="error" title="Could not load validator data" description={error.message} />}
-      {!error && (isLoading || !snapshot) && <ValidatorsSkeleton />}
+      {!error && isLoading && <ValidatorsSkeleton />}
+      {!error && !isLoading && !snapshot && (
+        <Alert
+          variant="info"
+          title="No validator data yet"
+          description="No complete day of validator data has been recorded for this network."
+        />
+      )}
 
       {!error && !isLoading && snapshot && (
         <div className="flex flex-col gap-10">
