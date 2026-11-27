@@ -217,11 +217,14 @@ function shortenNodeName(nodeName?: string): string {
 function ExpandedRowContent({
   slot,
   client,
+  version,
   colSpan,
   onClusterClick,
 }: {
   slot: number;
   client: string;
+  /** Lists only the nodes that ran this version; all versions when unset */
+  version?: string;
   colSpan: number;
   onClusterClick: (clusterName: string) => void;
 }): JSX.Element {
@@ -247,6 +250,7 @@ function ExpandedRowContent({
       query: {
         slot_eq: slot,
         meta_execution_implementation_eq: clientApiValue,
+        meta_execution_version_eq: version,
         node_class_eq: 'eip7870-block-builder',
         page_size: 50,
       },
@@ -1039,6 +1043,7 @@ export function ClientVersionBreakdown({
                             <ExpandedRowContent
                               slot={slot}
                               client={subRow.client}
+                              version={subRow.version}
                               colSpan={colCount}
                               onClusterClick={handleClusterClick}
                             />
